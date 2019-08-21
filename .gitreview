@@ -1,0 +1,5 @@
+[gerrit]
+host=gerrit.acumos.org
+port=29418
+project=model-deployments/deployment-client.git
+defaultbranch=master
