@@ -1,0 +1,17 @@
+Note over Portal_BE: User selects\n "deploy to k8s"
+Portal_BE->Deployment\nClient: POST /deploy \n{solutionId, revisionId,\n envId, userId}
+Deployment\nClient->CDS: POST /task \n {solId, revId,\n "taskCode": "DP",\n "statusCode": "IP", ...}
+Deployment\nClient->Portal_BE: 202 Accepted\n {taskId}
+Note over Portal_BE: Monitor task/stepresult\n and update UI as needed
+Deployment\nClient->Jenkins: Start Jenkins job\n with parameters
+Note over Jenkins: Jenkins jobs are preconfigured\n (simple, composite,\n pipeline) in configmap
+Note over Jenkins: Execute deployment script
+Jenkins->Deployment\nClient: POST /status/<trackingId>\n\n {"status": "in-progress"}
+Deployment\nClient->CDS: PUT /task/<taskId>\n {"statusCode": "IP", ...}
+Deployment\nClient->CDS: POST /task/stepresult \n {taskId, "name": "DEP",\n "statusCode": "IP", ...}
+Jenkins->Deployment\nClient: GET /getSolutionZip/trackingId
+Deployment\nClient->Jenkins: 202 OK\n(solution.zip)
+Jenkins->k8s_Master: Create solution deployment
+Jenkins->Deployment\nClient: POST /status/<trackingId>\n\n {"status": "complete",\n "ingress": "<url>"}
+Deployment\nClient->CDS: POST /task/stepresult \n {taskId, "name": "DEP",\n "statusCode": "SU", ...}
+Deployment\nClient->CDS: PUT /task/<taskId>\n {"statusCode": "SU", ...}
