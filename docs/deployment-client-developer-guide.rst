@@ -365,12 +365,17 @@ deployment package:
   * create a dockerinfo.json file using the example below
   * create an environment variable script "deploy_env.sh", with these values
 
+    * DEPLOYMENT_CLIENT_API_BASE_URL: Base URL (scheme://domain:port) of Deployment Client
+    * ACUMOS_DOCKER_REGISTRY: Base URL (https://domain:port) of docker registry
+    * ACUMOS_DOCKER_REGISTRY_USER: docker registry username
+    * ACUMOS_DOCKER_REGISTRY_PASSWORD: docker registry password
+    * TRACKING_ID: trackingID value
     * SOLUTION_MODEL_RUNNER_STANDARD: v1|v2
     * SOLUTION_ID: Solution ID for simple solution
-    * TRACKING_ID: trackingID value
     * COMP_SOLUTION_ID: Solution ID for composite solution (if applicable)
     * COMP_REVISION_ID: Revision ID for composite solution (if applicable)
-    * LOGSTASH_HOST: IP/FQDN of the Logstash service
+    * LOGSTASH_HOST: Hostname/FQDN of the Logstash service
+    * LOGSTASH_IP: IP address of the Logstash service
     * LOGSTASH_PORT: Port of the Logstash service
 
 * if a blueprint.json artifact was not found, this is a simple solution and a

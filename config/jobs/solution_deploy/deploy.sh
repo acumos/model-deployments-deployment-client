@@ -61,7 +61,8 @@ function docker_login() {
 function prepare_docker() {
   trap 'fail' ERR
   log "login to the Acumos platform docker proxy"
-  docker_login https://$ACUMOS_DOCKER_PROXY $ACUMOS_DOCKER_PROXY_USER $ACUMOS_DOCKER_PROXY_PASSWORD
+  docker_login $ACUMOS_DOCKER_REGISTRY $ACUMOS_DOCKER_REGISTRY_USER \
+    $ACUMOS_DOCKER_REGISTRY_PASSWORD
   log "Log into LF Nexus Docker repos"
   docker_login https://nexus3.acumos.org:10004 docker docker
   docker_login https://nexus3.acumos.org:10003 docker docker
