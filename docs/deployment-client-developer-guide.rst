@@ -365,13 +365,21 @@ deployment package:
   * create a dockerinfo.json file using the example below
   * create an environment variable script "deploy_env.sh", with these values
 
+    * DEPLOYMENT_CLIENT_API_BASE_URL: Base URL (scheme://domain:port) of Deployment Client
+    * ACUMOS_DOCKER_REGISTRY: Base URL (https://domain:port) of docker registry
+    * ACUMOS_DOCKER_REGISTRY_USER: docker registry username
+    * ACUMOS_DOCKER_REGISTRY_PASSWORD: docker registry password
+    * LOGSTASH_HOST: Hostname/FQDN of the Logstash service
+    * LOGSTASH_IP: IP address of the Logstash service
+    * LOGSTASH_PORT: Port of the Logstash service
+    * K8S_CLUSTER: name of a pre-configured k8s cluster
+    * SOLUTION_NAME: name of the solution
+    * SOLUTION_DOMAIN: IP address or resolvable FQDN/hostname of the k8s cluster
+      ingress
     * SOLUTION_MODEL_RUNNER_STANDARD: v1|v2
     * SOLUTION_ID: Solution ID for simple solution
-    * TRACKING_ID: trackingID value
     * COMP_SOLUTION_ID: Solution ID for composite solution (if applicable)
     * COMP_REVISION_ID: Revision ID for composite solution (if applicable)
-    * LOGSTASH_HOST: IP/FQDN of the Logstash service
-    * LOGSTASH_PORT: Port of the Logstash service
 
 * if a blueprint.json artifact was not found, this is a simple solution and a
   kubernetes service+deployment template is created, as solution.yaml. See below
@@ -432,14 +440,14 @@ simple solution. Notes on the template attributes:
   apiVersion: v1
   kind: Service
   metadata:
-    namespace: $NAMESPACE
-    name: padd-$TRACKING_ID
+    namespace: <NAMESPACE>
+    name: padd-<TRACKING_ID>
     labels:
-      app: padd-$TRACKING_ID
-      trackingid: $TRACKING_ID
+      app: padd-<TRACKING_ID>
+      trackingid: <TRACKING_ID>
   spec:
     selector:
-      app: padd-$TRACKING_ID
+      app: padd-<TRACKING_ID>
     type: NodePort
     ports:
     - name: protobuf-api
@@ -449,26 +457,26 @@ simple solution. Notes on the template attributes:
   apiVersion: apps/v1
   kind: Deployment
   metadata:
-    namespace: $NAMESPACE
-    name: padd-$TRACKING_ID
+    namespace: <NAMESPACE>
+    name: padd-<TRACKING_ID>
     labels:
-      app: padd-$TRACKING_ID
-      trackingid: $TRACKING_ID
+      app: padd-<TRACKING_ID>
+      trackingid: <TRACKING_ID>
   spec:
     replicas: 1
     selector:
       matchLabels:
-        app: padd-$TRACKING_ID
+        app: padd-<TRACKING_ID>
     template:
       metadata:
         labels:
-          app: padd-$TRACKING_ID
-          trackingid: $TRACKING_ID
+          app: padd-<TRACKING_ID>
+          trackingid: <TRACKING_ID>
       spec:
         imagePullSecrets:
         - name: acumos-registry
         containers:
-        - name: padd-$TRACKING_ID
+        - name: padd-<TRACKING_ID>
           image: $ACUMOS_DOMAIN:$ACUMOS_DOCKER_PROXY_PORT/padd_cee0c147-3c64-48cd-93ae-cdb715a5420c:3
           ports:
           - name: protobuf-api
@@ -498,62 +506,99 @@ Notes on the template attributes:
 
 .. code-block:: yaml
 
+  ---
   apiVersion: v1
   kind: Service
   metadata:
-    namespace: $NAMESPACE
-    name: databroker-$TRACKING_ID
-    labels:
-      app: databroker-$TRACKING_ID
-      trackingid: $TRACKING_ID
+    namespace: <NAMESPACE>
+    name: padd-<TRACKING_ID>
   spec:
     selector:
-      app: databroker-$TRACKING_ID
-    type: NodePort
+      app: padd-<TRACKING_ID>
+    type: ClusterIP
     ports:
-    - name: databroker-api
+    - name: protobuf-api
       port: 8556
-      targetPort: 8556
+      targetPort: 3330
   ---
   apiVersion: apps/v1
   kind: Deployment
   metadata:
-    namespace: $NAMESPACE
-    name: databroker-$TRACKING_ID
+    namespace: <NAMESPACE>
+    name: padd-<TRACKING_ID>
     labels:
-      app: databroker-$TRACKING_ID
-      trackingid: $TRACKING_ID
+      app: padd-<TRACKING_ID>
+      trackingid: <TRACKING_ID>
   spec:
     replicas: 1
     selector:
       matchLabels:
-        app: databroker-$TRACKING_ID
+        app: padd-<TRACKING_ID>
     template:
       metadata:
         labels:
-          app: databroker-$TRACKING_ID
-          trackingid: $TRACKING_ID
+          app: padd-<TRACKING_ID>
+          trackingid: <TRACKING_ID>
       spec:
         imagePullSecrets:
         - name: acumos-registry
         containers:
-        - name: databroker-$TRACKING_ID
-          image: $ACUMOS_DOMAIN:$ACUMOS_DOCKER_PROXY_PORT/genericdatabroker:1
+        - name: padd-<TRACKING_ID>
+          image: opnfv02:30883/padd_3abecdc4-7f91-41bd-98dd-a14354089f68:1
           ports:
-          - containerPort: 8556
-        restartPolicy: Always
+          - name: protobuf-api
+            containerPort: 3330
   ---
   apiVersion: v1
   kind: Service
   metadata:
-    namespace: $NAMESPACE
-    name: modelconnector-$TRACKING_ID
-    labels:
-      app: modelconnector-$TRACKING_ID
-      trackingid: $TRACKING_ID
+    namespace: <NAMESPACE>
+    name: square-<TRACKING_ID>
   spec:
     selector:
-      app: modelconnector-$TRACKING_ID
+      app: square-<TRACKING_ID>
+    type: ClusterIP
+    ports:
+    - name: protobuf-api
+      port: 8556
+      targetPort: 3330
+  ---
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    namespace: <NAMESPACE>
+    name: square-<TRACKING_ID>
+    labels:
+      app: square-<TRACKING_ID>
+      trackingid: <TRACKING_ID>
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: square-<TRACKING_ID>
+    template:
+      metadata:
+        labels:
+          app: square-<TRACKING_ID>
+          trackingid: <TRACKING_ID>
+      spec:
+        imagePullSecrets:
+        - name: acumos-registry
+        containers:
+        - name: square-<TRACKING_ID>
+          image: opnfv02:30883/square_d5782393-44ac-4ca4-8165-da6e8ac636c2:1
+          ports:
+          - name: protobuf-api
+            containerPort: 3330
+  ---
+  apiVersion: v1
+  kind: Service
+  metadata:
+    namespace: <NAMESPACE>
+    name: modelconnector-<TRACKING_ID>
+  spec:
+    selector:
+      app: modelconnector-<TRACKING_ID>
     type: NodePort
     ports:
     - name: mc-api
@@ -563,123 +608,38 @@ Notes on the template attributes:
   apiVersion: apps/v1
   kind: Deployment
   metadata:
-    namespace: $NAMESPACE
-    name: modelconnector-$TRACKING_ID
+    namespace: <NAMESPACE>
+    name: modelconnector-<TRACKING_ID>
     labels:
-      app: modelconnector-$TRACKING_ID
-      trackingid: $TRACKING_ID
+      app: modelconnector-<TRACKING_ID>
+      trackingid: <TRACKING_ID>
   spec:
     replicas: 1
     selector:
       matchLabels:
-        app: modelconnector-$TRACKING_ID
+        app: modelconnector-<TRACKING_ID>
     template:
       metadata:
         labels:
-          app: modelconnector-$TRACKING_ID
-          trackingid: $TRACKING_ID
+          app: modelconnector-<TRACKING_ID>
+          trackingid: <TRACKING_ID>
       spec:
         imagePullSecrets:
         - name: acumos-registry
         containers:
-        - name: modelconnector-$TRACKING_ID
-          image: nexus3.acumos.org:10004/blueprint-orchestrator:1.0.13
+        - name: modelconnector-<TRACKING_ID>
+          image: nexus3.acumos.org:10002/blueprint-orchestrator:2.0.13
           ports:
           - name: mc-api
             containerPort: 8555
+          volumeMounts:
+          - mountPath: /logs
+            name: logs
         restartPolicy: Always
-  ---
-  apiVersion: v1
-  kind: Service
-  metadata:
-    namespace: $NAMESPACE
-    name: padd-$TRACKING_ID
-    labels:
-      app: padd-$TRACKING_ID
-      trackingid: $TRACKING_ID
-  spec:
-    selector:
-      app: padd-$TRACKING_ID
-    type: ClusterIP
-    ports:
-    - name: protobuf-api
-      port: 8557
-      targetPort: 3330
-  ---
-  apiVersion: apps/v1
-  kind: Deployment
-  metadata:
-    namespace: $NAMESPACE
-    name: padd-$TRACKING_ID
-    labels:
-      app: padd-$TRACKING_ID
-      trackingid: $TRACKING_ID
-  spec:
-    replicas: 1
-    selector:
-      matchLabels:
-        app: padd-$TRACKING_ID
-    template:
-      metadata:
-        labels:
-          app: padd-$TRACKING_ID
-          trackingid: $TRACKING_ID
-      spec:
-        imagePullSecrets:
-        - name: acumos-registry
-        containers:
-        - name: padd-$TRACKING_ID
-          image: $ACUMOS_DOMAIN:$ACUMOS_DOCKER_PROXY_PORT/padd_cee0c147-3c64-48cd-93ae-cdb715a5420c:3
-          ports:
-          - name: protobuf-api
-            containerPort: 3330
-        restartPolicy: Always
-  ---
-  apiVersion: v1
-  kind: Service
-  metadata:
-    namespace: $NAMESPACE
-    name: square-$TRACKING_ID
-    labels:
-      app: square-$TRACKING_ID
-      trackingid: $TRACKING_ID
-  spec:
-    selector:
-      app: square-$TRACKING_ID
-    type: ClusterIP
-    ports:
-    - name: protobuf-api
-      port: 8558
-      targetPort: 3330
-  ---
-  apiVersion: apps/v1
-  kind: Deployment
-  metadata:
-    namespace: $NAMESPACE
-    name: square-$TRACKING_ID
-    labels:
-      app: square-$TRACKING_ID
-      trackingid: $TRACKING_ID
-  spec:
-    replicas: 1
-    selector:
-      matchLabels:
-        app: square-$TRACKING_ID
-    template:
-      metadata:
-        labels:
-          app: square-$TRACKING_ID
-          trackingid: $TRACKING_ID
-      spec:
-        imagePullSecrets:
-        - name: acumos-registry
-        containers:
-        - name: square-$TRACKING_ID
-          image: $ACUMOS_DOMAIN:$ACUMOS_DOCKER_PROXY_PORT/square_c8797158-3ead-48fd-ab3e-6b429b033677:6
-          ports:
-          - name: protobuf-api
-            containerPort: 3330
-        restartPolicy: Always
+        volumes:
+        - name: logs
+          hostPath:
+            path: /var/acumos/log
 ..
 
 The included dockerinfo.json can be created directly by the kubernetes-client

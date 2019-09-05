@@ -28,45 +28,44 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: <NAMESPACE>
-  name: nginx-proxy-<MODEL_NAME>
+  name: nginx-<MODEL_NAME>-<TRACKING_ID>
   labels:
-    app: nginx-proxy-<MODEL_NAME>
+    app: nginx-<MODEL_NAME>-<TRACKING_ID>
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: nginx-proxy-<MODEL_NAME>
+      app: nginx-<MODEL_NAME>-<TRACKING_ID>
   template:
     metadata:
       labels:
-        app: nginx-proxy-<MODEL_NAME>
-        logbeat: nginx-proxy-file-beat
+        app: nginx-<MODEL_NAME>-<TRACKING_ID>
+        logbeat: nginx-<MODEL_NAME>-<TRACKING_ID>
     spec:
       imagePullSecrets:
       - name: docker-registry
       containers:
-      - name: nginx-proxy-<MODEL_NAME>
+      - name: nginx-proxy
         image: nginx:1.15
         ports:
         - name: proxy-api
           containerPort: 80
         volumeMounts:
-            - name: nginx-proxy-config-volume-<MODEL_NAME>
+            - name: nginx-proxy-conf
               mountPath: /etc/nginx/proxy.conf
               subPath: proxy.conf
-            - name: nginx-proxy-config-volume-<MODEL_NAME>
+            - name: nginx-proxy-conf
               mountPath: /etc/nginx/cors.conf
               subPath: cors.conf
-            - name: nginx-proxy-config-volume-<MODEL_NAME>
+            - name: nginx-proxy-conf
               mountPath: /etc/nginx/nginx.conf
               subPath: nginx.conf
-            - name: nginx-proxy-volume-<MODEL_NAME>
-              mountPath: /var/log/nginx/<NAMESPACE>
+            - name: nginx-proxy-log
+              mountPath: /var/log/nginx
       volumes:
-        - name: nginx-proxy-config-volume-<MODEL_NAME>
+        - name: nginx-proxy-conf
           configMap:
-            name: nginx-proxy-conf-<MODEL_NAME>
-        - name: nginx-proxy-volume-<MODEL_NAME>
-          hostPath:
-            path: /var/log/nginx/<NAMESPACE>
-            type: DirectoryOrCreate
+            name: nginx-<MODEL_NAME>-<TRACKING_ID>
+        - name: nginx-proxy-log
+          persistentVolumeClaim:
+            claimName: nginx-<TRACKING_ID>
