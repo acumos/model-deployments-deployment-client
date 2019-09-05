@@ -27,16 +27,16 @@ apiVersion: v1
 
 kind: ConfigMap
 metadata:
-  name: filebeat-config-<NAMESPACE>
+  name: filebeat-<TRACKING_ID>
   namespace: <NAMESPACE>
   labels:
-    app: filebeat
+    app: filebeat-<TRACKING_ID>
 data:
-  filebeat-<NAMESPACE>.yml: |-
+  filebeat.yml: |-
     filebeat.prospectors:
       - type: log
         paths:
-          - /var/log/nginx/<NAMESPACE>/model-usage-*.log
+          - /var/log/nginx/model-usage-*.log
         tags: [ "acumos-model-usage-logs" ]
         close_inactive: 20m
         json.keys_under_root: true

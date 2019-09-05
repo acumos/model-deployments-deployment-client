@@ -28,7 +28,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   namespace: <NAMESPACE>
-  name: nginx-proxy-conf-mc
+  name: nginx-mc-<TRACKING_ID>
 data:
   proxy.conf: |
     # HTTP 1.1 support
@@ -51,7 +51,7 @@ data:
     add_header 'Access-Control-Allow_Credentials' 'true';
     add_header 'Access-Control-Allow-Headers' 'Authorization,Accept,Origin,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range';
     add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,PUT,DELETE,PATCH';
- 
+
     if ($request_method = 'OPTIONS') {
       add_header 'Access-Control-Allow-Origin' '*';
       add_header 'Access-Control-Allow_Credentials' 'true';
@@ -99,8 +99,8 @@ data:
                   '"$http_referer" "$http_user_agent" "$gzip_ratio"';
 
       # standard logs for nginx proxy go here - not used by filebeat
-      access_log /var/log/nginx/<NAMESPACE>/access.log common_log;
-      error_log /var/log/nginx/<NAMESPACE>/error.log warn;
+      access_log /var/log/nginx/access.log common_log;
+      error_log /var/log/nginx/error.log warn;
 
 
       server {
@@ -113,16 +113,16 @@ data:
 
           # Access log is used by filebeat for model usage tracking
           if ($request_method != 'OPTIONS') {
-            access_log /var/log/nginx/<NAMESPACE>/model-usage-<COMP_SOLUTION_ID>.log acumos;
+            access_log /var/log/nginx/model-usage-<COMP_SOLUTION_ID>.log acumos;
           }
-          error_log /var/log/nginx/<NAMESPACE>/error-<COMP_SOLUTION_ID>.log warn;
-          proxy_pass http://modelconnector:8555/$1;
+          error_log /var/log/nginx/error-<COMP_SOLUTION_ID>.log warn;
+          proxy_pass http://modelconnector-<TRACKING_ID>:8555/$1;
           include /etc/nginx/proxy.conf;
         }
 
         # reverse proxy use default logging
         location / {
-          proxy_pass http://modelconnector:8555/;
+          proxy_pass http://modelconnector-<TRACKING_ID>:8555/;
           include /etc/nginx/proxy.conf;
         }
       }

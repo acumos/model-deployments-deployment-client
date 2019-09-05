@@ -27,26 +27,26 @@ apiVersion: extensions/v1beta1
 
 kind: DaemonSet
 metadata:
-  name: filebeat
+  name: filebeat-<TRACKING_ID>
   namespace: <NAMESPACE>
   labels:
-    app: filebeat
+    app: filebeat-<TRACKING_ID>
 spec:
   selector:
     matchLabels:
-      app: filebeat
+      app: filebeat-<TRACKING_ID>
   template:
     metadata:
       labels:
-        app: filebeat
+        app: filebeat-<TRACKING_ID>
     spec:
-      serviceAccountName: filebeat
+      serviceAccountName: filebeat-<TRACKING_ID>
       terminationGracePeriodSeconds: 30
       containers:
       - name: filebeat
         image: docker.elastic.co/beats/filebeat:6.0.1
         args: [
-          "-c", "/etc/filebeat-<NAMESPACE>.yml",
+          "-c", "/etc/filebeat.yml",
           "-e",
           "-d", "publish"
         ]
@@ -62,28 +62,26 @@ spec:
             memory: 100Mi
         volumeMounts:
         - name: config
-          mountPath: /etc/filebeat-<NAMESPACE>.yml
+          mountPath: /etc/filebeat.yml
           readOnly: true
-          subPath: filebeat-<NAMESPACE>.yml
-        - name: data
+          subPath: filebeat.yml
+        - name: filebeat-data
           mountPath: /usr/share/filebeat/data
-        - name: varlognginx
-          mountPath: /var/log/nginx/<NAMESPACE>
+        - name: nginx-log
+          mountPath: /var/log/nginx
           readOnly: true
       volumes:
       - name: config
         configMap:
           defaultMode: 0600
-          name: filebeat-config-<NAMESPACE>
-      - name: varlognginx
-        hostPath:
-          path: /var/log/nginx/<NAMESPACE>
-          type: DirectoryOrCreate
+          name: filebeat-<TRACKING_ID>
+      - name: nginx-log
+        persistentVolumeClaim:
+          claimName: nginx-<TRACKING_ID>
       # data folder stores a registry of read status for all files, so we don't send everything again on a Filebeat pod restart
-      - name: data
-        hostPath:
-          path: /var/lib/filebeat-data
-          type: DirectoryOrCreate
+      - name: filebeat-data
+        persistentVolumeClaim:
+          claimName: filebeat-<TRACKING_ID>
       hostAliases:
       - ip: "<LOGSTASH_IP>"
         hostnames:

@@ -50,99 +50,6 @@ function log() {
   echo; echo "$fname:$fline ($(date)) $1"
 }
 
-function docker_login() {
-  trap 'fail' ERR
-  while ! docker login $1 -u $2 -p $3 ; do
-    sleep 10
-    log "Docker login failed at $1, trying again"
-  done
-}
-
-function prepare_docker() {
-  trap 'fail' ERR
-  log "login to the Acumos platform docker proxy"
-  docker_login https://$ACUMOS_DOCKER_PROXY $ACUMOS_DOCKER_PROXY_USER $ACUMOS_DOCKER_PROXY_PASSWORD
-  log "Log into LF Nexus Docker repos"
-  docker_login https://nexus3.acumos.org:10004 docker docker
-  docker_login https://nexus3.acumos.org:10003 docker docker
-  docker_login https://nexus3.acumos.org:10002 docker docker
-}
-
-function update_blueprint() {
-  trap 'fail' ERR
-  if [[ -d microservice ]]; then
-    log "update URL to model.proto files in blueprint.json"
-    # Note: modelconnector sends these URLs to probe which retrieves the proto
-    # files from the solution-embedded nginx server
-    nodes=$(jq '.nodes | length' blueprint.json)
-    models=$(ls microservice)
-    for model in $models ; do
-      node=0
-      while [[ $node < $nodes ]] ; do
-        name=$(jq -r ".nodes[$node].container_name" blueprint.json)
-        if [[ $name == $model ]]; then
-          echo ".nodes[$node].proto_uri = \"http://localhost/$model/model.proto\""
-          jq ".nodes[$node].proto_uri = \"http://localhost/$model/model.proto\"" blueprint.json > blueprint1.json
-          mv blueprint1.json blueprint.json
-        fi
-        node=$[$node+1]
-      done
-    done
-  fi
-}
-
-function deploy_solution() {
-  trap 'fail' ERR
-  log "invoke kubectl to deploy the services and deployments in solution.yaml"
-  kubectl create -f deploy/solution.yaml
-
-  log "Wait for all pods to be Running"
-  pods=$(kubectl get pods -n $ACUMOS_NAMESPACE | awk '/-/ {print $1}')
-  while [[ "$pods" == "No resources found." ]]; do
-    log "pods are not yet created, waiting 10 seconds"
-    pods=$(kubectl get pods -n $ACUMOS_NAMESPACE | awk '/-/ {print $1}')
-  done
-
-  for pod in $pods; do
-    status=$(kubectl get pods -n $ACUMOS_NAMESPACE | awk "/$pod/ {print \$3}")
-    while [[ "$status" != "Running" ]]; do
-      log "$pod status is $status. Waiting 10 seconds"
-      sleep 10
-      status=$(kubectl get pods -n $ACUMOS_NAMESPACE | awk "/$pod/ {print \$3}")
-    done
-    log "$pod status is $status"
-  done
-
-  if [[ $(grep -c 'app: modelconnector' solution.yaml) -gt 0 ]]; then
-    log "Patch dockerinfo.json as workaround for https://jira.acumos.org/browse/ACUMOS-1791"
-    sed -i -- 's/"container_name":"probe"/"container_name":"Probe"/' dockerinfo.json
-
-    log "Update blueprint.json and dockerinfo.json for use of logging components"
-    sol=$(grep "app:" solution.yaml | awk '{print $2}' | grep -v 'modelconnector' | uniq | sed ':a;N;$!ba;s/\n/ /g')
-    apps="$sol"
-    cp blueprint.json deploy/.
-    cp dockerinfo.json deploy/.
-    for app in $apps; do
-       sed -i -- "s/$app/nginx-proxy-$app/g" deploy/dockerinfo.json
-       sed -i -- "s/\"container_name\": \"$app\"/\"container_name\": \"nginx-proxy-$app\"/g" deploy/blueprint.json
-    done
-    # update to nginx-proxy service port
-    sed -i -- "s/\"port\":\"8556\"/\"port\":\"8550\"/g" deploy/dockerinfo.json
-
-    log "send dockerinfo.json to the Model Connector service via the /putDockerInfo API"
-    ACUMOS_MODELCONNECTOR_PORT=$(kubectl get pods -n $ACUMOS_NAMESPACE federation-service -o json | jq -r '.spec.ports[0].nodePort')
-    while ! curl -v -X PUT -H "Content-Type: application/json" \
-      http://$SOLUTION_DOMAIN:${ACUMOS_MODELCONNECTOR_PORT}/putDockerInfo -d @deploy/dockerinfo.json; do
-        log "wait for Model Connector service via the /putDockerInfo API"
-        sleep 10
-    done
-    log "send blueprint.json to the Model Connector service via the /putBlueprint API"
-    curl -v -X PUT -H "Content-Type: application/json" \
-      http://$SOLUTION_DOMAIN:${ACUMOS_MODELCONNECTOR_PORT}/putBlueprint \
-        -d @deploy/blueprint.json
-  fi
-}
-
 function replace_env() {
   trap 'fail' ERR
   local files; local vars; local v; local vv
@@ -160,69 +67,206 @@ function replace_env() {
   set -x
 }
 
-function deploy_logging() {
+function docker_login() {
   trap 'fail' ERR
-  cp kubernetes-client/deploy/private/templates/filebeat*.yaml deploy/.
-  replace_env deploy
-  kubectl create -f deploy/filebeat-configmap.yaml
-  kubectl create -f deploy/filebeat-rbac.yaml
-  kubectl create -f deploy/filebeat-daemonset.yaml
-  if [[ -d microservice ]]; then
-    # Composite model
-    sol=$(grep "app:" solution.yaml | awk '{print $2}' | grep -v 'modelconnector' | uniq | sed ':a;N;$!ba;s/\n/ /g')
-    apps="$sol"
-    modelrunnerversion="v1";
-    for app in $apps; do
-      export MODEL_NAME=$app
-      get_model_env $app
-      modelrunnerversion="v1";
-      if [[ $SOLUTION_MODEL_RUNNER_STANDARD -eq 1 ]]; then
-        modelrunnerversion="v2";
-      fi
-      cp kubernetes-client/deploy/private/templates/nginx-configmap-$modelrunnerversion.yaml deploy/$app-nginx-configmap-$modelrunnerversion.yaml
-      cp kubernetes-client/deploy/private/templates/nginx-service-composite.yaml deploy/$app-nginx-service-composite.yaml
-      cp kubernetes-client/deploy/private/templates/nginx-deployment.yaml deploy/$app-nginx-deployment.yaml
-      # copy k8s conf for modelconnector nginx-proxy
-      cp kubernetes-client/deploy/private/templates/nginx-mc-configmap-$modelrunnerversion.yaml deploy/.
-      cp kubernetes-client/deploy/private/templates/nginx-mc-service.yaml deploy/.
-      cp kubernetes-client/deploy/private/templates/nginx-mc-deployment.yaml deploy/.
+  while ! docker login $1 -u $2 -p $3 ; do
+    sleep 10
+    log "Docker login failed at $1, trying again"
+  done
+}
 
-      replace_env deploy
-      kubectl create -f deploy/$app-nginx-configmap-$modelrunnerversion.yaml
-      kubectl create -f deploy/$app-nginx-service-composite.yaml
-      kubectl create -f deploy/$app-nginx-deployment.yaml
+function prepare_docker() {
+  trap 'fail' ERR
+  log "login to the Acumos platform docker proxy"
+  docker_login $ACUMOS_DOCKER_REGISTRY $ACUMOS_DOCKER_REGISTRY_USER \
+    $ACUMOS_DOCKER_REGISTRY_PASSWORD
+  log "Log into LF Nexus Docker repos"
+  docker_login https://nexus3.acumos.org:10004 docker docker
+  docker_login https://nexus3.acumos.org:10003 docker docker
+  docker_login https://nexus3.acumos.org:10002 docker docker
+}
 
-    done
 
-    # create nginx-proxy for model-connector
-    kubectl create -f deploy/nginx-mc-configmap-$modelrunnerversion.yaml
-    kubectl create -f deploy/nginx-mc-service.yaml
-    kubectl create -f deploy/nginx-mc-deployment.yaml
+prepare_k8s() {
+  trap 'fail' ERR
+  if [[ $(kubectl get secrets -n $NAMESPACE | grep -c 'acumos-registry ') == 0 ]]; then
+    log "Create k8s secret for image pulling from docker using ~/.docker/config.json"
+    b64=$(cat ~/.docker/config.json | base64 -w 0)
+    cat << EOF >deploy/acumos-registry.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: acumos-registry
+  namespace: $NAMESPACE
+data:
+  .dockerconfigjson: $b64
+type: kubernetes.io/dockerconfigjson
+EOF
 
-  else
-    # Simple model
-    app=$(grep "app:" solution.yaml | awk '{print $2}' | grep -v 'modelconnector' | uniq)
-    export MODEL_NAME=$(grep -m 1 "name:" solution.yaml | awk '{print $2}')
-    get_model_env $app
-    modelrunnerversion="v1";
-    if [[ $SOLUTION_MODEL_RUNNER_STANDARD -eq 1 ]]; then
-      modelrunnerversion="v2";
-    fi
-    cp kubernetes-client/deploy/private/templates/nginx-configmap-$modelrunnerversion.yaml deploy/$app-nginx-configmap-$modelrunnerversion.yaml
-    cp kubernetes-client/deploy/private/templates/nginx-service.yaml deploy/$app-nginx-service.yaml
-    cp kubernetes-client/deploy/private/templates/nginx-deployment.yaml deploy/$app-nginx-deployment.yaml
-
-    replace_env deploy
-    kubectl create -f deploy/$app-nginx-configmap-$modelrunnerversion.yaml
-    kubectl create -f deploy/$app-nginx-service.yaml
-    kubectl create -f deploy/$app-nginx-deployment.yaml
+    kubectl create -f deploy/acumos-registry.yaml
   fi
 }
 
+function update_blueprint() {
+  trap 'fail' ERR
+  if [[ -d microservice ]]; then
+    log "update URL to model.proto files in blueprint.json"
+    # Note: modelconnector sends these URLs to probe which retrieves the proto
+    # files from the solution-embedded nginx server
+    nodes=$(jq '.nodes | length' blueprint.json)
+    models=$(ls microservice)
+    for model in $models ; do
+      node=0
+      while [[ $node -lt $nodes ]] ; do
+        name=$(jq -r ".nodes[$node].container_name" blueprint.json)
+        if [[ $name == $model ]]; then
+          echo ".nodes[$node].proto_uri = \"http://localhost/$model/model.proto\""
+          jq ".nodes[$node].proto_uri = \"http://localhost/$model/model.proto\"" blueprint.json > blueprint1.json
+          mv blueprint1.json blueprint.json
+        fi
+        node=$((node+1))
+      done
+    done
+  fi
+}
+
+function update_dockerinfo() {
+  trap 'fail' ERR
+  if [[ -d microservice ]]; then
+    log "update address of containers in dockerinfo.json"
+    nodes=$(jq '.docker_info_list | length' dockerinfo.json)
+    node=0
+    while [[ $node -lt $nodes ]]; do
+      ip=$(jq -r ".docker_info_list[$node].ip_address" dockerinfo.json)
+      jq ".docker_info_list[$node].ip_address = \"$ip-$TRACKING_ID\"" dockerinfo.json > dockerinfo1.json
+      mv dockerinfo1.json dockerinfo.json
+      node=$((node+1))
+    done
+  fi
+}
+
+function deploy_solution() {
+  trap 'fail' ERR
+  log "invoke kubectl to deploy the services and deployments in solution.yaml"
+  cp solution.yaml deploy/.
+  replace_env deploy
+  kubectl create -f deploy/solution.yaml
+
+  log "Wait for all pods to be Running"
+  pods=$(kubectl get pods -n $NAMESPACE | awk '/-/ {print $1}')
+  while [[ "$pods" == "No resources found." ]]; do
+    log "pods are not yet created, waiting 10 seconds"
+    pods=$(kubectl get pods -n $NAMESPACE | awk '/-/ {print $1}')
+  done
+
+  for pod in $pods; do
+    status=$(kubectl get pods -n $NAMESPACE | awk "/$pod/ {print \$3}")
+    while [[ "$status" != "Running" ]]; do
+      log "$pod status is $status. Waiting 10 seconds"
+      sleep 10
+      status=$(kubectl get pods -n $NAMESPACE | awk "/$pod/ {print \$3}")
+    done
+    log "$pod status is $status"
+  done
+
+  if [[ $(grep -c 'app: modelconnector' deploy/solution.yaml) -gt 0 ]]; then
+    log "Patch dockerinfo.json as workaround for https://jira.acumos.org/browse/ACUMOS-1791"
+    sed -i -- 's/"container_name":"probe"/"container_name":"Probe"/' dockerinfo.json
+
+    log "Update blueprint.json and dockerinfo.json for use of logging components"
+    sol=$(grep "app:" deploy/solution.yaml | awk '{print $2}' | grep -v 'modelconnector' | uniq | sed ':a;N;$!ba;s/\n/ /g')
+    apps="$sol"
+    cp blueprint.json deploy/.
+    cp dockerinfo.json deploy/.
+    for app in $apps; do
+       sed -i -- "s/$app/nginx-$app/g" deploy/dockerinfo.json
+       sed -i -- "s/\"container_name\": \"$app\"/\"container_name\": \"nginx-$app\"/g" deploy/blueprint.json
+    done
+    # update to nginx-proxy service port
+    sed -i -- 's/"8556"/"8550"/g' deploy/dockerinfo.json
+
+    log "send dockerinfo.json to the Model Connector service via the /putDockerInfo API"
+    ACUMOS_MODELCONNECTOR_PORT=$(kubectl get svc -n $NAMESPACE -o json modelconnector-$TRACKING_ID | jq -r '.spec.ports[0].nodePort')
+    while ! curl -v -X PUT -H "Content-Type: application/json" \
+      http://$SOLUTION_DOMAIN:${ACUMOS_MODELCONNECTOR_PORT}/putDockerInfo -d @deploy/dockerinfo.json; do
+        log "wait for Model Connector service via the /putDockerInfo API"
+        sleep 10
+    done
+    log "send blueprint.json to the Model Connector service via the /putBlueprint API"
+    curl -v -X PUT -H "Content-Type: application/json" \
+      http://$SOLUTION_DOMAIN:${ACUMOS_MODELCONNECTOR_PORT}/putBlueprint \
+        -d @deploy/blueprint.json
+  fi
+}
+
+function deploy_logging() {
+  trap 'fail' ERR
+  cp templates/filebeat-*.yaml deploy/.
+  cp templates/nginx-proxy-log-pvc.yaml deploy/.
+  replace_env deploy
+  kubectl create -f deploy/filebeat-data-pvc.yaml
+  kubectl create -f deploy/filebeat-configmap.yaml
+  kubectl create -f deploy/filebeat-rbac.yaml
+  kubectl create -f deploy/filebeat-daemonset.yaml
+  kubectl create -f deploy/nginx-proxy-log-pvc.yaml
+
+  if [[ -d microservice ]]; then
+    # Composite model
+    ns=$(jq '.nodes | length' blueprint.json)
+    n=0; apps=""
+    while [[ $n -lt $ns ]]; do
+      app=$(jq -r ".nodes[$n].container_name" blueprint.json)
+      apps="$apps $app"
+      n=$((n+1))
+    done
+    for app in $apps; do
+      export MODEL_NAME=$app
+      cp templates/nginx-configmap-$SOLUTION_MODEL_RUNNER_STANDARD.yaml deploy/$app-nginx-configmap.yaml
+      cp templates/nginx-service.yaml deploy/$app-nginx-service.yaml
+      cp templates/nginx-deployment.yaml deploy/$app-nginx-deployment.yaml
+      replace_env deploy
+      kubectl create -f deploy/$app-nginx-configmap.yaml
+      kubectl create -f deploy/$app-nginx-service.yaml
+      kubectl create -f deploy/$app-nginx-deployment.yaml
+    done
+
+    # create nginx-proxy for model-connector
+    # copy k8s conf for modelconnector nginx-proxy
+    cp templates/nginx-mc-configmap-$SOLUTION_MODEL_RUNNER_STANDARD.yaml deploy/nginx-mc-configmap.yaml
+    cp templates/nginx-mc-service.yaml deploy/.
+    cp templates/nginx-mc-deployment.yaml deploy/.
+    replace_env deploy
+    kubectl create -f deploy/nginx-mc-configmap.yaml
+    kubectl create -f deploy/nginx-mc-service.yaml
+    kubectl create -f deploy/nginx-mc-deployment.yaml
+  else
+    # Simple model
+    cp templates/nginx-configmap-$SOLUTION_MODEL_RUNNER_STANDARD.yaml deploy/nginx-configmap.yaml
+    cp templates/nginx-service.yaml deploy/nginx-service.yaml
+    cp templates/nginx-deployment.yaml deploy/nginx-deployment.yaml
+    MODEL_NAME=$SOLUTION_NAME
+    replace_env deploy
+    kubectl create -f deploy/nginx-configmap.yaml
+    kubectl create -f deploy/nginx-service.yaml
+    kubectl create -f deploy/nginx-deployment.yaml
+  fi
+
+  log "Create ingress rule"
+  cp templates/ingress.yaml deploy/.
+  replace_env deploy/ingress.yaml
+  kubectl create -f deploy/ingress.yaml
+}
+
 set -x
+WORK_DIR=$(pwd)
+cd $(dirname "$0")
+if [[ -e deploy ]]; then rm -rf deploy; fi
+mkdir deploy
 source ./deploy_env.sh
 
 prepare_docker
+prepare_k8s
 update_blueprint
+update_dockerinfo
 deploy_solution
 deploy_logging

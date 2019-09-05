@@ -28,7 +28,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   namespace: <NAMESPACE>
-  name: nginx-proxy-conf-<MODEL_NAME>
+  name: nginx-<MODEL_NAME>-<TRACKING_ID>
 data:
   proxy.conf: |
     # HTTP 1.1 support
@@ -51,7 +51,7 @@ data:
     add_header 'Access-Control-Allow_Credentials' 'true';
     add_header 'Access-Control-Allow-Headers' 'Authorization,Accept,Origin,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range';
     add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,PUT,DELETE,PATCH';
- 
+
     if ($request_method = 'OPTIONS') {
       add_header 'Access-Control-Allow-Origin' '*';
       add_header 'Access-Control-Allow_Credentials' 'true';
@@ -93,15 +93,15 @@ data:
                         ' "request": { "scheme": "$scheme", "length": $request_length }, '
                         ' "response": { "status": "$status", "bytesSent": $body_bytes_sent, "time": $request_time } '
                         '}';
-      access_log /var/log/nginx/<NAMESPACE>/model-usage-<SOLUTION_ID>.log acumos;
-      error_log /var/log/nginx/<NAMESPACE>/error-<SOLUTION_ID>.log warn;
+      access_log /var/log/nginx/model-usage-<SOLUTION_ID>.log acumos;
+      error_log /var/log/nginx/error-<SOLUTION_ID>.log warn;
 
       server {
         server_name nginx-proxy-<MODEL_NAME>;
 
         # reverse proxy
         location / {
-          proxy_pass http://<MODEL_NAME>:8556/;
+          proxy_pass http://<MODEL_NAME>-<TRACKING_ID>:8556/;
           include /etc/nginx/proxy.conf;
         }
       }

@@ -75,8 +75,63 @@ deployment is shown in the figure below.
 Functional Components
 .....................
 
-The Deployment Client will be provided through a single Springboot Java service
-container image.
+*****************
+Deployment Client
+*****************
+
+The Deployment Client has largely the same role/design as the current
+Kubernetes Client, with these key differences:
+
+* solution deployment is automated
+* the solution.zip package is designed for use in shared k8s environments, e.g.
+
+  * since target namespaces are likely to be used for deployment of multiple
+    solutions, or multiple instances of the same solution, all resources created
+    in the namespace are uniquely identified, using a UUID (the deployment
+    task trackingId)
+  * since use of cluster ingress is likely required, cluster ingress rules are
+    used to provide unique URLs where the the solution user can access the
+    solution APIs
+  * uses dynamic nodePorts where needed
+  * does not depend upon privileged operation for containers
+
+******
+Portal
+******
+
+A new "deploy to k8s" option will be added to the "Deployment" menu for
+solutions. When the user selects it, the Portal will:
+
+* present a dialog in which the user can select a target k8s env from a set of
+  pre-configured values (set in site-config value for "k8sClusters", as a list
+  of names)
+* invoke the /deploy API of the Deployment Client
+
+The Portal will have no further role in the deployment process, but the user
+will get a notification created by the Deployment Client when the job is
+complete, that will include important information such as the job status
+and the assigned ingress URL.
+
+************
+ML Workbench
+************
+
+When a Predictor is created, the MLWB will provide a "deploy to k8s" option
+to the user. When the user selects it, the MLWB will:
+
+* in the dialog, allow the user to select the target k8s env from a set of
+  pre-configured values (set in site-config value for "k8sClusters", as a list
+  of names).
+* invoke the /deploy API of the Deployment Client
+* monitor the status of the taskId returned by the /deploy API
+* when the task is complete, present the result to the user (success/fail)
+
+  * for success, retrieve the ingress URL from the Notification that was created
+    for the user, and save the URL in the Predictor object
+
+Post-deployment, the Predictor service can take further actions using the
+trackingId value related to the deployment taskId, via an API provided by the
+Deployment Client (design is WIP).
 
 ..........
 Interfaces
@@ -131,11 +186,11 @@ Get Solution Zip
 ++++++++++++++++
 
 The Deployment Client service exposes the following API where Jenkins can obtain
-the <trackingId>.zip package to be used in solution deployment.
+the <taskId>.zip package to be used in solution deployment.
 
-* URL resource: /getSolutionZip/<trackingId>
+* URL resource: /getSolutionZip/<taskId>
 
-  * trackingId: trackingId associated with the deployment task
+  * taskId: taskId associated with the deployment task
 
 * Supported HTTP operations
 
@@ -147,11 +202,11 @@ the <trackingId>.zip package to be used in solution deployment.
 
         * meaning: request received, content provided
         * Body
-          * the <trackingId>.zip package generated for the trackingId
+          * the <taskId>.zip package generated for the taskId
 
       * 404 Not Found
 
-        * meaning: trackingId not found
+        * meaning: taskId not found
 
 +++++++++++++++++
 Deployment Status
@@ -160,9 +215,9 @@ Deployment Status
 The Deployment Client service exposes the following API where Jenkins can post
 updates on the status of solution deployment.
 
-* URL resource: /status/<trackingId>
+* URL resource: /status/<taskId>
 
-  * trackingId: trackingId associated with the deployment task
+  * taskId: taskId associated with the deployment task
 
 * Supported HTTP operations
 
@@ -198,10 +253,10 @@ Jenkins Job Invocation
 The Deployment Client will use the Jenkins job creation API to start jobs that
 have these features:
 
-* take a single parameter: trackingId
+* take a single parameter: taskId
 * POST notifications of job progress (created, in progress, failed, complete)
-  with the trackingId using the `Deployment Status`_ API
-* deploy the solution using the <trackingId>.zip in a similar manner to the Boreas
+  with the taskId using the `Deployment Status`_ API
+* deploy the solution using the <taskId>.zip in a similar manner to the Boreas
   kubernetes-client design
 
 As described in the Jenkins documentation for the
@@ -212,7 +267,7 @@ JSON, e.g.
 
 .. code-block:: json
 
-  {"parameter": [{"name": "trackingId", "value": "<id>"}]}
+  {"parameter": [{"name": "taskId", "value": "<id>"}]}
 ..
 
 The value of JENKINS_URL and the user credentials will be provided in the
@@ -246,26 +301,23 @@ Upon a request to the /deploy API, the Deployment Client will:
 * create a task (taskCode "DP", statusCode": "IP") and stepresult (name
   "DEP", statusCode": "IP") entry in the CDS
 * return 202 Accepted to the Portal-BE, with the taskId
-* prepare a solution package per `Solution Package Preparation`_, and cache the
-  package under /app/cache/<trackingId>.zip, using the trackingId value created
-  for the task
-
-  * the trackingId is used as a convenient unique identifier for the current task
-    and will be added as an annotation in the deployed solution templates, so
-    information about the deployed solution can be retrieved later, e.g. for
-    presentation to the user in the ML Workbench UI.
-
 * start the appropriate Jenkins job as specified in the Spring environment with
-  the parameter 'trackingId' as created above
+  the parameter 'taskId' as created above
 
+  * the taskId is used as a convenient unique identifier for the current task
+    and will be used along with the generated trackingId by Jenkins, to
+    uniquely identify the solution deployment so information about the deployed
+    solution can be retrieved later, e.g. for presentation to the user in the ML
+    Workbench UI.
   * the appropriate job for the solution types will be provided as a value under
     the Spring environment, as described under `Jenkins Configuration`_
 
 * wait for status updates via the /status API, and save the status events to
   the CDS task table, for the taskId and name 'DEP'
 * wait for Jenkins to retrieve the solution package via the /getSolutionZip API
+  and then
 
-  * once the solution package has been retrieved, delete it from /app/cache/
+  * prepare a solution package per `Solution Package Preparation`_
 
 *********************
 Jenkins Configuration
@@ -273,7 +325,6 @@ Jenkins Configuration
 
 The Deployment Client Spring environment will include a block for the configurable
 parameters to be used in Jenkins APIs:
-
 
 .. code-block:: json
 
@@ -365,13 +416,24 @@ deployment package:
   * create a dockerinfo.json file using the example below
   * create an environment variable script "deploy_env.sh", with these values
 
+    * DEPLOYMENT_CLIENT_API_BASE_URL: Base URL (scheme://domain:port) of Deployment Client
+    * ACUMOS_DOCKER_REGISTRY: Base URL (https://domain:port) of docker registry
+    * ACUMOS_DOCKER_REGISTRY_USER: docker registry username
+    * ACUMOS_DOCKER_REGISTRY_PASSWORD: docker registry password
+    * LOGSTASH_HOST: Hostname/FQDN of the Logstash service
+    * LOGSTASH_IP: IP address of the Logstash service
+    * LOGSTASH_PORT: Port of the Logstash service
+    * K8S_CLUSTER: name of a pre-configured k8s cluster
+    * TRACKING_ID: trackingId for the deployment task
+    * TASK_ID: taskId for the deployment
+    * SOLUTION_TYPE: simple|composite|pipeline
+    * SOLUTION_NAME: name of the solution
+    * SOLUTION_DOMAIN: IP address or resolvable FQDN/hostname of the k8s cluster
+      ingress
     * SOLUTION_MODEL_RUNNER_STANDARD: v1|v2
     * SOLUTION_ID: Solution ID for simple solution
-    * TRACKING_ID: trackingID value
     * COMP_SOLUTION_ID: Solution ID for composite solution (if applicable)
     * COMP_REVISION_ID: Revision ID for composite solution (if applicable)
-    * LOGSTASH_HOST: IP/FQDN of the Logstash service
-    * LOGSTASH_PORT: Port of the Logstash service
 
 * if a blueprint.json artifact was not found, this is a simple solution and a
   kubernetes service+deployment template is created, as solution.yaml. See below
@@ -432,14 +494,14 @@ simple solution. Notes on the template attributes:
   apiVersion: v1
   kind: Service
   metadata:
-    namespace: $NAMESPACE
-    name: padd-$TRACKING_ID
+    namespace: <NAMESPACE>
+    name: padd-<TRACKING_ID>
     labels:
-      app: padd-$TRACKING_ID
-      trackingid: $TRACKING_ID
+      app: padd-<TRACKING_ID>
+      trackingid: <TRACKING_ID>
   spec:
     selector:
-      app: padd-$TRACKING_ID
+      app: padd-<TRACKING_ID>
     type: NodePort
     ports:
     - name: protobuf-api
@@ -449,26 +511,26 @@ simple solution. Notes on the template attributes:
   apiVersion: apps/v1
   kind: Deployment
   metadata:
-    namespace: $NAMESPACE
-    name: padd-$TRACKING_ID
+    namespace: <NAMESPACE>
+    name: padd-<TRACKING_ID>
     labels:
-      app: padd-$TRACKING_ID
-      trackingid: $TRACKING_ID
+      app: padd-<TRACKING_ID>
+      trackingid: <TRACKING_ID>
   spec:
     replicas: 1
     selector:
       matchLabels:
-        app: padd-$TRACKING_ID
+        app: padd-<TRACKING_ID>
     template:
       metadata:
         labels:
-          app: padd-$TRACKING_ID
-          trackingid: $TRACKING_ID
+          app: padd-<TRACKING_ID>
+          trackingid: <TRACKING_ID>
       spec:
         imagePullSecrets:
         - name: acumos-registry
         containers:
-        - name: padd-$TRACKING_ID
+        - name: padd-<TRACKING_ID>
           image: $ACUMOS_DOMAIN:$ACUMOS_DOCKER_PROXY_PORT/padd_cee0c147-3c64-48cd-93ae-cdb715a5420c:3
           ports:
           - name: protobuf-api
@@ -498,62 +560,99 @@ Notes on the template attributes:
 
 .. code-block:: yaml
 
+  ---
   apiVersion: v1
   kind: Service
   metadata:
-    namespace: $NAMESPACE
-    name: databroker-$TRACKING_ID
-    labels:
-      app: databroker-$TRACKING_ID
-      trackingid: $TRACKING_ID
+    namespace: <NAMESPACE>
+    name: padd-<TRACKING_ID>
   spec:
     selector:
-      app: databroker-$TRACKING_ID
-    type: NodePort
+      app: padd-<TRACKING_ID>
+    type: ClusterIP
     ports:
-    - name: databroker-api
+    - name: protobuf-api
       port: 8556
-      targetPort: 8556
+      targetPort: 3330
   ---
   apiVersion: apps/v1
   kind: Deployment
   metadata:
-    namespace: $NAMESPACE
-    name: databroker-$TRACKING_ID
+    namespace: <NAMESPACE>
+    name: padd-<TRACKING_ID>
     labels:
-      app: databroker-$TRACKING_ID
-      trackingid: $TRACKING_ID
+      app: padd-<TRACKING_ID>
+      trackingid: <TRACKING_ID>
   spec:
     replicas: 1
     selector:
       matchLabels:
-        app: databroker-$TRACKING_ID
+        app: padd-<TRACKING_ID>
     template:
       metadata:
         labels:
-          app: databroker-$TRACKING_ID
-          trackingid: $TRACKING_ID
+          app: padd-<TRACKING_ID>
+          trackingid: <TRACKING_ID>
       spec:
         imagePullSecrets:
         - name: acumos-registry
         containers:
-        - name: databroker-$TRACKING_ID
-          image: $ACUMOS_DOMAIN:$ACUMOS_DOCKER_PROXY_PORT/genericdatabroker:1
+        - name: padd-<TRACKING_ID>
+          image: opnfv02:30883/padd_3abecdc4-7f91-41bd-98dd-a14354089f68:1
           ports:
-          - containerPort: 8556
-        restartPolicy: Always
+          - name: protobuf-api
+            containerPort: 3330
   ---
   apiVersion: v1
   kind: Service
   metadata:
-    namespace: $NAMESPACE
-    name: modelconnector-$TRACKING_ID
-    labels:
-      app: modelconnector-$TRACKING_ID
-      trackingid: $TRACKING_ID
+    namespace: <NAMESPACE>
+    name: square-<TRACKING_ID>
   spec:
     selector:
-      app: modelconnector-$TRACKING_ID
+      app: square-<TRACKING_ID>
+    type: ClusterIP
+    ports:
+    - name: protobuf-api
+      port: 8556
+      targetPort: 3330
+  ---
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    namespace: <NAMESPACE>
+    name: square-<TRACKING_ID>
+    labels:
+      app: square-<TRACKING_ID>
+      trackingid: <TRACKING_ID>
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: square-<TRACKING_ID>
+    template:
+      metadata:
+        labels:
+          app: square-<TRACKING_ID>
+          trackingid: <TRACKING_ID>
+      spec:
+        imagePullSecrets:
+        - name: acumos-registry
+        containers:
+        - name: square-<TRACKING_ID>
+          image: opnfv02:30883/square_d5782393-44ac-4ca4-8165-da6e8ac636c2:1
+          ports:
+          - name: protobuf-api
+            containerPort: 3330
+  ---
+  apiVersion: v1
+  kind: Service
+  metadata:
+    namespace: <NAMESPACE>
+    name: modelconnector-<TRACKING_ID>
+  spec:
+    selector:
+      app: modelconnector-<TRACKING_ID>
     type: NodePort
     ports:
     - name: mc-api
@@ -563,123 +662,38 @@ Notes on the template attributes:
   apiVersion: apps/v1
   kind: Deployment
   metadata:
-    namespace: $NAMESPACE
-    name: modelconnector-$TRACKING_ID
+    namespace: <NAMESPACE>
+    name: modelconnector-<TRACKING_ID>
     labels:
-      app: modelconnector-$TRACKING_ID
-      trackingid: $TRACKING_ID
+      app: modelconnector-<TRACKING_ID>
+      trackingid: <TRACKING_ID>
   spec:
     replicas: 1
     selector:
       matchLabels:
-        app: modelconnector-$TRACKING_ID
+        app: modelconnector-<TRACKING_ID>
     template:
       metadata:
         labels:
-          app: modelconnector-$TRACKING_ID
-          trackingid: $TRACKING_ID
+          app: modelconnector-<TRACKING_ID>
+          trackingid: <TRACKING_ID>
       spec:
         imagePullSecrets:
         - name: acumos-registry
         containers:
-        - name: modelconnector-$TRACKING_ID
-          image: nexus3.acumos.org:10004/blueprint-orchestrator:1.0.13
+        - name: modelconnector-<TRACKING_ID>
+          image: nexus3.acumos.org:10002/blueprint-orchestrator:2.0.13
           ports:
           - name: mc-api
             containerPort: 8555
+          volumeMounts:
+          - mountPath: /logs
+            name: logs
         restartPolicy: Always
-  ---
-  apiVersion: v1
-  kind: Service
-  metadata:
-    namespace: $NAMESPACE
-    name: padd-$TRACKING_ID
-    labels:
-      app: padd-$TRACKING_ID
-      trackingid: $TRACKING_ID
-  spec:
-    selector:
-      app: padd-$TRACKING_ID
-    type: ClusterIP
-    ports:
-    - name: protobuf-api
-      port: 8557
-      targetPort: 3330
-  ---
-  apiVersion: apps/v1
-  kind: Deployment
-  metadata:
-    namespace: $NAMESPACE
-    name: padd-$TRACKING_ID
-    labels:
-      app: padd-$TRACKING_ID
-      trackingid: $TRACKING_ID
-  spec:
-    replicas: 1
-    selector:
-      matchLabels:
-        app: padd-$TRACKING_ID
-    template:
-      metadata:
-        labels:
-          app: padd-$TRACKING_ID
-          trackingid: $TRACKING_ID
-      spec:
-        imagePullSecrets:
-        - name: acumos-registry
-        containers:
-        - name: padd-$TRACKING_ID
-          image: $ACUMOS_DOMAIN:$ACUMOS_DOCKER_PROXY_PORT/padd_cee0c147-3c64-48cd-93ae-cdb715a5420c:3
-          ports:
-          - name: protobuf-api
-            containerPort: 3330
-        restartPolicy: Always
-  ---
-  apiVersion: v1
-  kind: Service
-  metadata:
-    namespace: $NAMESPACE
-    name: square-$TRACKING_ID
-    labels:
-      app: square-$TRACKING_ID
-      trackingid: $TRACKING_ID
-  spec:
-    selector:
-      app: square-$TRACKING_ID
-    type: ClusterIP
-    ports:
-    - name: protobuf-api
-      port: 8558
-      targetPort: 3330
-  ---
-  apiVersion: apps/v1
-  kind: Deployment
-  metadata:
-    namespace: $NAMESPACE
-    name: square-$TRACKING_ID
-    labels:
-      app: square-$TRACKING_ID
-      trackingid: $TRACKING_ID
-  spec:
-    replicas: 1
-    selector:
-      matchLabels:
-        app: square-$TRACKING_ID
-    template:
-      metadata:
-        labels:
-          app: square-$TRACKING_ID
-          trackingid: $TRACKING_ID
-      spec:
-        imagePullSecrets:
-        - name: acumos-registry
-        containers:
-        - name: square-$TRACKING_ID
-          image: $ACUMOS_DOMAIN:$ACUMOS_DOCKER_PROXY_PORT/square_c8797158-3ead-48fd-ab3e-6b429b033677:6
-          ports:
-          - name: protobuf-api
-            containerPort: 3330
-        restartPolicy: Always
+        volumes:
+        - name: logs
+          hostPath:
+            path: /var/acumos/log
 ..
 
 The included dockerinfo.json can be created directly by the kubernetes-client
