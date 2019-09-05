@@ -27,23 +27,23 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 
 kind: ClusterRoleBinding
 metadata:
-  name: filebeat
+  name: filebeat-<TRACKING_ID>
 subjects:
 - kind: ServiceAccount
-  name: filebeat
+  name: filebeat-<TRACKING_ID>
   namespace: <NAMESPACE>
 roleRef:
   kind: ClusterRole
-  name: filebeat
+  name: filebeat-<TRACKING_ID>
   apiGroup: rbac.authorization.k8s.io
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
-  name: filebeat
+  name: filebeat-<TRACKING_ID>
   labels:
-    app: filebeat
+    app: filebeat-<TRACKING_ID>
 rules:
 - apiGroups: [""] # "" indicates the core API group
   resources:
@@ -58,7 +58,7 @@ rules:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: filebeat
+  name: filebeat-<TRACKING_ID>
   namespace: <NAMESPACE>
   labels:
-    app: filebeat
+    app: filebeat-<TRACKING_ID>

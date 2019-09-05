@@ -24,14 +24,15 @@ apiVersion: v1
 # Usage: intended to be customized and created for the specific deployment by
 # deploy.sh
 #
+
 kind: Service
 metadata:
   namespace: <NAMESPACE>
-  name: nginx-proxy-<MODEL_NAME>
+  name: nginx-<MODEL_NAME>-<TRACKING_ID>
 spec:
   selector:
-    app: nginx-proxy-<MODEL_NAME>
-  type: ClusterIP
+    app: nginx-<MODEL_NAME>-<TRACKING_ID>
+  type: NodePort
   ports:
   - name: nginx-proxy-api
     port: 8550
