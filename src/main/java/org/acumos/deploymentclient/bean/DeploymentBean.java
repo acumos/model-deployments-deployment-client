@@ -1,0 +1,266 @@
+package org.acumos.deploymentclient.bean;
+
+import java.util.List;
+
+public class DeploymentBean {
+	private String solutionId;
+	private String solutionRevisionId;
+	private String envId;
+	private String userId;
+	private String cmnDataUrl;
+	private String cmnDataUser;
+	private String cmnDataPd;
+	private String dataBrokerJson;
+	private String dockerInfoJson;
+	private String solutionYml;
+	private String nexusUrl;
+	private String nexusUserName;
+	private String nexusPd;
+	private String bluePrintjson;
+	private String probeImage;
+	private String probePort;
+	private String bluePrintImage;
+	private String bluePrintPort;
+	private String dataBrokerTargetPort;
+	private String probeTargetPort;
+	private String incrementPort;
+	private String bluePrintNodePort;
+	private String dataBrokerNodePort;
+	private String probeNodePort;
+	private String dataBrokerModelPort;
+	private String probeModelPort;
+	private String mlTargetPort;
+	private String nginxImageName;
+	private String nexusEndPointURL;
+	private String probeSchemaPort;
+	private String probeApiPort;
+	private String probeExternalPort;
+	private String dockerProxyHost;
+	private String dockerProxyPort;
+	
+	
+	
+	
+	
+	public String getNginxImageName() {
+		return nginxImageName;
+	}
+	public void setNginxImageName(String nginxImageName) {
+		this.nginxImageName = nginxImageName;
+	}
+	public String getNexusEndPointURL() {
+		return nexusEndPointURL;
+	}
+	public void setNexusEndPointURL(String nexusEndPointURL) {
+		this.nexusEndPointURL = nexusEndPointURL;
+	}
+	public String getProbeSchemaPort() {
+		return probeSchemaPort;
+	}
+	public void setProbeSchemaPort(String probeSchemaPort) {
+		this.probeSchemaPort = probeSchemaPort;
+	}
+	public String getProbeApiPort() {
+		return probeApiPort;
+	}
+	public void setProbeApiPort(String probeApiPort) {
+		this.probeApiPort = probeApiPort;
+	}
+	public String getProbeExternalPort() {
+		return probeExternalPort;
+	}
+	public void setProbeExternalPort(String probeExternalPort) {
+		this.probeExternalPort = probeExternalPort;
+	}
+	public String getDockerProxyHost() {
+		return dockerProxyHost;
+	}
+	public void setDockerProxyHost(String dockerProxyHost) {
+		this.dockerProxyHost = dockerProxyHost;
+	}
+	public String getDockerProxyPort() {
+		return dockerProxyPort;
+	}
+	public void setDockerProxyPort(String dockerProxyPort) {
+		this.dockerProxyPort = dockerProxyPort;
+	}
+	public String getIncrementPort() {
+		return incrementPort;
+	}
+	public void setIncrementPort(String incrementPort) {
+		this.incrementPort = incrementPort;
+	}
+	public String getBluePrintNodePort() {
+		return bluePrintNodePort;
+	}
+	public void setBluePrintNodePort(String bluePrintNodePort) {
+		this.bluePrintNodePort = bluePrintNodePort;
+	}
+	public String getDataBrokerNodePort() {
+		return dataBrokerNodePort;
+	}
+	public void setDataBrokerNodePort(String dataBrokerNodePort) {
+		this.dataBrokerNodePort = dataBrokerNodePort;
+	}
+	public String getProbeNodePort() {
+		return probeNodePort;
+	}
+	public void setProbeNodePort(String probeNodePort) {
+		this.probeNodePort = probeNodePort;
+	}
+	public String getDataBrokerModelPort() {
+		return dataBrokerModelPort;
+	}
+	public void setDataBrokerModelPort(String dataBrokerModelPort) {
+		this.dataBrokerModelPort = dataBrokerModelPort;
+	}
+	public String getProbeModelPort() {
+		return probeModelPort;
+	}
+	public void setProbeModelPort(String probeModelPort) {
+		this.probeModelPort = probeModelPort;
+	}
+	public String getMlTargetPort() {
+		return mlTargetPort;
+	}
+	public void setMlTargetPort(String mlTargetPort) {
+		this.mlTargetPort = mlTargetPort;
+	}
+	public String getProbeTargetPort() {
+		return probeTargetPort;
+	}
+	public void setProbeTargetPort(String probeTargetPort) {
+		this.probeTargetPort = probeTargetPort;
+	}
+	private List<ContainerBean> containerBeanList;
+	
+	
+	
+	public String getDataBrokerTargetPort() {
+		return dataBrokerTargetPort;
+	}
+	public void setDataBrokerTargetPort(String dataBrokerTargetPort) {
+		this.dataBrokerTargetPort = dataBrokerTargetPort;
+	}
+	public String getProbeImage() {
+		return probeImage;
+	}
+	public void setProbeImage(String probeImage) {
+		this.probeImage = probeImage;
+	}
+	public String getProbePort() {
+		return probePort;
+	}
+	public void setProbePort(String probePort) {
+		this.probePort = probePort;
+	}
+	public String getBluePrintImage() {
+		return bluePrintImage;
+	}
+	public void setBluePrintImage(String bluePrintImage) {
+		this.bluePrintImage = bluePrintImage;
+	}
+	public String getBluePrintPort() {
+		return bluePrintPort;
+	}
+	public void setBluePrintPort(String bluePrintPort) {
+		this.bluePrintPort = bluePrintPort;
+	}
+	public List<ContainerBean> getContainerBeanList() {
+		return containerBeanList;
+	}
+	public void setContainerBeanList(List<ContainerBean> containerBeanList) {
+		this.containerBeanList = containerBeanList;
+	}
+	public String getBluePrintjson() {
+		return bluePrintjson;
+	}
+	public void setBluePrintjson(String bluePrintjson) {
+		this.bluePrintjson = bluePrintjson;
+	}
+	public String getNexusUrl() {
+		return nexusUrl;
+	}
+	public void setNexusUrl(String nexusUrl) {
+		this.nexusUrl = nexusUrl;
+	}
+	public String getNexusUserName() {
+		return nexusUserName;
+	}
+	public void setNexusUserName(String nexusUserName) {
+		this.nexusUserName = nexusUserName;
+	}
+	public String getNexusPd() {
+		return nexusPd;
+	}
+	public void setNexusPd(String nexusPd) {
+		this.nexusPd = nexusPd;
+	}
+	public String getCmnDataUrl() {
+		return cmnDataUrl;
+	}
+	public void setCmnDataUrl(String cmnDataUrl) {
+		this.cmnDataUrl = cmnDataUrl;
+	}
+	public String getCmnDataUser() {
+		return cmnDataUser;
+	}
+	public void setCmnDataUser(String cmnDataUser) {
+		this.cmnDataUser = cmnDataUser;
+	}
+	public String getCmnDataPd() {
+		return cmnDataPd;
+	}
+	public void setCmnDataPd(String cmnDataPd) {
+		this.cmnDataPd = cmnDataPd;
+	}
+	public String getDataBrokerJson() {
+		return dataBrokerJson;
+	}
+	public void setDataBrokerJson(String dataBrokerJson) {
+		this.dataBrokerJson = dataBrokerJson;
+	}
+	public String getDockerInfoJson() {
+		return dockerInfoJson;
+	}
+	public void setDockerInfoJson(String dockerInfoJson) {
+		this.dockerInfoJson = dockerInfoJson;
+	}
+	
+	
+	
+	
+	public String getSolutionYml() {
+		return solutionYml;
+	}
+	public void setSolutionYml(String solutionYml) {
+		this.solutionYml = solutionYml;
+	}
+	public String getSolutionId() {
+		return solutionId;
+	}
+	public void setSolutionId(String solutionId) {
+		this.solutionId = solutionId;
+	}
+	
+	public String getSolutionRevisionId() {
+		return solutionRevisionId;
+	}
+	public void setSolutionRevisionId(String solutionRevisionId) {
+		this.solutionRevisionId = solutionRevisionId;
+	}
+	public String getEnvId() {
+		return envId;
+	}
+	public void setEnvId(String envId) {
+		this.envId = envId;
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	
+	
+}

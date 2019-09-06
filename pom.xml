@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<groupId>org.acumos.deployment-client</groupId>
+	<artifactId>deployment-client</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<name>deployment-client</name>
+	<description>Demo project for Spring Boot</description>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.4.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+		<springfox.version>2.7.0</springfox.version>
+		<!-- Stand-alone RESTFul application -->
+		<start-class>org.acumos.deploymentclient.DeploymentClientApplication</start-class>
+		<!-- tests still depend on  host -->
+		<skipTests>false</skipTests>
+		<!-- Jenkins invokes mvn with argument -Dbuild.number=${BUILD_NUMBER} -->
+		<build.number>0</build.number>
+		<!-- Not supplied to all jobs; e.g., Javadoc -->
+		<docker.pull.registry>nexus3.acumos.org:10001</docker.pull.registry>
+		<!-- Supplied by Jenkins -->
+		<docker.push.registry>${env.CONTAINER_PUSH_REGISTRY}</docker.push.registry>
+		<!-- For distributionManagement section -->
+		<acumos.nexus.url>https://nexus.acumos.org</acumos.nexus.url>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.acumos.common-dataservice</groupId>
+			<artifactId>cmn-data-svc-client</artifactId>
+			<version>2.2.1</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.fasterxml.jackson.dataformat</groupId>
+		    <artifactId>jackson-dataformat-yaml</artifactId>
+		    <version>2.7.3</version>
+       </dependency>
+       <dependency>
+		    <groupId>org.json</groupId>
+		    <artifactId>json</artifactId>
+		    <version>20180813</version>
+		</dependency>
+		
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>1.14</version>
+				<configuration>
+					<licenseName>acumos</licenseName>
+					<licenseResolver>${project.baseUri}/src/license</licenseResolver>
+					<addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
+					<processStartTag>===============LICENSE_START=======================================================</processStartTag>
+					<processEndTag>===============LICENSE_END=========================================================</processEndTag>
+					<sectionDelimiter>===================================================================================</sectionDelimiter>
+					<inceptionYear>2017</inceptionYear>
+					<organizationName><![CDATA[AT&T Intellectual Property & Tech Mahindra. All rights reserved.]]></organizationName>
+					<projectName>Acumos</projectName>
+					<canUpdateCopyright>true</canUpdateCopyright>
+					<canUpdateDescription>true</canUpdateDescription>
+					<canUpdateLicense>true</canUpdateLicense>
+					<emptyLineAfterHeader>true</emptyLineAfterHeader>
+					<includes>
+						<include>**/*.java</include>
+						<!-- <include>**/*.js</include> -->
+						<!-- <include>**/*.ts</include> -->
+					</includes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<!-- spring chooses the <version>x</version> -->
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Generate source jar -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<!-- spring chooses the <version>x</version> -->
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<!-- <configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+						<manifestEntries>
+							<Build-Number>${project.version}.${build.number}</Build-Number>
+							<Build-Time>${maven.build.timestamp}</Build-Time>
+							<Implementation-Version>${project.version}-b${build.number}</Implementation-Version>
+						</manifestEntries>
+					</archive>
+				</configuration> -->
+				<executions>
+					<execution>
+						<id>jar-with-only-classes</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<classifier>classes</classifier>
+							<includes>
+								<include>org/**</include>
+							</includes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<!-- spring chooses very old version 1.10 -->
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>attach-artifact</goal>
+						</goals>
+						<phase>package</phase>
+						<configuration>
+							<artifacts>
+								<artifact>
+									<file>${project.build.directory}/deployment-client-${project.version}-classes.jar</file>
+									<type>jar</type>
+									<classifier>classes</classifier>
+								</artifact>
+							</artifacts>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.9</version>
+				<executions>
+					<execution>
+						<id>default-prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>default-report</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.21.0</version>
+				<configuration>
+					<verbose>true</verbose>
+					<!-- docker runs on the LF build minion so the default value is ok -->
+					<!-- LF <dockerHost>unix:///var/run/docker.sock</dockerHost> LF -->
+					<pullRegistry>${docker.pull.registry}</pullRegistry>
+					<pushRegistry>${docker.push.registry}</pushRegistry>
+					<!-- LF credentials are not supplied here -->
+					<images>
+						<image>
+							<!-- Specify a tag to avoid default tag "latest" -->
+							<name>deployment-client:${project.version}</name>
+							<build>
+								<from>openjdk:8-jre-slim</from>
+								<tags>
+									<!-- Add tag with build number -->
+									<tag>${project.version}-b${build.number}</tag>
+								</tags>
+								<assembly>
+									<inline>
+										<files>
+											<file>
+												<source>application.properties</source>
+												<outputDirectory />
+												<destName>application.properties</destName>
+											</file>
+											<file>
+												<source>tools/setup-docker.sh</source>
+												<outputDirectory />
+												<destName>setup-docker.sh</destName>
+											</file>
+											<file>
+												<source>target/${project.artifactId}-${project.version}.${project.packaging}</source>
+												<outputDirectory />
+											</file>
+										</files>
+									</inline>
+								</assembly>
+								<cmd>
+									<!-- CDATA prevents Eclipse from breaking/reformatting the line -->
+									 <shell><![CDATA[cd /maven; java -Xms128m -Xmx512m -Djava.security.egd=file:/dev/./urandom -jar ${project.artifactId}-${project.version}.${project.packaging}]]></shell>
+								</cmd>
+							</build>
+						</image>
+					</images>
+				</configuration>
+				<!-- build Docker images in install phase, push in deploy phase -->
+				<executions>
+					<execution>
+						<goals>
+							<goal>build</goal>
+							<goal>push</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
