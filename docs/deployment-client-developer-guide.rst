@@ -356,37 +356,27 @@ k8sCluster Site Config
 
 On startup, the Deployment Client will create or update a new site-config key,
 "k8sCluster" as described below. The default value for this key will be provided
-in the Spring environment variable siteConfig:
+in the Spring environment variable k8sCluster:
 
 .. code-block:: json
 
-  "siteConfig": "{ \"k8sCluster\": [
-       { \"clusterName\": "\<ACUMOS_DOMAIN>\",
-         \"namespace\": "\<ACUMOS_NAMESPACE>\",
-         \"ingressType\": "NodePort"
-       }
-     ]
+  "k8sCluster": "[
+    { \"name\": \"cluster1\" },
+    { \"name\": \"cluster2\" },
+    { \"name\": \"cluster3\" }
+  ]"
 ..
 
-The example above indicates that by default, solutions will be deployed in the
-same k8s cluster as the Acumos platform, under the same namespace, and use
-NodePort access by default. To modify or extend this set of clusters, the
-following attributes must be specified in new members of the k8sClusters array:
-
-* clusterName: FQDN of the k8s cluster (master node)
-* namespace: namespace to be deployed under
-* ingressType: "NodePort" or "IngressController"
-
-  * for Nodeport, a dynamic port will be assigned
-  * for IngressController, an ingress rule will be created and mapped to a
-    unique context path, which will be removed before messages are forwarded to
-    the solution
+The example above is simply a placeholder, expected to be updated by the
+Acumos platform admin. The values represent arbitrary identifiers of k8s
+environments that will be configured as part of the Jenkins solution deployment
+job.
 
 The Deployment Client will save the Spring environment value as an escaped JSON
-string, as a new site-config key "k8sCluster".
+string, for the site-config key "k8sCluster", if it doesn't already exist.
 
 Adding/updating clusters will require updating the Deployment Client template
-and applying the changes, to restart Deployment Client.
+and applying the changes, to restart the Deployment Client.
 
 ****************************
 Solution Package Preparation
