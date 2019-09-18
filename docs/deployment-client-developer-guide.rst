@@ -151,7 +151,8 @@ Deployment Request
 ++++++++++++++++++
 
 The Deployment Client service exposes the following API that initiates
-solution deployment.
+solution deployment. In the successful case, it will return a JSON response that
+includes the assigned taskId.
 
 * URL resource: /deploy
 
@@ -176,6 +177,11 @@ solution deployment.
       * 202 Accepted
 
         * meaning: request accepted, in progress
+        * Body
+
+          * { "taskId": <taskId> }
+
+            * taskId: the taskId that has been created for the deployment
 
       * 404 Not Found
 
@@ -186,7 +192,8 @@ Get Solution Zip
 ++++++++++++++++
 
 The Deployment Client service exposes the following API where Jenkins can obtain
-the <taskId>.zip package to be used in solution deployment.
+a solution.zip package to be used in solution deployment. In the successful case,
+it will return a solution.zip file with the package to be deployed.
 
 * URL resource: /getSolutionZip/<taskId>
 
@@ -202,7 +209,7 @@ the <taskId>.zip package to be used in solution deployment.
 
         * meaning: request received, content provided
         * Body
-          * the <taskId>.zip package generated for the taskId
+          * the solution.zip package generated for the taskId
 
       * 404 Not Found
 
