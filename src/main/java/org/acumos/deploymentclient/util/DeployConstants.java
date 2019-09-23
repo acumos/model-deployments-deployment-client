@@ -23,6 +23,12 @@ public class DeployConstants {
 	public static final String TARGETPORT_YML="targetPort";
 	public static final String PORTS_YML="ports";
 	public static final String SPEC_YML="spec";
+	public static final String TRACKINGID_YML="trackingid";
+	public static final String TRACKINGID_VALUE_YML="<TRACKING_ID>";
+	public static final String NAMESPACE_VALUE_YML="<NAMESPACE>";
+	public static final String ACUMOS_DOMAIN="$ACUMOS_DOMAIN";
+	public static final String ACUMOS_DOCKER_PROXY_PORT="$ACUMOS_DOCKER_PROXY_PORT";
+	public static final String ML_TARGET_PORT="mlTargetPort";
 	
 	public static final String APIVERSION_DEP_YML="apiVersion";
 	public static final String APPS_V1_DEP_YML="apps/v1";
@@ -67,6 +73,7 @@ public class DeployConstants {
 	public static final String NAME_DATABROKER_YML="databroker-api";
 	public static final String DATABROKER_NAME_YML= "databroker";
 	public static final String VOLUME_PROTO_YML= "proto-files";
+	public static final String MSG_SEVERITY_ME = "ME";
 	
 	public static final String APPLICATION_JSON="application/json";
 	public static final String BLUEPRINT_CONTAINER_NAME= "BluePrintContainer";
@@ -162,11 +169,55 @@ public class DeployConstants {
 	public static final String KUBE_SOLUTION="solution.zip";
 	public static final String KUBE_DEPLOY_SH="deploy.sh";
 	public static final String KUBE_DEPLOY_ENV_SH="deploy_env.sh";
-	public static final String KUBE_K8S_SH="setup_k8s.sh";
 	public static final String KUBE_BLUEPRINT_JSON="blueprint.json";
 	public static final String KUBE_DOCKERINFO_JSON="dockerinfo.json";
 	public static final String KUBE_SOLUTION_YML="solution.yaml";
 	public static final String KUBE_DATABROKER_JSON="databroker.json";
 	public static final String NGINX_CONTAINER="Nginx";
+	public static final String CMNDATASVC_CMNDATASVCENDPOINTURL_PROP="cmndatasvc.cmndatasvcendpointurl";
+	public static final String CMNDATASVC_CMNDATASVCUSER_PROP="cmndatasvc.cmndatasvcuser";
+	public static final String CMNDATASVC_CMNDATASVCPD_PROP="cmndatasvc.cmndatasvcpwd";
+	public static final String JENKIN_URL_PROP="jenkins.url";
+	public static final String JENKIN_USER_PROP="jenkins.user";
+	public static final String JENKIN_PASSWORD_PROP="jenkins.password";
+	
+	public static final String JENKIN_JOB="jenkins.job";
+	
+	public static final String JENKIN_JOBSIMPLE_PROP="jenkins.job.simple";
+	public static final String JENKIN_JOBCOMPOSITE_PROP="jenkins.job.composite";
+	public static final String JENKIN_JOBNIFI_PROP="jenkins.job.nifi";
+	public static final String BLUEPRINT_IMAGENAME_PROP="blueprint.ImageName";
+	public static final String BLUEPRINT_NAME_PROP="blueprint.name";
+	public static final String BLUEPRINT_PORT_PROP="blueprint.port";
+	public static final String BLUEPRINT_NODEPORT_PROP="blueprint.nodePort";
+	public static final String PROBE_MODEL_PORT="probe.probeModelPort";
+	public static final String PROBE_NODE_PORT="probe.probeNodePort";
+	public static final String PROBE_TARGET_PORT="probe.probeTargetPort";
+	public static final String PROBE_API_PORT="probe.probeApiPort";
+	public static final String PROBEIMAGE_NAME="probe.probeImageName";
+	public static final String PROBEIMAGE_PORT="probe.probeImagePORT";
+	public static final String SINGLE_MODEL_PORT="singleModelPort";
+	public static final String SINGLE_NODE_PORT="singleNodePort";
+	public static final String SINGLE_TARGET_PORT="singleTargetPort";
+	public static final String DATABROKER_MODEL_PORT="dataBroker.dataBrokerModelPort";
+	public static final String DATABROKER_NODE_PORT="dataBroker.dataBrokerNodePort";
+	public static final String DATABROKER_TARGET_PORT="dataBroker.dataBrokerTargetPort";
+	public static final String INCREMENT_PORT="incrementPort";
+	public static final String FOLDERPATH="folderPath";
+	public static final String TEMPLATE_YML_DIRECTORY="templateYmlDirectory";
+	public static final String NEXUS_URL_PROP="nexus.url";
+	public static final String NEXUS_USERNAME_PROP="nexus.username";
+	public static final String NEXUS_PD_PROP="nexus.password";
+	public static final String NGINX_IMAGE_NAME="nginxImageName";
+	public static final String LOGSTASH_IP="logstash.logstashIP";
+	public static final String LOGSTASH_PORT="logstash.logstashPort";
+	public static final String LOGSTASH_HOST="logstash.logstashHost";
+	public static final String DOCKERREGISTY_NAME="dockerRegistry.acumosRegistyName";
+	public static final String DOCKERREGISTY_USER="dockerRegistry.acumosRegistyUser";
+	public static final String DOCKERREGISTY_PD="dockerRegistry.acumosRegistyPd";
+	public static final String DEPLOYMENT_CLIENT_API_BASE_URL="deploymentClientApiBaseUrl";
+	public static final String KUBERNETES_CLUSTER="k8sCluster";
+	
+
 
 }

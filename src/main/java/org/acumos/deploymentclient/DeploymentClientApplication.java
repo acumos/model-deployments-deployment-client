@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"org.acumos.deploymentclient.*"})
+@ComponentScan(basePackages = {"org.acumos.*"})
 public class DeploymentClientApplication {
 	public static final String CONFIG_ENV_VAR_NAME = "SPRING_APPLICATION_JSON";
 	public static void main(String[] args)throws Exception {
