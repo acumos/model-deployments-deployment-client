@@ -40,7 +40,12 @@
 trap 'fail' ERR
 
 function fail() {
-  log "$1"
+  reason="$1"
+  if [[ "$reason" == "" ]]; then reason="Unknown failure in deployment script"; fi
+  cat <<EOF >status.json
+{"status": "FA", "reason": "$1", "ingress": ""}
+EOF
+  log "$reason"
   exit 1
 }
 
@@ -66,26 +71,6 @@ function replace_env() {
   done
   set -x
 }
-
-function docker_login() {
-  trap 'fail' ERR
-  while ! docker login $1 -u $2 -p $3 ; do
-    sleep 10
-    log "Docker login failed at $1, trying again"
-  done
-}
-
-function prepare_docker() {
-  trap 'fail' ERR
-  log "login to the Acumos platform docker proxy"
-  docker_login $ACUMOS_DOCKER_REGISTRY $ACUMOS_DOCKER_REGISTRY_USER \
-    $ACUMOS_DOCKER_REGISTRY_PASSWORD
-  log "Log into LF Nexus Docker repos"
-  docker_login https://nexus3.acumos.org:10004 docker docker
-  docker_login https://nexus3.acumos.org:10003 docker docker
-  docker_login https://nexus3.acumos.org:10002 docker docker
-}
-
 
 prepare_k8s() {
   trap 'fail' ERR
@@ -153,10 +138,10 @@ function deploy_solution() {
   kubectl create -f deploy/solution.yaml
 
   log "Wait for all pods to be Running"
-  pods=$(kubectl get pods -n $NAMESPACE | awk '/-/ {print $1}')
+  pods=$(kubectl get pods -n $NAMESPACE | awk "/$TRACKING_ID/ {print \$1}")
   while [[ "$pods" == "No resources found." ]]; do
     log "pods are not yet created, waiting 10 seconds"
-    pods=$(kubectl get pods -n $NAMESPACE | awk '/-/ {print $1}')
+    pods=$(kubectl get pods -n $NAMESPACE | awk "/$TRACKING_ID/ {print \$1}")
   done
 
   for pod in $pods; do
@@ -174,16 +159,24 @@ function deploy_solution() {
     sed -i -- 's/"container_name":"probe"/"container_name":"Probe"/' dockerinfo.json
 
     log "Update blueprint.json and dockerinfo.json for use of logging components"
-    sol=$(grep "app:" deploy/solution.yaml | awk '{print $2}' | grep -v 'modelconnector' | uniq | sed ':a;N;$!ba;s/\n/ /g')
-    apps="$sol"
     cp blueprint.json deploy/.
     cp dockerinfo.json deploy/.
-    for app in $apps; do
-       sed -i -- "s/$app/nginx-$app/g" deploy/dockerinfo.json
-       sed -i -- "s/\"container_name\": \"$app\"/\"container_name\": \"nginx-$app\"/g" deploy/blueprint.json
+    ds=$(jq '.docker_info_list | length' deploy/dockerinfo.json)
+    d=0
+    while [[ $d -lt $ds ]]; do
+      name=$(jq -r ".docker_info_list[$d].container_name" deploy/dockerinfo.json)
+      if [[ "$name" != "modelconnector" ]]; then
+        jq ".docker_info_list[$d].container_name |= \"nginx-$name\"" \
+          deploy/dockerinfo.json >/tmp/dockerinfo.json
+        ip=$(jq -r ".docker_info_list[$d].ip_address" deploy/dockerinfo.json)
+        jq ".docker_info_list[$d].ip_address |= \"nginx-$ip\"" \
+          /tmp/dockerinfo.json >/tmp/dockerinfo.json2
+        jq ".docker_info_list[$d].port |= \"8550\"" \
+          /tmp/dockerinfo.json2 >deploy/dockerinfo.json
+        sed -i -- "s/\"$name\"/\"nginx-$name\"/g" deploy/blueprint.json
+      fi
+      d=$((d+1))
     done
-    # update to nginx-proxy service port
-    sed -i -- 's/"8556"/"8550"/g' deploy/dockerinfo.json
 
     log "send dockerinfo.json to the Model Connector service via the /putDockerInfo API"
     ACUMOS_MODELCONNECTOR_PORT=$(kubectl get svc -n $NAMESPACE -o json modelconnector-$TRACKING_ID | jq -r '.spec.ports[0].nodePort')
@@ -213,21 +206,20 @@ function deploy_logging() {
   if [[ -d microservice ]]; then
     # Composite model
     ns=$(jq '.nodes | length' blueprint.json)
-    n=0; apps=""
+    n=0
     while [[ $n -lt $ns ]]; do
       app=$(jq -r ".nodes[$n].container_name" blueprint.json)
-      apps="$apps $app"
-      n=$((n+1))
-    done
-    for app in $apps; do
+      port=$(jq -r ".docker_info_list[$n].port" dockerinfo.json)
       export MODEL_NAME=$app
       cp templates/nginx-configmap-$SOLUTION_MODEL_RUNNER_STANDARD.yaml deploy/$app-nginx-configmap.yaml
+      sed -i -- "s/8556/$port/g" deploy/$app-nginx-configmap.yaml
       cp templates/nginx-service.yaml deploy/$app-nginx-service.yaml
       cp templates/nginx-deployment.yaml deploy/$app-nginx-deployment.yaml
       replace_env deploy
       kubectl create -f deploy/$app-nginx-configmap.yaml
       kubectl create -f deploy/$app-nginx-service.yaml
       kubectl create -f deploy/$app-nginx-deployment.yaml
+      n=$((n+1))
     done
 
     # create nginx-proxy for model-connector
@@ -239,6 +231,7 @@ function deploy_logging() {
     kubectl create -f deploy/nginx-mc-configmap.yaml
     kubectl create -f deploy/nginx-mc-service.yaml
     kubectl create -f deploy/nginx-mc-deployment.yaml
+    cp templates/ingress.yaml deploy/.
   else
     # Simple model
     cp templates/nginx-configmap-$SOLUTION_MODEL_RUNNER_STANDARD.yaml deploy/nginx-configmap.yaml
@@ -249,10 +242,11 @@ function deploy_logging() {
     kubectl create -f deploy/nginx-configmap.yaml
     kubectl create -f deploy/nginx-service.yaml
     kubectl create -f deploy/nginx-deployment.yaml
+    cp templates/ingress.yaml deploy/.
+    sed -i -- "s/nginx-<TRACKING_ID>/nginx-$MODEL_NAME-<TRACKING_ID>/g" deploy/ingress.yaml
   fi
 
   log "Create ingress rule"
-  cp templates/ingress.yaml deploy/.
   replace_env deploy/ingress.yaml
   kubectl create -f deploy/ingress.yaml
 }
@@ -264,9 +258,11 @@ if [[ -e deploy ]]; then rm -rf deploy; fi
 mkdir deploy
 source ./deploy_env.sh
 
-prepare_docker
-prepare_k8s
 update_blueprint
 update_dockerinfo
 deploy_solution
 deploy_logging
+ingress="https://$SOLUTION_DOMAIN/$SOLUTION_NAME/$TRACKING_ID/"
+cat <<EOF >status.json
+{"status": "SU", "reason": "$SOLUTION_NAME deployment is complete. The solution can be accessed at the ingress URL $ingress", "ingress": "$ingress"}
+EOF
