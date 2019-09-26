@@ -8,9 +8,9 @@
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *  
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * This file is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
@@ -19,44 +19,38 @@
  */
 package org.acumos.deploymentclient.parsebean;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
- * Representation of Operation Signature list of a Node. IMPORTANT: This itself
- * is NOT an Arraylist.
+ * Representation of Operation Signature list of a Node. IMPORTANT: This itself is NOT an Arraylist.
  */
-
 public class MapInputs implements Serializable {
-	
-	private static final long serialVersionUID = 619387367199699393L;
-	
-	@JsonProperty("input_field")
-	private InputField inputField = null;
-    
 
-    public MapInputs(InputField inputField) {
-		super();
-		this.inputField = inputField;
-	}
-    public MapInputs(){
-    	super();
-    }
+  private static final long serialVersionUID = 619387367199699393L;
 
-	public InputField getInputField() {
-		return inputField;
-	}
+  @JsonProperty("input_field")
+  private InputField inputField = null;
 
+  public MapInputs(InputField inputField) {
+    super();
+    this.inputField = inputField;
+  }
 
-	public void setInputField(InputField inputField) {
-		this.inputField = inputField;
-	}
+  public MapInputs() {
+    super();
+  }
 
+  public InputField getInputField() {
+    return inputField;
+  }
 
-	@Override
-    public String toString()
-    {
-        return "ClassPojo [inputField = "+inputField+"]";
-    }
+  public void setInputField(InputField inputField) {
+    this.inputField = inputField;
+  }
+
+  @Override
+  public String toString() {
+    return "ClassPojo [inputField = " + inputField + "]";
+  }
 }
