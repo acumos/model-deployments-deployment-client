@@ -8,9 +8,9 @@
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *  
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * This file is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
@@ -20,46 +20,39 @@
 
 package org.acumos.deploymentclient.parsebean;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.Serializable;
 
 public class ProbeIndicator implements Serializable {
 
-	private final static long serialVersionUID = 6463163730071836107L;
-	@JsonProperty("value")
-	private String value;
+  private static final long serialVersionUID = 6463163730071836107L;
 
-	/**
-	 * Standard POJO no-arg constructor
-	 */
-	public ProbeIndicator() {
-		super();
-	}
+  @JsonProperty("value")
+  private String value;
 
-	/**
-	 * 
-	 * @param value
-	 *            Indicates whether Probe is present in the solution.
-	 */
-	public ProbeIndicator(String value) {
-		super();
-		this.value = value;
-	}
+  /** Standard POJO no-arg constructor */
+  public ProbeIndicator() {
+    super();
+  }
 
-	@JsonProperty("value")
-	public String getValue() {
-		return value;
-	}
+  /** @param value Indicates whether Probe is present in the solution. */
+  public ProbeIndicator(String value) {
+    super();
+    this.value = value;
+  }
 
-	@JsonProperty("value")
-	public void setValue(String value) {
-		this.value = value;
-	}
+  @JsonProperty("value")
+  public String getValue() {
+    return value;
+  }
 
-	@Override
-	public String toString() {
-		return "ProbeIndicator [value=" + value + "]";
-	}
+  @JsonProperty("value")
+  public void setValue(String value) {
+    this.value = value;
+  }
 
+  @Override
+  public String toString() {
+    return "ProbeIndicator [value=" + value + "]";
+  }
 }
