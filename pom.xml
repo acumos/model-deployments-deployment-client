@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<groupId>org.acumos.deployment-client</groupId>
 	<artifactId>deployment-client</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
@@ -45,8 +45,8 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
-		
+
+
 		<dependency>
 			<groupId>org.acumos.common-dataservice</groupId>
 			<artifactId>cmn-data-svc-client</artifactId>
@@ -117,9 +117,9 @@
 					<groupId>org.slf4j</groupId>
 					<artifactId>slf4j-api</artifactId>
 				</exclusion>
-			</exclusions> 
+			</exclusions>
 		</dependency>
-		
+
 	</dependencies>
 
 	<build>
@@ -245,7 +245,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.9</version>
+				<version>0.8.4</version>
 				<executions>
 					<execution>
 						<id>default-prepare-agent</id>
@@ -265,7 +265,7 @@
 			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
-				<version>0.21.0</version>
+				<version>0.30.0</version>
 				<configuration>
 					<verbose>true</verbose>
 					<!-- docker runs on the LF build minion so the default value is ok -->
@@ -292,15 +292,19 @@
 												<destName>application.properties</destName>
 											</file>
 											<file>
-												<source>tools/setup-docker.sh</source>
-												<outputDirectory />
-												<destName>setup-docker.sh</destName>
-											</file>
-											<file>
 												<source>target/${project.artifactId}-${project.version}.${project.packaging}</source>
 												<outputDirectory />
 											</file>
 										</files>
+                    <fileSets>
+                      <fileSet>
+                        <directory>config/jobs/solution_deploy</directory>
+                        <outputDirectory>config/jobs/solution_deploy</outputDirectory>
+                        <includes>
+                          <include>*/**</include>
+                        </includes>
+                      </fileSet>
+                    </fileSets>
 									</inline>
 								</assembly>
 								<cmd>
