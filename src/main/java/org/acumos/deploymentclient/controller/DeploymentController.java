@@ -1,26 +1,33 @@
+/*-
+ * ===============LICENSE_START=======================================================
+ * Acumos
+ * ===================================================================================
+ * Copyright (C) 2017 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+ * ===================================================================================
+ * This Acumos software file is distributed by AT&T and Tech Mahindra
+ * under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *  
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * This file is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ===============LICENSE_END=========================================================
+ */
 package org.acumos.deploymentclient.controller;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.lang.invoke.MethodHandles;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
+import java.lang.invoke.MethodHandles;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.acumos.cds.domain.MLPTask;
 import org.acumos.deploymentclient.bean.DeployBean;
 import org.acumos.deploymentclient.bean.DeploymentBean;
 import org.acumos.deploymentclient.bean.StatusBean;
 import org.acumos.deploymentclient.service.DeploymentService;
-import org.acumos.deploymentclient.util.DeployConstants;
-import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,17 +48,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class DeploymentController {
 	@Autowired
 	private Environment env;
-	
+
 	@Autowired(required=true)
 	DeploymentService deploymentService;
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-	
+
 	@RequestMapping(value = "/deploy", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public String deploy(HttpServletRequest request,@RequestBody DeployBean deployBean,HttpServletResponse response) throws Exception {
 		 log.debug("Start deploy API ");
 		 JSONObject  jsonOutput = new JSONObject();
 		 DeploymentBean dBean=new DeploymentBean();
-		 
+         String taskId="";
 		 try {
 			 log.debug("solutionId "+deployBean.getSolutionId());
 			 log.debug("revisionId "+deployBean.getRevisionId());
@@ -63,30 +70,38 @@ public class DeploymentController {
 				 response.setStatus(404);
 				 return jsonOutput.toString();
 			 }
+	        dBean.setEnvId(deployBean.getEnvId());
+	        dBean.setSolutionId(deployBean.getSolutionId());
+	        dBean.setRevisionId(deployBean.getRevisionId());
+	        dBean.setUserId(deployBean.getUserId());
 			 deploymentService.setDeploymentBeanProperties(dBean, env);
 			 MLPTask mlpTask=deploymentService.createTaskDetails(deployBean, dBean);
 			 log.debug("mlpTask created taskId"+mlpTask.getTaskId());
+			 taskId=String.valueOf(mlpTask.getTaskId());
+			 
 			 String solutionToolKitType=deploymentService.getSolutionCode(dBean.getSolutionId(),
 					   dBean.getDatasource(), dBean.getDataUserName(), dBean.getDataPd());
-			  System.out.println("solutionToolKitType "+solutionToolKitType);
+			  log.debug("solutionToolKitType "+solutionToolKitType);
 			  if(solutionToolKitType!=null && !"".equals(solutionToolKitType) && "CP".equalsIgnoreCase(solutionToolKitType)){
-				  deploymentService.createJenkinTask(dBean,String.valueOf(mlpTask.getTaskId()),"Composite");	
+				  deploymentService.createJenkinTask(dBean,String.valueOf(mlpTask.getTaskId()),env.getProperty("jenkins.job.composite"));
 				}else {
-				  deploymentService.createJenkinTask(dBean,String.valueOf(mlpTask.getTaskId()),"Simple");	
+				  deploymentService.createJenkinTask(dBean,String.valueOf(mlpTask.getTaskId()),env.getProperty("jenkins.job.simple"));
 				}
-			 
+			 log.debug("taskId "+taskId);
+			 jsonOutput.put("taskId", taskId);
 			 jsonOutput.put("status", "SUCCESS");
 			 response.setStatus(202);
 		 }catch(Exception e){
 			log.error("deploy API failed", e);
+			jsonOutput.put("taskId", taskId);
 			jsonOutput.put("status", "FAIL");
 			response.setStatus(400);
 		 }
 		 log.debug("End deploy API ");
 		 return jsonOutput.toString();
 	}
-	
-	
+
+
 	@RequestMapping(value = "/getSolutionZip/{taskId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	public String getSolutionZip(HttpServletRequest request, @PathVariable("taskId") String taskId,HttpServletResponse response) throws Exception {
 		 log.debug("Start getSolutionZip ");
@@ -107,21 +122,21 @@ public class DeploymentController {
 		   deploymentService.getTaskDetails(dBean.getDatasource(), dBean.getDataUserName(), dBean.getDataPd(), taskIdNum,dBean);
 		   String solutionToolKitType=deploymentService.getSolutionCode(dBean.getSolutionId(),
 				   dBean.getDatasource(), dBean.getDataUserName(), dBean.getDataPd());
-				System.out.println("solutionToolKitType "+solutionToolKitType);
+				log.debug("solutionToolKitType "+solutionToolKitType);
 				if(solutionToolKitType!=null && !"".equals(solutionToolKitType) && "CP".equalsIgnoreCase(solutionToolKitType)){
-				System.out.println("Composite Solution Details Start");
+				log.debug("Composite Solution Details Start");
 				solutionZip=deploymentService.compositeSolutionDetails(dBean);
-				System.out.println("Composite Solution Deployment End");
+				log.debug("Composite Solution Deployment End");
 				}else{
-				System.out.println("Single Solution Details Start");
-				String imageTag=deploymentService.getSingleImageData(dBean.getSolutionId(), dBean.getRevisionId(), 
+				log.debug("Single Solution Details Start");
+				String imageTag=deploymentService.getSingleImageData(dBean.getSolutionId(), dBean.getRevisionId(),
 						dBean.getDatasource(), dBean.getDataUserName(), dBean.getDataPd());
 				solutionZip=deploymentService.singleSolutionDetails(dBean, imageTag, singleModelPort);
-				System.out.println("Single Solution Details End");
+				log.debug("Single Solution Details End");
 				}
 		   jsonOutput.put("status", "OK");
 		   response.setStatus(200);
-		 
+
 		 }catch(Exception e){
 				log.error("getSolutionZip failed", e);
 				jsonOutput.put("status", "FAIL");
@@ -132,7 +147,7 @@ public class DeploymentController {
 		 log.debug("End getSolutionZip");
 		 return jsonOutput.toString();
 	}
-	
+
 	@RequestMapping(value = "/status/{taskId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public String status(HttpServletRequest request,@RequestBody StatusBean statusBean, @PathVariable("taskId") String taskId,
 			HttpServletResponse response) throws Exception {
@@ -152,14 +167,14 @@ public class DeploymentController {
 			   log.debug("Status "+statusBean.getStatus());
 			   log.debug("Reason "+statusBean.getReason());
 			   deploymentService.setDeploymentBeanProperties(dBean, env);
-			   mlpTask=deploymentService.getTaskDetails(dBean.getDatasource(), dBean.getDataUserName(), 
+			   mlpTask=deploymentService.getTaskDetails(dBean.getDatasource(), dBean.getDataUserName(),
 					   dBean.getDataPd(), taskIdNum,null);
-			   deploymentService.updateTaskDetails(dBean.getDatasource(), dBean.getDataUserName(), 
+			   deploymentService.updateTaskDetails(dBean.getDatasource(), dBean.getDataUserName(),
 					   dBean.getDataPd(), taskIdNum, statusBean.getStatus(),statusBean.getReason(), mlpTask);
-			   
+
 			   jsonOutput.put("status", "OK");
 			   response.setStatus(200);
-			 
+
 			 }catch(Exception e){
 					log.error("status API failed", e);
 					jsonOutput.put("status", "FAIL");
@@ -168,7 +183,7 @@ public class DeploymentController {
 		 log.debug("End status API ");
 		 return jsonOutput.toString();
 	}
-	
-	
-	
+
+
+
 }
