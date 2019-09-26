@@ -8,9 +8,9 @@
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *  
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * This file is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
@@ -19,58 +19,50 @@
  */
 package org.acumos.deploymentclient.parsebean;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class MlModel implements Serializable {
-	private final static long serialVersionUID = 4186812809255376373L;
+  private static final long serialVersionUID = 4186812809255376373L;
 
-	@JsonProperty("name")
-	private String name = null;
-	@JsonProperty("operation_signature")
-	private OperationSignature operationSignature = null;
+  @JsonProperty("name")
+  private String name = null;
 
-	/**
-	 * No args constructor for use in serialization
-	 * 
-	 */
-	public MlModel() {
-		super();
-	}
+  @JsonProperty("operation_signature")
+  private OperationSignature operationSignature = null;
 
-	/**
-	 * 
-	 * @param operationSignature
-	 *            This is the operation signature
-	 * @param name
-	 *            This is the model name
-	 * 
-	 */
-	public MlModel(String name, OperationSignature operationSignature) {
-		super();
-		this.name = name;
-		this.operationSignature = operationSignature;
-	}
+  /** No args constructor for use in serialization */
+  public MlModel() {
+    super();
+  }
 
-	@JsonProperty("name")
-	public String getName() {
-		return name;
-	}
+  /**
+   * @param operationSignature This is the operation signature
+   * @param name This is the model name
+   */
+  public MlModel(String name, OperationSignature operationSignature) {
+    super();
+    this.name = name;
+    this.operationSignature = operationSignature;
+  }
 
-	@JsonProperty("name")
-	public void setName(String name) {
-		this.name = name;
-	}
+  @JsonProperty("name")
+  public String getName() {
+    return name;
+  }
 
-	@JsonProperty("operation_signature")
-	public OperationSignature getOperationSignature() {
-		return operationSignature;
-	}
+  @JsonProperty("name")
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	@JsonProperty("operation_signature")
-	public void setOperationSignature(OperationSignature operationSignature) {
-		this.operationSignature = operationSignature;
-	}
+  @JsonProperty("operation_signature")
+  public OperationSignature getOperationSignature() {
+    return operationSignature;
+  }
 
+  @JsonProperty("operation_signature")
+  public void setOperationSignature(OperationSignature operationSignature) {
+    this.operationSignature = operationSignature;
+  }
 }

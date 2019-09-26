@@ -8,9 +8,9 @@
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *  
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * This file is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
@@ -19,145 +19,145 @@
  */
 package org.acumos.deploymentclient.parsebean;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
- * Representation of Operation Signature list of a Node. IMPORTANT: This itself
- * is NOT an Arraylist.
+ * Representation of Operation Signature list of a Node. IMPORTANT: This itself is NOT an Arraylist.
  */
-
 public class DataBrokerMap implements Serializable {
-	
-	
-	private static final long serialVersionUID = -5950222666895492477L;
 
-	@JsonProperty("map_inputs")
-	private ArrayList<MapInputs> mapInputs = null;
+  private static final long serialVersionUID = -5950222666895492477L;
 
-	@JsonProperty("data_broker_type")
-    private String dataBrokerType = null;
+  @JsonProperty("map_inputs")
+  private ArrayList<MapInputs> mapInputs = null;
 
-	@JsonProperty("csv_file_field_separator")
-    private String csvFileFieldSeparator = null;
+  @JsonProperty("data_broker_type")
+  private String dataBrokerType = null;
 
-	@JsonProperty("target_system_url")
-    private String targetSystemUrl = null;
+  @JsonProperty("csv_file_field_separator")
+  private String csvFileFieldSeparator = null;
 
-    @JsonProperty("map_outputs")
-    private ArrayList<MapOutputs> mapOutputs = null;
+  @JsonProperty("target_system_url")
+  private String targetSystemUrl = null;
 
-    @JsonProperty("local_system_data_file_path")
-    private String localSystemDataFilePath = null;
+  @JsonProperty("map_outputs")
+  private ArrayList<MapOutputs> mapOutputs = null;
 
-    @JsonProperty("first_row")
-    private String firstRow = null;
+  @JsonProperty("local_system_data_file_path")
+  private String localSystemDataFilePath = null;
 
-    @JsonProperty("script")
-    private String script = null;
+  @JsonProperty("first_row")
+  private String firstRow = null;
 
-    
-    public DataBrokerMap(ArrayList<MapInputs> mapInputs, String dataBrokerType, String csvFileFieldSeparator,
-			String targetSystemUrl, ArrayList<MapOutputs> mapOutputs, String localSystemDataFilePath, String firstRow,
-			String script) {
-		super();
-		this.mapInputs = mapInputs;
-		this.dataBrokerType = dataBrokerType;
-		this.csvFileFieldSeparator = csvFileFieldSeparator;
-		this.targetSystemUrl = targetSystemUrl;
-		this.mapOutputs = mapOutputs;
-		this.localSystemDataFilePath = localSystemDataFilePath;
-		this.firstRow = firstRow;
-		this.script = script;
-	}
+  @JsonProperty("script")
+  private String script = null;
 
-    public DataBrokerMap(){
-    	
-    }
-	public String getDataBrokerType() {
-		return dataBrokerType;
-	}
+  public DataBrokerMap(
+      ArrayList<MapInputs> mapInputs,
+      String dataBrokerType,
+      String csvFileFieldSeparator,
+      String targetSystemUrl,
+      ArrayList<MapOutputs> mapOutputs,
+      String localSystemDataFilePath,
+      String firstRow,
+      String script) {
+    super();
+    this.mapInputs = mapInputs;
+    this.dataBrokerType = dataBrokerType;
+    this.csvFileFieldSeparator = csvFileFieldSeparator;
+    this.targetSystemUrl = targetSystemUrl;
+    this.mapOutputs = mapOutputs;
+    this.localSystemDataFilePath = localSystemDataFilePath;
+    this.firstRow = firstRow;
+    this.script = script;
+  }
 
+  public DataBrokerMap() {}
 
-	public void setDataBrokerType(String dataBrokerType) {
-		this.dataBrokerType = dataBrokerType;
-	}
+  public String getDataBrokerType() {
+    return dataBrokerType;
+  }
 
+  public void setDataBrokerType(String dataBrokerType) {
+    this.dataBrokerType = dataBrokerType;
+  }
 
-	public String getCsvFileFieldSeparator() {
-		return csvFileFieldSeparator;
-	}
+  public String getCsvFileFieldSeparator() {
+    return csvFileFieldSeparator;
+  }
 
+  public void setCsvFileFieldSeparator(String csvFileFieldSeparator) {
+    this.csvFileFieldSeparator = csvFileFieldSeparator;
+  }
 
-	public void setCsvFileFieldSeparator(String csvFileFieldSeparator) {
-		this.csvFileFieldSeparator = csvFileFieldSeparator;
-	}
+  public String getTargetSystemUrl() {
+    return targetSystemUrl;
+  }
 
+  public void setTargetSystemUrl(String targetSystemUrl) {
+    this.targetSystemUrl = targetSystemUrl;
+  }
 
-	public String getTargetSystemUrl() {
-		return targetSystemUrl;
-	}
+  public String getLocalSystemDataFilePath() {
+    return localSystemDataFilePath;
+  }
 
+  public void setLocalSystemDataFilePath(String localSystemDataFilePath) {
+    this.localSystemDataFilePath = localSystemDataFilePath;
+  }
 
-	public void setTargetSystemUrl(String targetSystemUrl) {
-		this.targetSystemUrl = targetSystemUrl;
-	}
+  public String getFirstRow() {
+    return firstRow;
+  }
 
-	public String getLocalSystemDataFilePath() {
-		return localSystemDataFilePath;
-	}
+  public void setFirstRow(String firstRow) {
+    this.firstRow = firstRow;
+  }
 
+  public String getScript() {
+    return script;
+  }
 
-	public void setLocalSystemDataFilePath(String localSystemDataFilePath) {
-		this.localSystemDataFilePath = localSystemDataFilePath;
-	}
+  public void setScript(String script) {
+    this.script = script;
+  }
 
+  public ArrayList<MapInputs> getMapInputs() {
+    return mapInputs;
+  }
 
-	public String getFirstRow() {
-		return firstRow;
-	}
+  public void setMapInputs(ArrayList<MapInputs> mapInputs) {
+    this.mapInputs = mapInputs;
+  }
 
+  public ArrayList<MapOutputs> getMapOutputs() {
+    return mapOutputs;
+  }
 
-	public void setFirstRow(String firstRow) {
-		this.firstRow = firstRow;
-	}
+  public void setMapOutputs(ArrayList<MapOutputs> mapOutputs) {
+    this.mapOutputs = mapOutputs;
+  }
 
-
-	public String getScript() {
-		return script;
-	}
-	
-	public void setScript(String script) {
-		this.script = script;
-	}
-
-
-	public ArrayList<MapInputs> getMapInputs() {
-		return mapInputs;
-	}
-
-
-	public void setMapInputs(ArrayList<MapInputs> mapInputs) {
-		this.mapInputs = mapInputs;
-	}
-
-
-	public ArrayList<MapOutputs> getMapOutputs() {
-		return mapOutputs;
-	}
-
-
-	public void setMapOutputs(ArrayList<MapOutputs> mapOutputs) {
-		this.mapOutputs = mapOutputs;
-	}	
-	
-
-	@Override
-    public String toString()
-    {
-        return "ClassPojo [map_inputs = "+mapInputs+", data_broker_type = "+dataBrokerType+", csv_file_field_separator = "+csvFileFieldSeparator+", target_system_url = "+targetSystemUrl+", map_outputs = "+mapOutputs+", local_system_data_file_path = "+localSystemDataFilePath +", first_row = "+firstRow+", script = "+script +"]";
-    }
-	
+  @Override
+  public String toString() {
+    return "ClassPojo [map_inputs = "
+        + mapInputs
+        + ", data_broker_type = "
+        + dataBrokerType
+        + ", csv_file_field_separator = "
+        + csvFileFieldSeparator
+        + ", target_system_url = "
+        + targetSystemUrl
+        + ", map_outputs = "
+        + mapOutputs
+        + ", local_system_data_file_path = "
+        + localSystemDataFilePath
+        + ", first_row = "
+        + firstRow
+        + ", script = "
+        + script
+        + "]";
+  }
 }

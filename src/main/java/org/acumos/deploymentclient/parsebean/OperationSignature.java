@@ -8,9 +8,9 @@
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *  
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * This file is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
@@ -20,78 +20,81 @@
 
 package org.acumos.deploymentclient.parsebean;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.Serializable;
 
 public class OperationSignature implements Serializable {
 
-	private final static long serialVersionUID = 832153494386063512L;
+  private static final long serialVersionUID = 832153494386063512L;
 
-	@JsonProperty("operation_name")
-	private String operationName = null;
-	@JsonProperty("input_message_name")
-	private String inputMessageName = null;
-	@JsonProperty("output_message_name")
-	private String outputMessageName = null;
+  @JsonProperty("operation_name")
+  private String operationName = null;
 
-	/**
-	 * Standard POJO no-arg constructor
-	 */
-	public OperationSignature() {
-		super();
-	}
+  @JsonProperty("input_message_name")
+  private String inputMessageName = null;
 
-	/**
-	 * Standard POJO constructor initialized with field
-	 * @param operationName
-	 *            This is the operation name
-	 * @param inputMessageName
-	 *            This is the input msg name
-	 * @param outputMessageName
-	 *            This is the output msg name
-	 */
-	public OperationSignature(String operationName, String inputMessageName, String outputMessageName) {
-		super();
-		this.operationName = operationName;
-		this.inputMessageName = inputMessageName;
-		this.outputMessageName = outputMessageName;
-	}
+  @JsonProperty("output_message_name")
+  private String outputMessageName = null;
 
-	@JsonProperty("operation_name")
-	public String getOperationName() {
-		return operationName;
-	}
+  /** Standard POJO no-arg constructor */
+  public OperationSignature() {
+    super();
+  }
 
-	@JsonProperty("operation_name")
-	public void setOperationName(String operationName) {
-		this.operationName = operationName;
-	}
+  /**
+   * Standard POJO constructor initialized with field
+   *
+   * @param operationName This is the operation name
+   * @param inputMessageName This is the input msg name
+   * @param outputMessageName This is the output msg name
+   */
+  public OperationSignature(
+      String operationName, String inputMessageName, String outputMessageName) {
+    super();
+    this.operationName = operationName;
+    this.inputMessageName = inputMessageName;
+    this.outputMessageName = outputMessageName;
+  }
 
-	@JsonProperty("input_message_name")
-	public String getInputMessageName() {
-		return inputMessageName;
-	}
+  @JsonProperty("operation_name")
+  public String getOperationName() {
+    return operationName;
+  }
 
-	@JsonProperty("input_message_name")
-	public void setInputMessageName(String inputMessageName) {
-		this.inputMessageName = inputMessageName;
-	}
+  @JsonProperty("operation_name")
+  public void setOperationName(String operationName) {
+    this.operationName = operationName;
+  }
 
-	@JsonProperty("output_message_name")
-	public String getOutputMessageName() {
-		return outputMessageName;
-	}
+  @JsonProperty("input_message_name")
+  public String getInputMessageName() {
+    return inputMessageName;
+  }
 
-	@JsonProperty("output_message_name")
-	public void setOutputMessageName(String outputMessageName) {
-		this.outputMessageName = outputMessageName;
-	}
+  @JsonProperty("input_message_name")
+  public void setInputMessageName(String inputMessageName) {
+    this.inputMessageName = inputMessageName;
+  }
 
-	@Override
-	public String toString() {
+  @JsonProperty("output_message_name")
+  public String getOutputMessageName() {
+    return outputMessageName;
+  }
 
-		return "OperationSignature [operationName=" + operationName + ", inputMessageName=" + inputMessageName
-				+ ", outputMessageName=" + outputMessageName + "]";
-	}
+  @JsonProperty("output_message_name")
+  public void setOutputMessageName(String outputMessageName) {
+    this.outputMessageName = outputMessageName;
+  }
+
+  @Override
+  public String toString() {
+
+    return "OperationSignature [operationName="
+        + operationName
+        + ", inputMessageName="
+        + inputMessageName
+        + ", outputMessageName="
+        + outputMessageName
+        + "]";
+  }
 }
