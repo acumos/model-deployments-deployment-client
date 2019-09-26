@@ -65,19 +65,19 @@ private static final Logger logger = LoggerFactory.getLogger(DeploymentServiceIm
 public boolean deployValidation(DeployBean deployBean) {
 	boolean valid=true;
 	if(deployBean!=null) {
-		if(isNullOrEmpty(deployBean.getEnvId())) 
+		if(isNullOrEmpty(deployBean.getEnvId()))
 			valid=false;
-		if(isNullOrEmpty(deployBean.getRevisionId())) 
+		if(isNullOrEmpty(deployBean.getRevisionId()))
 			valid=false;
-		if(isNullOrEmpty(deployBean.getSolutionId())) 
+		if(isNullOrEmpty(deployBean.getSolutionId()))
 			valid=false;
-		if(isNullOrEmpty(deployBean.getUserId())) 
+		if(isNullOrEmpty(deployBean.getUserId()))
 			valid=false;
-		
+
 	}else {
 		valid=false;
 	}
-	
+
 	return valid;
   }
 public  boolean isNullOrEmpty(String str) {
@@ -118,7 +118,7 @@ public String getSolutionCode(String solutionId,String datasource,String userNam
 		System.out.println("Error in get solution "+e.getMessage());
 		toolKitTypeCode="";
 	}
-	System.out.println("getSolution End toolKitTypeCode " +toolKitTypeCode);	
+	System.out.println("getSolution End toolKitTypeCode " +toolKitTypeCode);
   return toolKitTypeCode;
  }
 public String getSingleImageData(String solutionId,String revisionId,String datasource,String userName,String dataPd)throws Exception{
@@ -139,7 +139,7 @@ public String getSingleImageData(String solutionId,String revisionId,String data
 			}
 		}
 	}
-	 
+
 	logger.debug("End getSingleImageData imageTag"+imageTag);
 	return imageTag;
 }
@@ -149,7 +149,7 @@ public byte[] singleSolutionDetails(DeploymentBean dBean,String imageTag,String 
 	System.out.println("imageTag "+imageTag +" singleModelPort "+singleModelPort);
 	byte[] solutionZip=null;
 	String solutionName=getModelName(imageTag, dBean.getSolutionId());
-	
+
 	logger.debug("solutionName "+solutionName);
 	dBean.setSolutionName(solutionName);
 	String solutionYaml=getSingleSolutionYMLFile(imageTag,singleModelPort,dBean);
@@ -178,34 +178,34 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 	    YAMLMapper yamlMapper = new YAMLMapper(new YAMLFactory().configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true));
 	    ObjectNode apiRootNode = objectMapper.createObjectNode();
 	    apiRootNode.put(DeployConstants.APIVERSION_YML,DeployConstants.V_YML);
-	   	    
+
 	    /*ObjectNode kindDataNode = objectMapper.createObjectNode();
 	    kindDataNode.put(DeployConstants.KIND_YML, DeployConstants.SERVICE_YML);*/
 	    apiRootNode.put(DeployConstants.KIND_YML, DeployConstants.SERVICE_YML);
-	    
+
 	    ObjectNode metadataNode = objectMapper.createObjectNode();
 		metadataNode.put(DeployConstants.NAMESPACE_YML, DeployConstants.NAMESPACE_VALUE_YML);
 		metadataNode.put(DeployConstants.NAME_YML, dBean.getSolutionName()+"-"+DeployConstants.TRACKINGID_VALUE_YML);
-		
+
 		ObjectNode labelsNode = objectMapper.createObjectNode();
 		labelsNode.put(DeployConstants.APP_DEP_YML, dBean.getSolutionName()+"-"+DeployConstants.TRACKINGID_VALUE_YML);
 		labelsNode.put(DeployConstants.TRACKINGID_YML, DeployConstants.TRACKINGID_VALUE_YML);
 		metadataNode.put(DeployConstants.LABELS_DEP_YML, labelsNode);
-		
+
 		apiRootNode.set(DeployConstants.METADATA_YML, metadataNode);
-		
-		
-		
+
+
+
 		ObjectNode specNode = objectMapper.createObjectNode();
-		
+
 		ObjectNode selectorNode = objectMapper.createObjectNode();
 		selectorNode.put(DeployConstants.APP_YML, dBean.getSolutionName()+"-"+DeployConstants.TRACKINGID_VALUE_YML);
 		specNode.set(DeployConstants.SELECTOR_YML, selectorNode);
 		specNode.put(DeployConstants.TYPE_YML, DeployConstants.NODE_TYPE_PORT_YML);
-		
+
 		ArrayNode portsArrayNode = specNode.arrayNode();
 		ObjectNode portsNode = objectMapper.createObjectNode();
-		
+
 		portsNode.put(DeployConstants.NAME_YML, DeployConstants.PROTOBUF_API_DEP_YML);
 		portsNode.put(DeployConstants.PORT_YML, dBean.getSingleModelPort());
 		portsNode.put(DeployConstants.TARGETPORT_YML, dBean.getSingleTargetPort());
@@ -214,14 +214,14 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 		//portsNode.put(DeployConstants.TARGETPORT_YML, dBean.getSingleTargetPort());
 		portsArrayNode.add(portsNode);
 		specNode.set(DeployConstants.PORTS_YML, portsArrayNode);
-		
+
 		apiRootNode.set(DeployConstants.SPEC_YML, specNode);
-		
+
 		serviceYml = yamlMapper.writeValueAsString(apiRootNode);
 		 logger.debug("solutionDeployment "+serviceYml);
 	  return serviceYml;
-  }	
-  
+  }
+
   public String getSingleSolutionDeployment(String imageTag,DeploymentBean dBean)throws Exception{
 	    logger.debug("getSingleSolutionDeployment Start");
 	    ObjectMapper objectMapper = new ObjectMapper();
@@ -230,91 +230,91 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 	    ObjectNode kindRootNode = objectMapper.createObjectNode();
 	    kindRootNode.put(DeployConstants.APIVERSION_DEP_YML, DeployConstants.APPS_V1_DEP_YML);
 	    kindRootNode.put(DeployConstants.KIND_DEP_YML, DeployConstants.DEPLOYMENT_DEP_YML);
-	    
+
 	    ObjectNode metadataNode = objectMapper.createObjectNode();
 		metadataNode.put(DeployConstants.NAMESPACE_DEP_YML,  DeployConstants.NAMESPACE_VALUE_YML);
 		metadataNode.put(DeployConstants.NAME_DEP_YML, dBean.getSolutionName()+"-"+DeployConstants.TRACKINGID_VALUE_YML);
-		
+
 		ObjectNode labelsNode = objectMapper.createObjectNode();
 		labelsNode.put(DeployConstants.APP_DEP_YML, dBean.getSolutionName()+"-"+DeployConstants.TRACKINGID_VALUE_YML);
 		labelsNode.put(DeployConstants.TRACKINGID_YML, DeployConstants.TRACKINGID_VALUE_YML);
 		metadataNode.put(DeployConstants.LABELS_DEP_YML, labelsNode);
-		
+
 		kindRootNode.set(DeployConstants.METADATA_DEP_YML, metadataNode);
-		
+
 		ObjectNode specNode = objectMapper.createObjectNode();
 		specNode.put(DeployConstants.REPLICAS_DEP_YML, 1);
-		
+
 		ObjectNode selectorNode = objectMapper.createObjectNode();
 		ObjectNode matchLabelsNode = objectMapper.createObjectNode();
 		matchLabelsNode.put(DeployConstants.APP_DEP_YML, dBean.getSolutionName()+"-"+DeployConstants.TRACKINGID_VALUE_YML);
 		selectorNode.set(DeployConstants.MATCHLABELS_DEP_YML, matchLabelsNode);
-		
+
 		specNode.set(DeployConstants.SELECTOR_DEP_YML, selectorNode);
-	    
+
 		ObjectNode templateNode = objectMapper.createObjectNode();
 		ObjectNode metadataTemplateNode = objectMapper.createObjectNode();
 		ObjectNode labelsTemplateNode = objectMapper.createObjectNode();
 		labelsTemplateNode.put(DeployConstants.APP_DEP_YML, dBean.getSolutionName()+"-"+DeployConstants.TRACKINGID_VALUE_YML);
 		labelsTemplateNode.put(DeployConstants.TRACKINGID_YML, DeployConstants.TRACKINGID_VALUE_YML);
 		metadataTemplateNode.set(DeployConstants.LABELS_DEP_YML, labelsTemplateNode);
-		
-		
+
+
 		ObjectNode specTempNode = objectMapper.createObjectNode();
 		ArrayNode containerArrayNode = templateNode.arrayNode();
 		ObjectNode containerNode  = objectMapper.createObjectNode();
 		containerNode.put(DeployConstants.NAME_DEP_YML, dBean.getSolutionName()+"-"+DeployConstants.TRACKINGID_VALUE_YML);
 		containerNode.put(DeployConstants.IMAGE_DEP_YML, imageTag);
-		/*containerNode.put(DeployConstants.IMAGE_DEP_YML, 
+		/*containerNode.put(DeployConstants.IMAGE_DEP_YML,
 				cutil.getProxyImageName(imageTag, dBean.getDockerProxyHost(), dBean.getDockerProxyPort()));*/
-		
+
 		ArrayNode portsArrayNode = containerNode.arrayNode();
 		ObjectNode portsNode  = objectMapper.createObjectNode();
 		portsNode.put(DeployConstants.NAME_DEP_YML, DeployConstants.PROTOBUF_API_DEP_YML);
 		portsNode.put(DeployConstants.CONTAINERPORT_DEP_YML, dBean.getSingleTargetPort());
-		
+
 		portsArrayNode.add(portsNode);
 		containerArrayNode.add(containerNode);
 		containerNode.set(DeployConstants.PORTS_DEP_YML, portsArrayNode);
-		
+
 		ObjectNode imagePullSecretsNode = objectMapper.createObjectNode();
 		ArrayNode imageSecretArrayNode = containerNode.arrayNode();
 		imagePullSecretsNode.put(DeployConstants.NAME_DEP_YML, DeployConstants.ACUMOS_REGISTRY_DEP_YML);
 		imageSecretArrayNode.add(imagePullSecretsNode);
 		specTempNode.set(DeployConstants.IMAGEPULLSECRETS_DEP_YML, imageSecretArrayNode);
-		
+
 		specTempNode.set(DeployConstants.CONTAINERS_DEP_YML, containerArrayNode);
-		
-		
+
+
 		ObjectNode restartPolicyObjectNode = objectMapper.createObjectNode();
 		//ArrayNode restartPolicyNode = containerNode.arrayNode();
 		restartPolicyObjectNode.put(DeployConstants.RESTARTPOLICY_DEP_YML, DeployConstants.ALWAYS_DEP_YML);
 		//restartPolicyNode.add(restartPolicyObjectNode);
 		specTempNode.set(DeployConstants.RESTARTPOLICY_DEP_YML, restartPolicyObjectNode);
-		
+
 		templateNode.set(DeployConstants.METADATA_DEP_YML, metadataTemplateNode);
 		templateNode.set(DeployConstants.SPEC_DEP_YML, specTempNode);
 		specNode.set(DeployConstants.TEMPLATE_DEP_YML, templateNode);
-		
-	
-		
-		
+
+
+
+
 		kindRootNode.put(DeployConstants.SPEC_DEP_YML, specNode);
-		
+
 		String solutionDeployment = yamlMapper.writeValueAsString(kindRootNode);
 		logger.debug("solutionDeployment "+solutionDeployment);
-		
-	    
+
+
 	  return solutionDeployment;
   }
-  
+
   public byte[] compositeSolutionDetails(DeploymentBean dBean)throws Exception{
 		logger.debug("compositeSolutionDetails start");
 		byte[] solutionZip=null;
 		List<ContainerBean> contList=null;
 		ParseJSON parseJson=new ParseJSON();
 		/**Blueprint.json**/
-	   	 ByteArrayOutputStream byteArrayOutputStream=getBluePrintNexus(dBean.getSolutionId(), dBean.getRevisionId(), 
+	   	 ByteArrayOutputStream byteArrayOutputStream=getBluePrintNexus(dBean.getSolutionId(), dBean.getRevisionId(),
 	   			 dBean.getDatasource(),dBean.getDataUserName(), dBean.getDataPd(),
 	   			 dBean.getNexusUrl(), dBean.getNexusUserName(), dBean.getNexusPd());
 	   	 logger.debug("byteArrayOutputStream "+byteArrayOutputStream);
@@ -342,8 +342,8 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 		 logger.debug("compositeSolutionDetails End");
 		return solutionZip;
 	}
-  
- 
+
+
 	public ByteArrayOutputStream getBluePrintNexus(String solutionId, String revisionId,String datasource,String userName,String dataPd,
 			String nexusUrl,String nexusUserName,String nexusPd) throws  Exception{
 		  logger.debug(" getBluePrintNexus Start");
@@ -367,14 +367,14 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 					if (null != nexusURI) {
 						NexusArtifactClient nexusArtifactClient=nexusArtifactClient(nexusUrl,nexusUserName,nexusPd);
 						byteArrayOutputStream = nexusArtifactClient.getArtifact(nexusURI);
-						
+
 					}
 				}
-			}	
-			logger.debug("getBluePrintNexus End byteArrayOutputStream "+byteArrayOutputStream);	
-		return byteArrayOutputStream;	
+			}
+			logger.debug("getBluePrintNexus End byteArrayOutputStream "+byteArrayOutputStream);
+		return byteArrayOutputStream;
 	  }
-	
+
 	public List<ContainerBean> getprotoDetails(List<ContainerBean> contList,DeploymentBean dBean) throws Exception{
 		if(contList!=null){
 			int j = 0;
@@ -392,11 +392,11 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 		}
 		return contList;
 	  }
-	
+
 	public ByteArrayOutputStream getNexusUrlFile(String nexusUrl, String nexusUserName,String nexusPassword,String nexusURI)throws Exception {
 		   logger.debug("getNexusUrlFile start");
 		    ByteArrayOutputStream byteArrayOutputStream=null;
-			NexusArtifactClient nexusArtifactClient=nexusArtifactClient(nexusUrl, 
+			NexusArtifactClient nexusArtifactClient=nexusArtifactClient(nexusUrl,
 					nexusUserName, nexusPassword);
 			 byteArrayOutputStream = nexusArtifactClient.getArtifact(nexusURI);
 			 logger.debug("byteArrayOutputStream "+byteArrayOutputStream);
@@ -414,18 +414,18 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 						logger.debug("byteArrayOutputStream "+byteArrayOutputStream);
 						if(byteArrayOutputStream!=null){
 							dataBrokerBean.setProtobufFile(byteArrayOutputStream.toString());
-							dBean.setDataBrokerJson(byteArrayOutputStream.toString());	
+							dBean.setDataBrokerJson(byteArrayOutputStream.toString());
 						}else{
 							dataBrokerBean.setProtobufFile("");
-							dBean.setDataBrokerJson("");	
+							dBean.setDataBrokerJson("");
 						}
-						
+
 					 }
-					
+
 			  }
-		  
+
 	}
- 
+
  public void getSolutionYMLFile(DeploymentBean dBean,String jsonString)throws Exception{
 	    logger.debug("Start getSolutionYMLFile");
 		DataBrokerBean dataBrokerBean=null;
@@ -455,12 +455,12 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 		depBlueprintBean.setImagePort(dBean.getBluePrintPort());
 		depBlueprintBean.setNodeType(DeployConstants.BLUEPRINT_CONTAINER_NAME);
 		deploymentKubeBeanList.add(depBlueprintBean);
-		
-		
-		
+
+
+
 		int contPort=Integer.parseInt(dBean.getIncrementPort());
 		DockerInfo dockerBluePrintInfo=new DockerInfo();
-		
+
 		Iterator itr=deploymentKubeBeanList.iterator();
 		while(itr.hasNext()){
 			String portDockerInfo="";
@@ -468,11 +468,11 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 			if(depBen!=null && depBen.getContainerName()!=null && !"".equals(depBen.getContainerName())
 					        && depBen.getImage()!=null && !"".equals(depBen.getImage())
 					        && depBen.getNodeType()!=null && !"".equals(depBen.getNodeType())){
-				
+
 				String imagePort="";
 				if(depBen.getNodeType()!=null){
-					if(depBen.getNodeType().equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER) 
-							|| depBen.getNodeType().equalsIgnoreCase(DeployConstants.DATABROKER_NAME) 
+					if(depBen.getNodeType().equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)
+							|| depBen.getNodeType().equalsIgnoreCase(DeployConstants.DATABROKER_NAME)
 							|| depBen.getNodeType().equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)){
 						imagePort="";
 					}else{
@@ -483,12 +483,12 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 					imagePort=String.valueOf(contPort);
 					contPort++;
 				}
-				
+
 				logger.debug("imagePort "+imagePort);
 				String serviceYml=getCompositeSolutionService(depBen.getContainerName(),imagePort,depBen.getNodeType(),dBean);
 				String deploymentYml=getCompositeSolutionDeployment(depBen.getImage(),depBen.getContainerName(),
 						imagePort,depBen.getNodeType(),dBean);
-				
+
 				if(depBen.getNodeType()!=null && depBen.getNodeType().equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)){
 					portDockerInfo=dBean.getBluePrintPort();
 				}else if(depBen.getNodeType()!=null && depBen.getNodeType().equalsIgnoreCase(DeployConstants.DATA_BROKER)){
@@ -505,14 +505,14 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 				solutionYml=solutionYml+serviceYml;
 				solutionYml=solutionYml+deploymentYml;
 				logger.debug("solutionYml "+solutionYml);
-				
+
 				DockerInfoBean dockerInfoBean=new DockerInfoBean();
 				dockerInfoBean.setContainer(depBen.getContainerName());
 				dockerInfoBean.setIpAddress(depBen.getContainerName());
 				dockerInfoBean.setPort(portDockerInfo);
 				dockerInfoBeanList.add(dockerInfoBean);
 			}
-			
+
 		}
 		logger.debug("Final solutionYml "+solutionYml);
 		dBean.setSolutionYml(solutionYml);
@@ -531,40 +531,40 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 		}
 	logger.debug("End getSolutionYMLFile");
   }
- 
+
  public String getCompositeSolutionService(String containerName,String imagePort,String nodeType,DeploymentBean dBen)throws Exception{
 	  logger.debug("getSingleSolutionService Start");
 	    String serviceYml="";
-	    
+
 	    ObjectMapper objectMapper = new ObjectMapper();
 	    YAMLMapper yamlMapper = new YAMLMapper(new YAMLFactory().configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true));
 	    ObjectNode apiRootNode = objectMapper.createObjectNode();
 	    apiRootNode.put(DeployConstants.APIVERSION_YML, DeployConstants.V_YML);
 	    apiRootNode.put(DeployConstants.KIND_YML, DeployConstants.SERVICE_YML);
-	    
+
 	    ObjectNode metadataNode = objectMapper.createObjectNode();
 		metadataNode.put(DeployConstants.NAMESPACE_YML,DeployConstants.NAMESPACE_VALUE_YML);
 		if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)){
 		    metadataNode.put(DeployConstants.NAME_YML, DeployConstants.BLUEPRINT_MODELCONNECTOR_NAME+"-"+DeployConstants.TRACKINGID_VALUE_YML);
-		}else if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)){  
+		}else if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)){
 			metadataNode.put(DeployConstants.NAME_YML, DeployConstants.DATABROKER_NAME_YML+"-"+DeployConstants.TRACKINGID_VALUE_YML);
 		}else{
 			metadataNode.put(DeployConstants.NAME_YML, containerName+"-"+DeployConstants.TRACKINGID_VALUE_YML);
 		}
 		apiRootNode.set(DeployConstants.METADATA_YML, metadataNode);
-		
+
 		ObjectNode specNode = objectMapper.createObjectNode();
-		
+
 		ObjectNode selectorNode = objectMapper.createObjectNode();
 		if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)){
 		   selectorNode.put(DeployConstants.APP_YML, DeployConstants.BLUEPRINT_MODELCONNECTOR_NAME+"-"+DeployConstants.TRACKINGID_VALUE_YML);
-		}else if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)){ 
+		}else if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)){
 			selectorNode.put(DeployConstants.APP_YML, DeployConstants.DATABROKER_NAME_YML+"-"+DeployConstants.TRACKINGID_VALUE_YML);
 		}else{
 			selectorNode.put(DeployConstants.APP_YML, containerName+"-"+DeployConstants.TRACKINGID_VALUE_YML);
 		}
 		specNode.set(DeployConstants.SELECTOR_YML, selectorNode);
-		if(nodeType!=null && (nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER) 
+		if(nodeType!=null && (nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)
 				|| nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER) || nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME))){
 		  specNode.put(DeployConstants.TYPE_YML, DeployConstants.NODE_TYPE_PORT_YML);
 		}else{
@@ -572,26 +572,26 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 		}
 		ArrayNode portsArrayNode = specNode.arrayNode();
 		ObjectNode portsNode = objectMapper.createObjectNode();
-		
+
 		if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)){
 		  portsNode.put(DeployConstants.NAME_YML, DeployConstants.NAME_MCAPI_YML);
-		}else if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)){ 
+		}else if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)){
 			portsNode.put(DeployConstants.NAME_YML, DeployConstants.NAME_DATABROKER_YML);
-		}else if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)){ 
+		}else if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)){
 			//NA
 		}else{
 			portsNode.put(DeployConstants.NAME_YML, DeployConstants.PROTOBUF_API_DEP_YML);
 		}
-		
+
 		if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)){
 		 //portsNode.put(DeployConstants.NODEPORT_YML, dBen.getBluePrintNodePort());
 		}else if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)){
 			portsNode.put(DeployConstants.NODEPORT_YML, dBen.getDataBrokerNodePort());
-		}else if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)){	
+		}else if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)){
 			portsNode.put(DeployConstants.NODEPORT_YML, dBen.getProbeNodePort());
 		}
-		
-		
+
+
 		if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)){
 			portsNode.put(DeployConstants.PORT_YML, dBen.getBluePrintPort());
 		    portsNode.put(DeployConstants.TARGETPORT_YML, dBen.getBluePrintPort());
@@ -612,7 +612,7 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 		logger.debug("solutionDeployment "+serviceYml);
 	  return serviceYml;
   }
- 
+
  public String getCompositeSolutionDeployment(String imageTag,String containerName,String imagePort,String nodeType,DeploymentBean dBean)throws Exception{
 	    logger.debug("getSingleSolutionDeployment Start");
 	    ObjectMapper objectMapper = new ObjectMapper();
@@ -620,25 +620,25 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 	    ObjectNode kindRootNode = objectMapper.createObjectNode();
 	    kindRootNode.put(DeployConstants.APIVERSION_DEP_YML, DeployConstants.APPS_V1_DEP_YML);
 	    kindRootNode.put(DeployConstants.KIND_DEP_YML, DeployConstants.DEPLOYMENT_DEP_YML);
-	    
-	    
+
+
 	    ObjectNode metadataNode = objectMapper.createObjectNode();
 		metadataNode.put(DeployConstants.NAMESPACE_DEP_YML, DeployConstants.NAMESPACE_VALUE_YML);
 		if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)){
 			metadataNode.put(DeployConstants.NAME_DEP_YML, DeployConstants.BLUEPRINT_MODELCONNECTOR_NAME+"-"+DeployConstants.TRACKINGID_VALUE_YML);
-		}else if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)){  
+		}else if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)){
 			metadataNode.put(DeployConstants.NAME_YML, DeployConstants.DATABROKER_NAME_YML+"-"+DeployConstants.TRACKINGID_VALUE_YML);
 		}else{
 			metadataNode.put(DeployConstants.NAME_DEP_YML, containerName+"-"+DeployConstants.TRACKINGID_VALUE_YML);
 		}
-		
-		
+
+
 		ObjectNode labelsNode = objectMapper.createObjectNode();
-		
+
 		if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)){
 			labelsNode.put(DeployConstants.APP_DEP_YML, DeployConstants.BLUEPRINT_MODELCONNECTOR_NAME+"-"+DeployConstants.TRACKINGID_VALUE_YML);
 			labelsNode.put(DeployConstants.TRACKINGID_YML, DeployConstants.TRACKINGID_VALUE_YML);
-		}else if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)){  
+		}else if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)){
 			labelsNode.put(DeployConstants.APP_DEP_YML, DeployConstants.DATABROKER_NAME_YML+"-"+DeployConstants.TRACKINGID_VALUE_YML);
 			labelsNode.put(DeployConstants.TRACKINGID_YML, DeployConstants.TRACKINGID_VALUE_YML);
 		}else{
@@ -646,26 +646,26 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 			labelsNode.put(DeployConstants.TRACKINGID_YML, DeployConstants.TRACKINGID_VALUE_YML);
 		}
 		metadataNode.put(DeployConstants.LABELS_DEP_YML, labelsNode);
-		
+
 		kindRootNode.set(DeployConstants.METADATA_DEP_YML, metadataNode);
-		
+
 		ObjectNode specNode = objectMapper.createObjectNode();
 		specNode.put(DeployConstants.REPLICAS_DEP_YML, 1);
-		
+
 		ObjectNode selectorNode = objectMapper.createObjectNode();
 		ObjectNode matchLabelsNode = objectMapper.createObjectNode();
 		if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)){
 			matchLabelsNode.put(DeployConstants.APP_DEP_YML, DeployConstants.BLUEPRINT_MODELCONNECTOR_NAME+"-"+DeployConstants.TRACKINGID_VALUE_YML);
-		}else if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)){ 
+		}else if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)){
 			matchLabelsNode.put(DeployConstants.APP_DEP_YML, DeployConstants.DATABROKER_NAME_YML+"-"+DeployConstants.TRACKINGID_VALUE_YML);
 		}else{
 			matchLabelsNode.put(DeployConstants.APP_DEP_YML, containerName+"-"+DeployConstants.TRACKINGID_VALUE_YML);
 		}
-		
+
 		selectorNode.set(DeployConstants.MATCHLABELS_DEP_YML, matchLabelsNode);
-		
+
 		specNode.set(DeployConstants.SELECTOR_DEP_YML, selectorNode);
-	    
+
 		ObjectNode templateNode = objectMapper.createObjectNode();
 		ObjectNode metadataTemplateNode = objectMapper.createObjectNode();
 		ObjectNode labelsTemplateNode = objectMapper.createObjectNode();
@@ -679,10 +679,10 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 			labelsTemplateNode.put(DeployConstants.APP_DEP_YML, containerName+"-"+DeployConstants.TRACKINGID_VALUE_YML);
 			labelsTemplateNode.put(DeployConstants.TRACKINGID_YML, DeployConstants.TRACKINGID_VALUE_YML);
 		}
-		
+
 		metadataTemplateNode.set(DeployConstants.LABELS_DEP_YML, labelsTemplateNode);
-		
-		
+
+
 		ObjectNode specTempNode = objectMapper.createObjectNode();
 		ArrayNode containerArrayNode = templateNode.arrayNode();
 		ObjectNode containerNode  = objectMapper.createObjectNode();
@@ -694,18 +694,18 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 		}else{
 			containerNode.put(DeployConstants.NAME_DEP_YML, containerName+"-"+DeployConstants.TRACKINGID_VALUE_YML);
 		}
-		
+
 		if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)){
 			containerNode.put(DeployConstants.IMAGE_DEP_YML,imageTag);
 		}else if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)){
-			//containerNode.put(DeployConstants.IMAGE_DEP_YML, 
+			//containerNode.put(DeployConstants.IMAGE_DEP_YML,
 					//getProxyImageName(imageTag, dBean.getDockerProxyHost(), dBean.getDockerProxyPort()));
 		}else if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)){
 			containerNode.put(DeployConstants.IMAGE_DEP_YML,imageTag);
 		}else{
 			containerNode.put(DeployConstants.IMAGE_DEP_YML,imageTag);
 		}
-		
+
 		if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)){
 			ArrayNode envArrayNode = containerNode.arrayNode();
 			ObjectNode envNode  = objectMapper.createObjectNode();
@@ -718,8 +718,8 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 			envArrayNode.add(envNodeExternal);
 			containerNode.set(DeployConstants.ENV, envArrayNode);
 		}
-		
-		
+
+
 		ArrayNode portsArrayNode = containerNode.arrayNode();
 		ObjectNode portsNode  = objectMapper.createObjectNode();
 		if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)){
@@ -740,7 +740,7 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 		}else{
 			portsNode.put(DeployConstants.CONTAINERPORT_DEP_YML, dBean.getMlTargetPort());
 		}
-		
+
 		portsArrayNode.add(portsNode);
 		/*if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)){
 			ObjectNode portsNode2  = objectMapper.createObjectNode();
@@ -748,7 +748,7 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 			portsNode2.put(DeployConstants.CONTAINERPORT_DEP_YML, dBean.getProbeApiPort());
 			portsArrayNode.add(portsNode2);
 		}*/
-		
+
 		containerNode.set(DeployConstants.PORTS_DEP_YML, portsArrayNode);
 		//for Nginx
 		if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)){
@@ -760,7 +760,7 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 			portSchemaNode.put(DeployConstants.CONTAINERPORT_DEP_YML, dBean.getProbeSchemaPort());
 			portSchemaArrayNode.add(portSchemaNode);
 			containerNodeNginx.set(DeployConstants.PORTS_DEP_YML, portSchemaArrayNode);
-			
+
 		}
 		//BLUEPRINT or DataBroker
 		if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)){
@@ -788,8 +788,8 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 			containerNodeNginx.set(DeployConstants.VOLUMEMOUNTS_DEP_YML, volmeMountArrayNode);
 		}
 		//Finish
-		
-		
+
+
 		ObjectNode imagePullSecretsNode = objectMapper.createObjectNode();
 		ArrayNode imageSecretArrayNode = containerNode.arrayNode();
 		imagePullSecretsNode.put(DeployConstants.NAME_DEP_YML, DeployConstants.ACUMOS_REGISTRY_DEP_YML);
@@ -813,7 +813,7 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 			specTempNode.set(DeployConstants.VOLUMES_DEP_YML, volumeArrNode);
 		}
 		if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.DATABROKER_NAME)){
-			
+
 			ArrayNode volumeArrNode = templateNode.arrayNode();
 			ObjectNode volumeNode  = objectMapper.createObjectNode();
 			volumeNode.put(DeployConstants.NAME_DEP_YML, DeployConstants.DATABROKER_LOGNAME);
@@ -825,7 +825,7 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 			specTempNode.set(DeployConstants.VOLUMES_DEP_YML, volumeArrNode);
 		}
        if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)){
-			
+
 			ArrayNode volumeArrNode = templateNode.arrayNode();
 			ObjectNode volumeNode  = objectMapper.createObjectNode();
 			volumeNode.put(DeployConstants.NAME_DEP_YML, DeployConstants.VOLUME_PROTO_YML);
@@ -837,21 +837,21 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 			specTempNode.set(DeployConstants.VOLUMES_DEP_YML, volumeArrNode);
 		}
 		//Finish
-		
+
 		templateNode.set(DeployConstants.METADATA_DEP_YML, metadataTemplateNode);
 		templateNode.set(DeployConstants.SPEC_DEP_YML, specTempNode);
 		specNode.set(DeployConstants.TEMPLATE_DEP_YML, templateNode);
-		
+
 		kindRootNode.put(DeployConstants.SPEC_DEP_YML, specNode);
-		
+
 		String solutionDeployment = yamlMapper.writeValueAsString(kindRootNode);
 		logger.debug("before "+solutionDeployment);
 		solutionDeployment=solutionDeployment.replace("'", "");
 		logger.debug("After "+solutionDeployment);
-	    
+
 	  return solutionDeployment;
 }
- 
+
  public String getProxyImageName(String imageName,String dockerProxyHost,String dockerProxyPort){
 		logger.debug("Start-geProxyImageName "+imageName);
 		String dockerImage="";
@@ -866,11 +866,11 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 		if(image!=null && !"".equals(image) && dockerProxyHost!=null && dockerProxyPort!=null){
 			dockerImage=dockerProxyHost+":"+dockerProxyPort+"/"+image;
 		}
-		
+
 		logger.debug(" end geProxyImageName dockerImage"+dockerImage);
 		return dockerImage;
 	}
- 
+
  public MLPTask createTaskDetails(DeployBean deployBean, DeploymentBean dBean ) throws Exception{
 	 logger.debug("createTaskDetails start");
 	 MLPTask mlpTask =new MLPTask();
@@ -892,7 +892,7 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 	 logger.debug("createTaskDetails end");
 	 return mlpTask;
  }
- 
+
  public MLPTask getTaskDetails(String datasource,String userName,String dataPd, long taskIdNum,DeploymentBean dBean) throws Exception{
 	 logger.debug("getTaskDetails start");
 	 MLPTask mlpTask =null;
@@ -907,11 +907,19 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 		 if(mlpTask.getRevisionId()!=null && !"".equalsIgnoreCase(mlpTask.getRevisionId().trim())) {
 			 dBean.setRevisionId(mlpTask.getRevisionId().trim());
 		 }
+     logger.debug("mlpTask.getTrackingId() "+mlpTask.getTrackingId());
+		 if(mlpTask.getTrackingId()!=null && !"".equalsIgnoreCase(mlpTask.getTrackingId().trim())) {
+			 dBean.setTrackingId(mlpTask.getTrackingId().trim());
+		 }
+     logger.debug("mlpTask.getTaskId() "+mlpTask.getTaskId());
+     if(mlpTask.getTaskId()!=null ) {
+       dBean.setTaskId(mlpTask.getTaskId().toString());
+     }
 	 }
 	 logger.debug("getTaskDetails end");
 	 return mlpTask;
  }
- 
+
  public void updateTaskDetails(String datasource,String userName,String dataPd, long taskIdNum,
 		 String status,String reason,MLPTask mlpTask)throws Exception {
 	 logger.debug("updateTaskDetails Start");
@@ -924,11 +932,11 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 		 generateNotification("Kubernetes Jenkin deployment complete ",mlpTask.getUserId(),datasource,userName,dataPd);
 	 }
 	 logger.debug("updateTaskDetails End");
-	 
- }
- 
 
- 
+ }
+
+
+
  public void generateNotification(String msg, String userId,String dataSource,String dataUserName,String dataPassword)throws Exception {
 	 logger.debug("generateNotification Start");
 	 logger.debug("userId "+userId+"msg "+msg);
@@ -953,9 +961,9 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
     	 logger.error("generateNotification failed", e);
     	 throw e;
      }
-     logger.debug("generateNotification End"); 
+     logger.debug("generateNotification End");
  }
- 
+
  public org.acumos.deploymentclient.bean.MLNotification createNotification(MLPNotification mlpNotification,String dataSource,
 		 String dataUserName,String dataPassword) {
 	 logger.debug("createNotification Start");
@@ -964,7 +972,7 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
      logger.debug("createNotification End");
      return mlNotification;
  }
- 
+
  public static MLNotification convertToMLNotification(MLPNotification mlpNotification) {
 		MLNotification mlNotification = new MLNotification();
 		if (!isEmptyOrNullString(mlpNotification.getNotificationId())) {
@@ -994,58 +1002,58 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 		}
 		return isEmpty;
 	}
- 
+
  public void createJenkinTask(DeploymentBean dBean,String taskId,String jobName) throws Exception{
 	 logger.debug("createJenkinTask Start");
 	 JenkinsJobBuilder jobBuilder=new JenkinsJobBuilder();
 	 jobBuilder.buildJenkinsJob(dBean.getJenkinUrl(), dBean.getJenkinUserName(), dBean.getJenkinPassword(),
-			 "jobone", taskId);
+			 jobName, taskId);
 	 logger.debug("createJenkinTask End");
  }
- 
- 
+
+
  public void setDeploymentBeanProperties(DeploymentBean dBean,Environment env)throws Exception {
 	 logger.debug("setDeploymentBeanProperties Start");
-	 
+
 	 String bluePrintImage=(env.getProperty(DeployConstants.BLUEPRINT_IMAGENAME_PROP)!= null) ?env.getProperty(DeployConstants.BLUEPRINT_IMAGENAME_PROP):"";
   	 String bluePrintPort=(env.getProperty(DeployConstants.BLUEPRINT_PORT_PROP)!= null) ?env.getProperty(DeployConstants.BLUEPRINT_PORT_PROP):"";
   	 String bluePrintNodePort=(env.getProperty(DeployConstants.BLUEPRINT_NODEPORT_PROP)!= null) ?env.getProperty(DeployConstants.BLUEPRINT_NODEPORT_PROP):"";
-  	 
+
   	 String probeModelPort=(env.getProperty(DeployConstants.PROBE_MODEL_PORT) != null) ? env.getProperty(DeployConstants.PROBE_MODEL_PORT) : "";
 	 //String probeNodePort=(env.getProperty(DeployConstants.PROBE_NODE_PORT) != null) ? env.getProperty(DeployConstants.PROBE_NODE_PORT) : "";
 	 String probeTargetPort=(env.getProperty(DeployConstants.PROBE_TARGET_PORT) != null) ? env.getProperty(DeployConstants.PROBE_TARGET_PORT) : "";
 	 String probeApiPort=(env.getProperty(DeployConstants.PROBE_API_PORT) != null) ? env.getProperty(DeployConstants.PROBE_API_PORT) : "";
 	 String probeImageName=(env.getProperty(DeployConstants.PROBEIMAGE_NAME) != null) ? env.getProperty(DeployConstants.PROBEIMAGE_NAME) : "";
-	 
+
 	 String singleModelPort=(env.getProperty(DeployConstants.SINGLE_MODEL_PORT) != null) ? env.getProperty(DeployConstants.SINGLE_MODEL_PORT) : "";
 	 //String singleNodePort=(env.getProperty(DeployConstants.SINGLE_NODE_PORT) != null) ? env.getProperty(DeployConstants.SINGLE_NODE_PORT) : "";
 	 String singleTargetPort=(env.getProperty(DeployConstants.SINGLE_TARGET_PORT) != null) ? env.getProperty(DeployConstants.SINGLE_TARGET_PORT) : "";
 	 String incrementPort=(env.getProperty(DeployConstants.INCREMENT_PORT)!= null) ?env.getProperty(DeployConstants.INCREMENT_PORT):"";
 	 String folderPath=(env.getProperty(DeployConstants.FOLDERPATH) != null) ? env.getProperty(DeployConstants.FOLDERPATH) : "";
-	 
+
 	 String dataBrokerModelPort=(env.getProperty(DeployConstants.DATABROKER_MODEL_PORT) != null) ? env.getProperty(DeployConstants.DATABROKER_MODEL_PORT) : "";
 	 //String dataBrokerNodePort=(env.getProperty(DeployConstants.DATABROKER_NODE_PORT) != null) ? env.getProperty(DeployConstants.DATABROKER_NODE_PORT) : "";
 	 String dataBrokerTargetPort=(env.getProperty(DeployConstants.DATABROKER_TARGET_PORT) != null) ? env.getProperty(DeployConstants.DATABROKER_TARGET_PORT) : "";
-	 
+
 	 String nginxImageName=(env.getProperty(DeployConstants.NGINX_IMAGE_NAME) != null) ? env.getProperty(DeployConstants.NGINX_IMAGE_NAME) : "";
 
 	 String nexusUrl=(env.getProperty(DeployConstants.NEXUS_URL_PROP) != null) ? env.getProperty(DeployConstants.NEXUS_URL_PROP) : "";
 	 String nexusUsername=(env.getProperty(DeployConstants.NEXUS_USERNAME_PROP) != null) ? env.getProperty(DeployConstants.NEXUS_USERNAME_PROP) : "";
 	 String nexusPd=(env.getProperty(DeployConstants.NEXUS_PD_PROP) != null) ? env.getProperty(DeployConstants.NEXUS_PD_PROP) : "";
-	 
+
 	 String cmnDataUrl=(env.getProperty(DeployConstants.CMNDATASVC_CMNDATASVCENDPOINTURL_PROP) != null) ? env.getProperty(DeployConstants.CMNDATASVC_CMNDATASVCENDPOINTURL_PROP) : "";
    	 String cmnDataUser=(env.getProperty(DeployConstants.CMNDATASVC_CMNDATASVCUSER_PROP) != null) ? env.getProperty(DeployConstants.CMNDATASVC_CMNDATASVCUSER_PROP) : "";
    	 String cmnDataPd=(env.getProperty(DeployConstants.CMNDATASVC_CMNDATASVCPD_PROP) != null) ? env.getProperty(DeployConstants.CMNDATASVC_CMNDATASVCPD_PROP) : "";
    	 String jenkinUrl=(env.getProperty(DeployConstants.JENKIN_URL_PROP) != null) ? env.getProperty(DeployConstants.JENKIN_URL_PROP) : "";
    	 String jenkinUserName=(env.getProperty(DeployConstants.JENKIN_USER_PROP) != null) ? env.getProperty(DeployConstants.JENKIN_USER_PROP) : "";
    	 String jenkinPassword=(env.getProperty(DeployConstants.JENKIN_PASSWORD_PROP) != null) ? env.getProperty(DeployConstants.JENKIN_PASSWORD_PROP) : "";
-   	 
-   	
+
+
    	 String jenkinJob=(env.getProperty(DeployConstants.JENKIN_JOB) != null) ? env.getProperty(DeployConstants.JENKIN_JOB) : "";
-   	 //String jenkinJobSimple=(env.getProperty(DeployConstants.JENKIN_JOBSIMPLE_PROP) != null) ? env.getProperty(DeployConstants.JENKIN_JOBSIMPLE_PROP) : "";
-   	 //String jenkinJobComposite=(env.getProperty(DeployConstants.JENKIN_JOBCOMPOSITE_PROP) != null) ? env.getProperty(DeployConstants.JENKIN_JOBCOMPOSITE_PROP) : "";
+   	 String jenkinJobSimple=(env.getProperty(DeployConstants.JENKIN_JOBSIMPLE_PROP) != null) ? env.getProperty(DeployConstants.JENKIN_JOBSIMPLE_PROP) : "";
+   	 String jenkinJobComposite=(env.getProperty(DeployConstants.JENKIN_JOBCOMPOSITE_PROP) != null) ? env.getProperty(DeployConstants.JENKIN_JOBCOMPOSITE_PROP) : "";
    	 // jenkinJobNifi=(env.getProperty(DeployConstants.JENKIN_JOBNIFI_PROP) != null) ? env.getProperty(DeployConstants.JENKIN_JOBNIFI_PROP) : "";
-   	 
+
    	String logstashIP=(env.getProperty(DeployConstants.LOGSTASH_IP) != null) ? env.getProperty(DeployConstants.LOGSTASH_IP) : "";
    	String logstashHost=(env.getProperty(DeployConstants.LOGSTASH_PORT) != null) ? env.getProperty(DeployConstants.LOGSTASH_PORT) : "";
    	String logstashPort=(env.getProperty(DeployConstants.LOGSTASH_HOST) != null) ? env.getProperty(DeployConstants.LOGSTASH_HOST) : "";
@@ -1055,56 +1063,55 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
    	String templateYmlDirectory=(env.getProperty(DeployConstants.TEMPLATE_YML_DIRECTORY) != null) ? env.getProperty(DeployConstants.TEMPLATE_YML_DIRECTORY) : "";
    	String mlTargetPort=(env.getProperty(DeployConstants.ML_TARGET_PORT) != null) ? env.getProperty(DeployConstants.ML_TARGET_PORT) : "";
 	String deploymentClientApiBaseUrl=(env.getProperty(DeployConstants.DEPLOYMENT_CLIENT_API_BASE_URL) != null) ? env.getProperty(DeployConstants.DEPLOYMENT_CLIENT_API_BASE_URL) : "";
-	String kubernetesCluster=(env.getProperty(DeployConstants.KUBERNETES_CLUSTER) != null) ? env.getProperty(DeployConstants.KUBERNETES_CLUSTER) : "";
-   	
+
 	 dBean.setDeploymentClientApiBaseUrl(deploymentClientApiBaseUrl);
    	 dBean.setMlTargetPort(mlTargetPort);
 	 dBean.setBluePrintImage(bluePrintImage);
 	 dBean.setBluePrintPort(bluePrintPort);
 	 dBean.setBluePrintNodePort(bluePrintNodePort);
-	 
+
 	 dBean.setProbeModelPort(probeModelPort);
 	 //dBean.setProbeNodePort(probeNodePort);
 	 dBean.setProbeTargetPort(probeTargetPort);
 	 dBean.setProbeApiPort(probeApiPort);
 	 dBean.setProbeImageName(probeImageName);
-	 
-	 
+
+
 	 dBean.setSingleModelPort(singleModelPort);
 	 //dBean.setSingleNodePort(singleNodePort);
 	 dBean.setSingleTargetPort(singleTargetPort);
 	 dBean.setIncrementPort(incrementPort);
 	 dBean.setFolderPath(folderPath);
-	 
+
 	 dBean.setDataBrokerModelPort(dataBrokerModelPort);
 	 //dBean.setDataBrokerNodePort(dataBrokerNodePort);
 	 dBean.setDataBrokerTargetPort(dataBrokerTargetPort);
-	 
+
 	 dBean.setNginxImageName(nginxImageName);
 	 dBean.setNexusUrl(nexusUrl);
 	 dBean.setNexusUserName(nexusUsername);
 	 dBean.setNexusPd(nexusPd);
-	 
+
 	 dBean.setDatasource(cmnDataUrl);
 	 dBean.setDataUserName(cmnDataUser);
 	 dBean.setDataPd(cmnDataPd);
 	 dBean.setJenkinUrl(jenkinUrl);
 	 dBean.setJenkinUserName(jenkinUserName);
 	 dBean.setJenkinPassword(jenkinPassword);
-	 
-	 dBean.setJenkinJobSimple("simple");
-	 dBean.setJenkinJobComposite("composite");
+
+	 dBean.setJenkinJobSimple(jenkinJobSimple);
+	 dBean.setJenkinJobComposite(jenkinJobComposite);
 	 dBean.setJenkinJobNifi("nifi");
-	 
-	 dBean.setLogstashIP(logstashIP); 
+
+	 dBean.setLogstashIP(logstashIP);
 	 dBean.setLogstashHost(logstashHost);
 	 dBean.setLogstashPort(logstashPort);
 	 dBean.setAcumosRegistyName(acumosRegistyName);
 	 dBean.setAcumosRegistyUser(acumosRegistyUser);
 	 dBean.setAcumosRegistyPd(acumosRegistyPd);
 	 dBean.setTemplateYmlDirectory(templateYmlDirectory);
-	   	
-   	 
+
+
    	 logger.debug("cmnDataUrl "+cmnDataUrl);
    	 logger.debug("cmnDataUser "+cmnDataUser);
    	 logger.debug("cmnDataPd "+cmnDataPd);
@@ -1115,12 +1122,11 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
    	 logger.debug("jenkinJobComposite "+jenkinJobComposite);
    	 logger.debug("jenkinJobNifi "+jenkinJobNifi);*/
  	logger.debug("jenkinJob "+jenkinJob);
-   	logger.debug("kubernetesCluster "+kubernetesCluster);
-	 
-	 
+
+
 	 logger.debug("setDeploymentBeanProperties End");
  }
- 
+
  public String createEnvFile(DeploymentBean dBean,String solType) throws Exception {
 	  logger.debug("createEnvFile Start");
 	  StringBuffer envBuffer = new StringBuffer();
@@ -1132,33 +1138,34 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 				+ "export ACUMOS_DOCKER_REGISTRY="+dBean.getAcumosRegistyName()+" \n"
 				+ "export ACUMOS_DOCKER_REGISTRY_USER="+dBean.getAcumosRegistyUser()+" \n"
 				+ "export ACUMOS_DOCKER_REGISTRY_PASSWORD="+dBean.getAcumosRegistyPd()+" \n"
-				+ "export K8S_CLUSTER= \n"
-				+ "export TRACKING_ID= "+dBean.getTrackingId()+"\n"
-				+ "export TASK_ID="+dBean.getLogstashHost()+" \n"
-				+ "export SOLUTION_TYPE="+solType+" \n"	
-				+ "export SOLUTION_NAME="+dBean.getSolutionId()+" \n"
-				+ "export SOLUTION_DOMAIN= \n"
-				+ "export SOLUTION_MODEL_RUNNER_STANDARD=v2 \n"
+		//		+ "export K8S_CLUSTER="+dBean.getEnvId()+"\n"
+        + "export K8S_CLUSTER=default"+"\n"
+				+ "export TRACKING_ID="+dBean.getTrackingId()+"\n"
+				+ "export TASK_ID="+dBean.getTaskId()+"\n"
+				+ "export SOLUTION_TYPE="+solType+"\n"
+				+ "export SOLUTION_NAME="+dBean.getSolutionName()+" \n"
+        // TODO: figure out how to determine the actual model runner version
+				+ "export SOLUTION_MODEL_RUNNER_STANDARD=v2\n"
 				+ "export LOGSTASH_HOST="+dBean.getLogstashHost()+" \n"
 				+ "export LOGSTASH_IP= "+dBean.getLogstashIP()+"\n"
 				+ "export LOGSTASH_PORT="+dBean.getLogstashPort()+" \n";
-				
-	  
+
+
 	  if(solType!=null && "simple".equalsIgnoreCase(solType)) {
 		  simpEnv ="export SOLUTION_ID="+dBean.getSolutionId()+" \n";
 	  }else {
 		  compEnv ="export COMP_SOLUTION_ID="+dBean.getLogstashPort()+" \n"
-					+ "export COMP_REVISION_ID="+dBean.getLogstashPort()+" \n"; 
+					+ "export COMP_REVISION_ID="+dBean.getLogstashPort()+" \n";
 	  }
 	  envBuffer.append(setEnvDeploy);
 	  envBuffer.append(simpEnv);
       logger.debug("createEnvFile End"+setEnvDeploy);
 	  return setEnvDeploy;
  }
- 
+
 
  public byte[] createSingleSolutionZip(DeploymentBean dBean)throws Exception{
-	  
+
 	    byte[] buffer = new byte[1024];
 		ByteArrayOutputStream baos =null;
 		ArrayList<String> filesListInDir = new ArrayList<String>();
@@ -1167,8 +1174,8 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 		ByteArrayOutputStream bOutput = new ByteArrayOutputStream(12);
 		//CommonUtil util=new CommonUtil();
 			if(dBean!=null){
-					 
-					 
+
+
 					 bOutput = new ByteArrayOutputStream(12);
 					 String deployFile=dBean.getFolderPath()+DeployConstants.KUBE_DEPLOY_SH;
 					 String deployScript=getFileDetails(deployFile);
@@ -1183,19 +1190,19 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 						 bOutput.write(tempEnvFile.getBytes());
 						 hmap.put(DeployConstants.KUBE_DEPLOY_ENV_SH, bOutput);
 						 logger.debug(DeployConstants.KUBE_DEPLOY_ENV_SH+" "+bOutput);
-					 } 
-				
-				
-				
+					 }
+
+
+
 				if(dBean.getSolutionYml()!=null && !"".equals(dBean.getSolutionYml())){
 					bOutput = new ByteArrayOutputStream(12);
 					bOutput.write(dBean.getSolutionYml().getBytes());
 					hmap.put(DeployConstants.KUBE_SOLUTION_YML, bOutput);
 					logger.debug(DeployConstants.KUBE_SOLUTION_YML+"  "+bOutput);
 				}
-				
+
 			}
-			
+
 			baos= new ByteArrayOutputStream();
 			ZipOutputStream zos = new ZipOutputStream(baos);
 			Iterator it = hmap.entrySet().iterator();
@@ -1203,7 +1210,7 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 		        Map.Entry pair = (Map.Entry)it.next();
 		        String fileName=(String)pair.getKey();
 		        ByteArrayOutputStream ba=(ByteArrayOutputStream)pair.getValue();
-		        
+
 		        ZipEntry ze = new ZipEntry(fileName);
 				zos.putNextEntry(ze);
 				InputStream in = new ByteArrayInputStream(ba.toByteArray());
@@ -1215,7 +1222,7 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 		    }
 		    File dir =new File(dBean.getTemplateYmlDirectory());
         	filesListInDir=populateFilesList(dir,filesListInDir);
-        	
+
         	 for(String filePath : filesListInDir){
         		 logger.debug("Zipping "+filePath);
 	                //for ZipEntry we need to keep only relative file path, so we used substring on absolute path
@@ -1229,14 +1236,14 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 	                }
 	                fis.close();
 	            }
-			
+
 			zos.closeEntry();
 			zos.close();
 			logger.debug("Done");
-	 
+
 		return baos.toByteArray();
   }
- 
+
  public ArrayList<String> populateFilesList(File dir,ArrayList<String> filesListInDir) throws Exception {
  	File[] files = dir.listFiles();
      for(File file : files){
@@ -1245,9 +1252,9 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
      }
      return filesListInDir;
  }
- 
+
  public byte[] createCompositeSolutionZip(DeploymentBean dBean)throws Exception{
-	  
+
 	    byte[] buffer = new byte[1024];
 		ByteArrayOutputStream baos =null;
 		ArrayList<String> filesListInDir = new ArrayList<String>();
@@ -1255,8 +1262,8 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 		ByteArrayOutputStream bOutput = new ByteArrayOutputStream(12);
 		//CommonUtil util=new CommonUtil();
 			if(dBean!=null){
-				 
-				 
+
+
 				 bOutput = new ByteArrayOutputStream(12);
 				 String deployFile=dBean.getFolderPath()+DeployConstants.KUBE_DEPLOY_SH;
 				 String deployScript=getFileDetails(deployFile);
@@ -1279,7 +1286,7 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 					hmap.put(DeployConstants.KUBE_BLUEPRINT_JSON, bOutput);
 					logger.debug(DeployConstants.KUBE_BLUEPRINT_JSON+" "+bOutput);
 				}
-				
+
 				if(dBean.getDockerInfoJson()!=null && !"".equals(dBean.getDockerInfoJson())){
 					bOutput = new ByteArrayOutputStream(12);
 					bOutput.write(dBean.getDockerInfoJson().getBytes());
@@ -1319,10 +1326,10 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 						}
 					}
 				}
-				
-				
+
+
 			}
-			
+
 			baos= new ByteArrayOutputStream();
 			ZipOutputStream zos = new ZipOutputStream(baos);
 			Iterator it = hmap.entrySet().iterator();
@@ -1330,7 +1337,7 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 		        Map.Entry pair = (Map.Entry)it.next();
 		        String fileName=(String)pair.getKey();
 		        ByteArrayOutputStream ba=(ByteArrayOutputStream)pair.getValue();
-		        
+
 		        ZipEntry ze = new ZipEntry(fileName);
 				zos.putNextEntry(ze);
 				InputStream in = new ByteArrayInputStream(ba.toByteArray());
@@ -1340,10 +1347,10 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 				}
 				in.close();
 		    }
-		    
+
 		    File dir =new File(dBean.getTemplateYmlDirectory());
         	filesListInDir=populateFilesList(dir,filesListInDir);
-        	
+
         	 for(String filePath : filesListInDir){
         		 logger.debug("Zipping "+filePath);
 	                //for ZipEntry we need to keep only relative file path, so we used substring on absolute path
@@ -1357,7 +1364,7 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 	                }
 	                fis.close();
 	            }
-			
+
 			zos.closeEntry();
 			zos.close();
 	    	return baos.toByteArray();
@@ -1380,7 +1387,7 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 		content = stringBuilder.toString();
 		return content;
 	}
- 
+
  public String getModelName(String imageName, String solutionId){
 		logger.debug("Start getModelName: imgName:" + imageName + ", solutionId:" + solutionId);
 		String modelName = null;
@@ -1409,11 +1416,11 @@ public String getSingleSolutionYMLFile(String imageTag,String singleModelPort,De
 				}
 			}
 		}
-		
+
 		logger.debug(" End-getModelName " + modelName);
 		return modelName;
 	}
- 
+
 
 
 }

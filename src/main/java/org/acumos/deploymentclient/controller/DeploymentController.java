@@ -41,17 +41,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class DeploymentController {
 	@Autowired
 	private Environment env;
-	
+
 	@Autowired(required=true)
 	DeploymentService deploymentService;
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-	
+
 	@RequestMapping(value = "/deploy", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public String deploy(HttpServletRequest request,@RequestBody DeployBean deployBean,HttpServletResponse response) throws Exception {
 		 log.debug("Start deploy API ");
 		 JSONObject  jsonOutput = new JSONObject();
 		 DeploymentBean dBean=new DeploymentBean();
-		 
+
 		 try {
 			 log.debug("solutionId "+deployBean.getSolutionId());
 			 log.debug("revisionId "+deployBean.getRevisionId());
@@ -63,6 +63,10 @@ public class DeploymentController {
 				 response.setStatus(404);
 				 return jsonOutput.toString();
 			 }
+       dBean.setEnvId(deployBean.getEnvId());
+       dBean.setSolutionId(deployBean.getSolutionId());
+       dBean.setRevisionId(deployBean.getRevisionId());
+       dBean.setUserId(deployBean.getUserId());
 			 deploymentService.setDeploymentBeanProperties(dBean, env);
 			 MLPTask mlpTask=deploymentService.createTaskDetails(deployBean, dBean);
 			 log.debug("mlpTask created taskId"+mlpTask.getTaskId());
@@ -70,11 +74,11 @@ public class DeploymentController {
 					   dBean.getDatasource(), dBean.getDataUserName(), dBean.getDataPd());
 			  System.out.println("solutionToolKitType "+solutionToolKitType);
 			  if(solutionToolKitType!=null && !"".equals(solutionToolKitType) && "CP".equalsIgnoreCase(solutionToolKitType)){
-				  deploymentService.createJenkinTask(dBean,String.valueOf(mlpTask.getTaskId()),"Composite");	
+				  deploymentService.createJenkinTask(dBean,String.valueOf(mlpTask.getTaskId()),env.getProperty("jenkins.job.composite"));
 				}else {
-				  deploymentService.createJenkinTask(dBean,String.valueOf(mlpTask.getTaskId()),"Simple");	
+				  deploymentService.createJenkinTask(dBean,String.valueOf(mlpTask.getTaskId()),env.getProperty("jenkins.job.simple"));
 				}
-			 
+
 			 jsonOutput.put("status", "SUCCESS");
 			 response.setStatus(202);
 		 }catch(Exception e){
@@ -85,8 +89,8 @@ public class DeploymentController {
 		 log.debug("End deploy API ");
 		 return jsonOutput.toString();
 	}
-	
-	
+
+
 	@RequestMapping(value = "/getSolutionZip/{taskId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	public String getSolutionZip(HttpServletRequest request, @PathVariable("taskId") String taskId,HttpServletResponse response) throws Exception {
 		 log.debug("Start getSolutionZip ");
@@ -114,14 +118,14 @@ public class DeploymentController {
 				System.out.println("Composite Solution Deployment End");
 				}else{
 				System.out.println("Single Solution Details Start");
-				String imageTag=deploymentService.getSingleImageData(dBean.getSolutionId(), dBean.getRevisionId(), 
+				String imageTag=deploymentService.getSingleImageData(dBean.getSolutionId(), dBean.getRevisionId(),
 						dBean.getDatasource(), dBean.getDataUserName(), dBean.getDataPd());
 				solutionZip=deploymentService.singleSolutionDetails(dBean, imageTag, singleModelPort);
 				System.out.println("Single Solution Details End");
 				}
 		   jsonOutput.put("status", "OK");
 		   response.setStatus(200);
-		 
+
 		 }catch(Exception e){
 				log.error("getSolutionZip failed", e);
 				jsonOutput.put("status", "FAIL");
@@ -132,7 +136,7 @@ public class DeploymentController {
 		 log.debug("End getSolutionZip");
 		 return jsonOutput.toString();
 	}
-	
+
 	@RequestMapping(value = "/status/{taskId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public String status(HttpServletRequest request,@RequestBody StatusBean statusBean, @PathVariable("taskId") String taskId,
 			HttpServletResponse response) throws Exception {
@@ -152,14 +156,14 @@ public class DeploymentController {
 			   log.debug("Status "+statusBean.getStatus());
 			   log.debug("Reason "+statusBean.getReason());
 			   deploymentService.setDeploymentBeanProperties(dBean, env);
-			   mlpTask=deploymentService.getTaskDetails(dBean.getDatasource(), dBean.getDataUserName(), 
+			   mlpTask=deploymentService.getTaskDetails(dBean.getDatasource(), dBean.getDataUserName(),
 					   dBean.getDataPd(), taskIdNum,null);
-			   deploymentService.updateTaskDetails(dBean.getDatasource(), dBean.getDataUserName(), 
+			   deploymentService.updateTaskDetails(dBean.getDatasource(), dBean.getDataUserName(),
 					   dBean.getDataPd(), taskIdNum, statusBean.getStatus(),statusBean.getReason(), mlpTask);
-			   
+
 			   jsonOutput.put("status", "OK");
 			   response.setStatus(200);
-			 
+
 			 }catch(Exception e){
 					log.error("status API failed", e);
 					jsonOutput.put("status", "FAIL");
@@ -168,7 +172,7 @@ public class DeploymentController {
 		 log.debug("End status API ");
 		 return jsonOutput.toString();
 	}
-	
-	
-	
+
+
+
 }
