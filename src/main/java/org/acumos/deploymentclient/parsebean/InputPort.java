@@ -8,9 +8,9 @@
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *  
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * This file is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
@@ -19,68 +19,63 @@
  */
 package org.acumos.deploymentclient.parsebean;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-/**
- * This class is a representation of Input Port in blueprint
- * 
- */
-
+/** This class is a representation of Input Port in blueprint */
 public class InputPort implements Serializable {
 
-	private final static long serialVersionUID = 4874295563788554992L;
-	@JsonProperty("container_name")
-	private String container = null;
-	@JsonProperty("operation_signature")
-	private OperationSignature operationSignature = null;
+  private static final long serialVersionUID = 4874295563788554992L;
 
-	/**
-	 * Standard POJO no-arg constructor
-	 */
-	public InputPort() {
-		super();
-	}
+  @JsonProperty("container_name")
+  private String container = null;
 
-	/**
-	 * 
-	 * @param operationSignature
-	 *            An operation - it further has a name, input message and output
-	 *            message
-	 * @param container
-	 *            Name of the container in the dockerinfo.json
-	 */
-	public InputPort(String container, OperationSignature operationSignature) {
-		super();
-		this.container = container;
-		this.operationSignature = operationSignature;
-	}
+  @JsonProperty("operation_signature")
+  private OperationSignature operationSignature = null;
 
-	@JsonProperty("container_name")
-	public String getContainerName() {
-		return container;
-	}
+  /** Standard POJO no-arg constructor */
+  public InputPort() {
+    super();
+  }
 
-	@JsonProperty("container_name")
-	public void setContainerName(String container) {
-		this.container = container;
-	}
+  /**
+   * @param operationSignature An operation - it further has a name, input message and output
+   *     message
+   * @param container Name of the container in the dockerinfo.json
+   */
+  public InputPort(String container, OperationSignature operationSignature) {
+    super();
+    this.container = container;
+    this.operationSignature = operationSignature;
+  }
 
-	@JsonProperty("operation_signature")
-	public OperationSignature getOperationSignature() {
-		return operationSignature;
-	}
+  @JsonProperty("container_name")
+  public String getContainerName() {
+    return container;
+  }
 
-	@JsonProperty("operation_signature")
-	public void setOperationSignature(OperationSignature operationSignature) {
-		this.operationSignature = operationSignature;
-	}
+  @JsonProperty("container_name")
+  public void setContainerName(String container) {
+    this.container = container;
+  }
 
-	@Override
-	public String toString() {
+  @JsonProperty("operation_signature")
+  public OperationSignature getOperationSignature() {
+    return operationSignature;
+  }
 
-		return "InputPort [container=" + container + ", operationSignature =" + operationSignature + "]";
-	}
+  @JsonProperty("operation_signature")
+  public void setOperationSignature(OperationSignature operationSignature) {
+    this.operationSignature = operationSignature;
+  }
 
+  @Override
+  public String toString() {
+
+    return "InputPort [container="
+        + container
+        + ", operationSignature ="
+        + operationSignature
+        + "]";
+  }
 }
