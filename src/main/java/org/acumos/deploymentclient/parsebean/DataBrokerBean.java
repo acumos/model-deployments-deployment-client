@@ -8,9 +8,9 @@
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *  
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * This file is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
@@ -22,75 +22,70 @@ package org.acumos.deploymentclient.parsebean;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class DataBrokerBean {
-	
-	@JsonProperty("data_broker_map")
-    private DataBrokerMap dataBrokerMap = null;
-	
-	@JsonProperty("userName")
-	private String userName=null;
-	
-	@JsonProperty("password")
-	private String password=null;
-	
-	@JsonProperty("host")
-	private String host=null;
-	
-	@JsonProperty("port")
-	private String port=null;
-	
-	@JsonProperty("protobufFile")
-	private String protobufFile=null;
 
-	public DataBrokerMap getDataBrokerMap() {
-		return dataBrokerMap;
-	}
+  @JsonProperty("data_broker_map")
+  private DataBrokerMap dataBrokerMap = null;
 
-	public void setDataBrokerMap(DataBrokerMap dataBrokerMap) {
-		this.dataBrokerMap = dataBrokerMap;
-	}
+  @JsonProperty("userName")
+  private String userName = null;
 
-	public String getUserName() {
-		return userName;
-	}
+  @JsonProperty("password")
+  private String password = null;
 
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
+  @JsonProperty("host")
+  private String host = null;
 
-	public String getPassword() {
-		return password;
-	}
+  @JsonProperty("port")
+  private String port = null;
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+  @JsonProperty("protobufFile")
+  private String protobufFile = null;
 
-	public String getHost() {
-		return host;
-	}
+  public DataBrokerMap getDataBrokerMap() {
+    return dataBrokerMap;
+  }
 
-	public void setHost(String host) {
-		this.host = host;
-	}
+  public void setDataBrokerMap(DataBrokerMap dataBrokerMap) {
+    this.dataBrokerMap = dataBrokerMap;
+  }
 
-	public String getPort() {
-		return port;
-	}
+  public String getUserName() {
+    return userName;
+  }
 
-	public void setPort(String port) {
-		this.port = port;
-	}
+  public void setUserName(String userName) {
+    this.userName = userName;
+  }
 
-	public String getProtobufFile() {
-		return protobufFile;
-	}
+  public String getPassword() {
+    return password;
+  }
 
-	public void setProtobufFile(String protobufFile) {
-		this.protobufFile = protobufFile;
-	}
-	
-	
-	
-	
+  public void setPassword(String password) {
+    this.password = password;
+  }
 
+  public String getHost() {
+    return host;
+  }
+
+  public void setHost(String host) {
+    this.host = host;
+  }
+
+  public String getPort() {
+    return port;
+  }
+
+  public void setPort(String port) {
+    this.port = port;
+  }
+
+  public String getProtobufFile() {
+    return protobufFile;
+  }
+
+  public void setProtobufFile(String protobufFile) {
+    this.protobufFile = protobufFile;
+  }
 }

@@ -8,9 +8,9 @@
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *  
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * This file is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
@@ -21,125 +21,107 @@
 package org.acumos.deploymentclient.bean;
 
 import java.time.Instant;
-import java.util.Date;
 
 public class MLNotification {
 
-	private String notificationId;
-	private String title;
-	private String message;
-	private String url;
-	private Instant start;
-	private Instant end;
-	private int count;
+  private String notificationId;
+  private String title;
+  private String message;
+  private String url;
+  private Instant start;
+  private Instant end;
+  private int count;
 
-	public String getNotificationId() {
-		
-		return notificationId;
-		
-	}
+  public String getNotificationId() {
 
-	public void setNotificationId(String notificationId) {
-		
-		this.notificationId = notificationId;
-		
-	}
+    return notificationId;
+  }
 
-	public String getTitle() {
-		
-		return title;
-		
-	}
+  public void setNotificationId(String notificationId) {
 
-	public void setTitle(String title) {
-		
-		this.title = title;
-		
-	}
+    this.notificationId = notificationId;
+  }
 
-	public String getMessage() {
-		
-		return message;
-		
-	}
+  public String getTitle() {
 
-	public void setMessage(String message) {
-		
-		this.message = message;
-		
-	}
+    return title;
+  }
 
-	public String getUrl() {
-		
-		return url;
-		
-	}
+  public void setTitle(String title) {
 
-	public void setUrl(String url) {
-		
-		this.url = url;
-		
-	}
+    this.title = title;
+  }
 
-	
+  public String getMessage() {
 
-	public Instant getStart() {
-		
-		return start;
-		
-	}
+    return message;
+  }
 
-	public void setStart(Instant start) {
-		
-		this.start = start;
-		
-	}
+  public void setMessage(String message) {
 
-	public Instant getEnd() {
-		
-		return end;
-		
-	}
+    this.message = message;
+  }
 
-	public void setEnd(Instant end) {
-		
-		this.end = end;
-		
-	}
+  public String getUrl() {
 
-	public int getCount() {
-		
-		return count;
-		
-	}
+    return url;
+  }
 
-	public void setCount(int count) {
-		
-		this.count = count;
-		
-	}
+  public void setUrl(String url) {
 
-	@Override
-	public String toString() {
-		
-		StringBuilder builder = new StringBuilder();
-		builder.append("MLNotification [notificationId=");
-		builder.append(notificationId);
-		builder.append(", title=");
-		builder.append(title);
-		builder.append(", message=");
-		builder.append(message);
-		builder.append(", url=");
-		builder.append(url);
-		builder.append(", start=");
-		builder.append(start);
-		builder.append(", end=");
-		builder.append(end);
-		builder.append(", count=");
-		builder.append(count);
-		builder.append("]");
-		
-		return builder.toString();
-	}
-	
+    this.url = url;
+  }
+
+  public Instant getStart() {
+
+    return start;
+  }
+
+  public void setStart(Instant start) {
+
+    this.start = start;
+  }
+
+  public Instant getEnd() {
+
+    return end;
+  }
+
+  public void setEnd(Instant end) {
+
+    this.end = end;
+  }
+
+  public int getCount() {
+
+    return count;
+  }
+
+  public void setCount(int count) {
+
+    this.count = count;
+  }
+
+  @Override
+  public String toString() {
+
+    StringBuilder builder = new StringBuilder();
+    builder.append("MLNotification [notificationId=");
+    builder.append(notificationId);
+    builder.append(", title=");
+    builder.append(title);
+    builder.append(", message=");
+    builder.append(message);
+    builder.append(", url=");
+    builder.append(url);
+    builder.append(", start=");
+    builder.append(start);
+    builder.append(", end=");
+    builder.append(end);
+    builder.append(", count=");
+    builder.append(count);
+    builder.append("]");
+
+    return builder.toString();
+  }
 }
