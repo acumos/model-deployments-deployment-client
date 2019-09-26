@@ -67,26 +67,6 @@ function replace_env() {
   set -x
 }
 
-function docker_login() {
-  trap 'fail' ERR
-  while ! docker login $1 -u $2 -p $3 ; do
-    sleep 10
-    log "Docker login failed at $1, trying again"
-  done
-}
-
-function prepare_docker() {
-  trap 'fail' ERR
-  log "login to the Acumos platform docker proxy"
-  docker_login $ACUMOS_DOCKER_REGISTRY $ACUMOS_DOCKER_REGISTRY_USER \
-    $ACUMOS_DOCKER_REGISTRY_PASSWORD
-  log "Log into LF Nexus Docker repos"
-  docker_login https://nexus3.acumos.org:10004 docker docker
-  docker_login https://nexus3.acumos.org:10003 docker docker
-  docker_login https://nexus3.acumos.org:10002 docker docker
-}
-
-
 prepare_k8s() {
   trap 'fail' ERR
   if [[ $(kubectl get secrets -n $NAMESPACE | grep -c 'acumos-registry ') == 0 ]]; then
@@ -153,10 +133,10 @@ function deploy_solution() {
   kubectl create -f deploy/solution.yaml
 
   log "Wait for all pods to be Running"
-  pods=$(kubectl get pods -n $NAMESPACE | awk '/-/ {print $1}')
+  pods=$(kubectl get pods -n $NAMESPACE | awk "/$TRACKING_ID/ {print \$1}")
   while [[ "$pods" == "No resources found." ]]; do
     log "pods are not yet created, waiting 10 seconds"
-    pods=$(kubectl get pods -n $NAMESPACE | awk '/-/ {print $1}')
+    pods=$(kubectl get pods -n $NAMESPACE | awk "/$TRACKING_ID/ {print \$1}")
   done
 
   for pod in $pods; do
@@ -264,8 +244,6 @@ if [[ -e deploy ]]; then rm -rf deploy; fi
 mkdir deploy
 source ./deploy_env.sh
 
-prepare_docker
-prepare_k8s
 update_blueprint
 update_dockerinfo
 deploy_solution
