@@ -8,9 +8,9 @@
  * under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *  
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * This file is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
@@ -19,66 +19,71 @@
  */
 package org.acumos.deploymentclient.parsebean;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
- * Representation of Operation Signature list of a Node. IMPORTANT: This itself
- * is NOT an Arraylist.
+ * Representation of Operation Signature list of a Node. IMPORTANT: This itself is NOT an Arraylist.
  */
-
 public class OutputField implements Serializable {
-	
-	private static final long serialVersionUID = -606679948054329684L;
 
-	@JsonProperty("tag")
-	private String tag = null;
+  private static final long serialVersionUID = -606679948054329684L;
 
-	@JsonProperty("name")
-	private String name = null;
+  @JsonProperty("tag")
+  private String tag = null;
 
-	@JsonProperty("type_and_role_hierarchy_list")
-	private ArrayList<TypeAndRoleHierarchyList>  typeAndRoleHierarchyList;
-	
-	public OutputField(String tag, String name, ArrayList<TypeAndRoleHierarchyList>  typeAndRoleHierarchyList) {
-		super();
-		this.tag = tag;
-		this.name = name;
-		this.typeAndRoleHierarchyList = typeAndRoleHierarchyList;
-	}
-	public OutputField(){
-		super();
-	}
+  @JsonProperty("name")
+  private String name = null;
 
-	public String getTag() {
-		return tag;
-	}	
+  @JsonProperty("type_and_role_hierarchy_list")
+  private ArrayList<TypeAndRoleHierarchyList> typeAndRoleHierarchyList;
 
-	public void setTag(String tag) {
-		this.tag = tag;
-	}
+  public OutputField(
+      String tag, String name, ArrayList<TypeAndRoleHierarchyList> typeAndRoleHierarchyList) {
+    super();
+    this.tag = tag;
+    this.name = name;
+    this.typeAndRoleHierarchyList = typeAndRoleHierarchyList;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public OutputField() {
+    super();
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}	
-	
-	public ArrayList<TypeAndRoleHierarchyList> getTypeAndRoleHierarchyList() {
-		return typeAndRoleHierarchyList;
-	}
+  public String getTag() {
+    return tag;
+  }
 
-	public void setTypeAndRoleHierarchyList(ArrayList<TypeAndRoleHierarchyList> typeAndRoleHierarchyList) {
-		this.typeAndRoleHierarchyList = typeAndRoleHierarchyList;
-	}
+  public void setTag(String tag) {
+    this.tag = tag;
+  }
 
-	@Override
-    public String toString()
-    {
-        return "ClassPojo [tag = "+tag+", name = "+name+", type_and_role_hierarchy_list = "+typeAndRoleHierarchyList+"]";
-    }	
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public ArrayList<TypeAndRoleHierarchyList> getTypeAndRoleHierarchyList() {
+    return typeAndRoleHierarchyList;
+  }
+
+  public void setTypeAndRoleHierarchyList(
+      ArrayList<TypeAndRoleHierarchyList> typeAndRoleHierarchyList) {
+    this.typeAndRoleHierarchyList = typeAndRoleHierarchyList;
+  }
+
+  @Override
+  public String toString() {
+    return "ClassPojo [tag = "
+        + tag
+        + ", name = "
+        + name
+        + ", type_and_role_hierarchy_list = "
+        + typeAndRoleHierarchyList
+        + "]";
+  }
 }
