@@ -21,10 +21,8 @@
 package org.acumos.deploymentclient.util;
 
 
-import java.io.File;
 import java.io.StringReader;
 import java.lang.invoke.MethodHandles;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,22 +30,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.acumos.cds.client.CommonDataServiceRestClientImpl;
-import org.acumos.cds.domain.MLPTask;
 import org.acumos.deploymentclient.bean.ContainerBean;
-import org.acumos.deploymentclient.bean.DeploymentBean;
 import org.acumos.deploymentclient.bean.DeploymentKubeBean;
 import org.acumos.deploymentclient.parsebean.*;
-import org.acumos.deploymentclient.serviceimpl.DeploymentServiceImpl;
-import org.apache.commons.io.FileUtils;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ParseJSON {
@@ -896,39 +886,6 @@ public class ParseJSON {
 		log.debug("getBluprintDetail End");
 	}
 	 
-	 /*public static void main(String[] arg) {
-			CommonDataServiceRestClientImpl client=getClient("http://cognita-dev1-vm01-core.eastus.cloudapp.azure.com:8001/ccds","ccds_client","ccds_client");
-			System.out.println( "==========================Database connected======================== ");
-			//client.getTask(5);
-			//String v=getSolutionCode("8c4f72fa-d1d8-4d47-809d-fffc463d0315","http://cognita-dev1-vm01-core.eastus.cloudapp.azure.com:8000/ccds","ccds_client","ccds_client");
-			MLPTask task = new MLPTask();
-			String trackingID = UUID.randomUUID().toString();
-			System.out.println( "Tracking ID Created: " + trackingID);
-			task.setTaskCode("OB");
-			task.setStatusCode("ST");
-			task.setName("OnBoarding");
-			task.setCreated(Instant.now());
-			task.setModified(Instant.now());
-			task.setTrackingId(trackingID);
-			task.setUserId("19a554b1-4b00-4135-a122-2b6061480185");
-			task.setSolutionId("d425e49c-2228-456d-a9f7-f1820073a4a1");
-			task.setRevisionId("ea4ef543-bc81-43e1-9f51-acab0d552772");
-			task = client.createTask(task);
-			System.out.println( "taskId " + task.getTaskId());
-			
-			//task=client.getTask(2997);
-			
-			System.out.println( "Tracking ID : " + task.getTrackingId());
-			System.out.println( "solution " + task.getSolutionId());
-			System.out.println( "revision " + task.getRevisionId());
-			System.out.println( "==============finish=================== ");
-		}*/
-	 
-	 public static CommonDataServiceRestClientImpl getClient(String datasource,String userName,String dataPd) {
-			System.out.println("getClient start");
-			CommonDataServiceRestClientImpl client = new CommonDataServiceRestClientImpl(datasource, userName, dataPd,null);
-			System.out.println("getClient End");
-			return client;
-		}
-	 
+
+
  }
