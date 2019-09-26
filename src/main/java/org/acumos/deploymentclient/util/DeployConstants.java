@@ -1,12 +1,31 @@
+/*-
+ * ===============LICENSE_START=======================================================
+ * Acumos
+ * ===================================================================================
+ * Copyright (C) 2017 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+ * ===================================================================================
+ * This Acumos software file is distributed by AT&T and Tech Mahindra
+ * under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *  
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ * This file is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ===============LICENSE_END=========================================================
+ */
 package org.acumos.deploymentclient.util;
 
 public class DeployConstants {
-	
+
 	public static final String APIVERSION_YML="apiVersion";
 	public static final String V_YML="v1";
 	public static final String KIND_YML="kind";
 	public static final String SERVICE_YML="Service";
-	public static final String NAMESPACE_YML="namespace"; 
+	public static final String NAMESPACE_YML="namespace";
 	public static final String ACUMOS_YML="$NAMESPACE";
 	public static final String NAME_YML="name";
 	public static final String METADATA_YML="metadata";
@@ -29,7 +48,7 @@ public class DeployConstants {
 	public static final String ACUMOS_DOMAIN="$ACUMOS_DOMAIN";
 	public static final String ACUMOS_DOCKER_PROXY_PORT="$ACUMOS_DOCKER_PROXY_PORT";
 	public static final String ML_TARGET_PORT="mlTargetPort";
-	
+
 	public static final String APIVERSION_DEP_YML="apiVersion";
 	public static final String APPS_V1_DEP_YML="apps/v1";
 	public static final String KIND_DEP_YML="kind";
@@ -47,7 +66,7 @@ public class DeployConstants {
 	public static final String IMAGE_DEP_YML="image";
 	public static final String PROTOBUF_API_DEP_YML="protobuf-api";
 	public static final String PROBE_UI_YML="probe-ui";
-	
+
 	public static final String CONTAINERPORT_DEP_YML="containerPort";
 	public static final String PORTS_DEP_YML="ports";
 	public static final String CONTAINERS_DEP_YML="containers";
@@ -74,7 +93,7 @@ public class DeployConstants {
 	public static final String DATABROKER_NAME_YML= "databroker";
 	public static final String VOLUME_PROTO_YML= "proto-files";
 	public static final String MSG_SEVERITY_ME = "ME";
-	
+
 	public static final String APPLICATION_JSON="application/json";
 	public static final String BLUEPRINT_CONTAINER_NAME= "BluePrintContainer";
 	public static final String BLUEPRINT_MODELCONNECTOR_NAME= "modelconnector";
@@ -100,7 +119,7 @@ public class DeployConstants {
 	public static final String ACUMOS_PROBE_EXTERNAL_PORT="ACUMOS_PROBE_EXTERNAL_PORT";
 	public static final String ENV="env";
 	public static final String PROBE_SCHEMA_YML="probe-schema";
-	
+
 	public static final String DEPLOYMENT_PROCESS= "DP";
 	public static final String DEPLOYMENT_FAILED= "FA";
 	public static final String DATA_BROKER_CSV_FILE= "csv";
@@ -180,9 +199,9 @@ public class DeployConstants {
 	public static final String JENKIN_URL_PROP="jenkins.url";
 	public static final String JENKIN_USER_PROP="jenkins.user";
 	public static final String JENKIN_PASSWORD_PROP="jenkins.password";
-	
+
 	public static final String JENKIN_JOB="jenkins.job";
-	
+
 	public static final String JENKIN_JOBSIMPLE_PROP="jenkins.job.simple";
 	public static final String JENKIN_JOBCOMPOSITE_PROP="jenkins.job.composite";
 	public static final String JENKIN_JOBNIFI_PROP="jenkins.job.nifi";
@@ -196,28 +215,27 @@ public class DeployConstants {
 	public static final String PROBE_API_PORT="probe.probeApiPort";
 	public static final String PROBEIMAGE_NAME="probe.probeImageName";
 	public static final String PROBEIMAGE_PORT="probe.probeImagePORT";
-	public static final String SINGLE_MODEL_PORT="singleModelPort";
-	public static final String SINGLE_NODE_PORT="singleNodePort";
+	public static final String SINGLE_MODEL_PORT="kube.singleModelPort";
+	public static final String SINGLE_NODE_PORT="kube.singleNodePort";
 	public static final String SINGLE_TARGET_PORT="singleTargetPort";
-	public static final String DATABROKER_MODEL_PORT="dataBroker.dataBrokerModelPort";
-	public static final String DATABROKER_NODE_PORT="dataBroker.dataBrokerNodePort";
-	public static final String DATABROKER_TARGET_PORT="dataBroker.dataBrokerTargetPort";
-	public static final String INCREMENT_PORT="incrementPort";
+	public static final String DATABROKER_MODEL_PORT="kube.dataBrokerModelPort";
+	public static final String DATABROKER_NODE_PORT="kube.dataBrokerNodePort";
+	public static final String DATABROKER_TARGET_PORT="kube.dataBrokerTargetPort";
+	public static final String INCREMENT_PORT="kube.incrementPort";
 	public static final String FOLDERPATH="folderPath";
 	public static final String TEMPLATE_YML_DIRECTORY="templateYmlDirectory";
 	public static final String NEXUS_URL_PROP="nexus.url";
 	public static final String NEXUS_USERNAME_PROP="nexus.username";
 	public static final String NEXUS_PD_PROP="nexus.password";
 	public static final String NGINX_IMAGE_NAME="nginxImageName";
-	public static final String LOGSTASH_IP="logstash.logstashIP";
-	public static final String LOGSTASH_PORT="logstash.logstashPort";
-	public static final String LOGSTASH_HOST="logstash.logstashHost";
-	public static final String DOCKERREGISTY_NAME="dockerRegistry.acumosRegistyName";
-	public static final String DOCKERREGISTY_USER="dockerRegistry.acumosRegistyUser";
-	public static final String DOCKERREGISTY_PD="dockerRegistry.acumosRegistyPd";
-	public static final String DEPLOYMENT_CLIENT_API_BASE_URL="deploymentClientApiBaseUrl";
-	public static final String KUBERNETES_CLUSTER="k8sCluster";
-	
+	public static final String LOGSTASH_IP="logstash.ip";
+	public static final String LOGSTASH_PORT="logstash.port";
+	public static final String LOGSTASH_HOST="logstash.host";
+	public static final String DOCKERREGISTY_NAME="dockerRegistry.url";
+	public static final String DOCKERREGISTY_USER="dockerRegistry.username";
+	public static final String DOCKERREGISTY_PD="dockerRegistry.password";
+	public static final String DEPLOYMENT_CLIENT_API_BASE_URL="api.baseUrl";
+
 
 
 }

@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<groupId>org.acumos.deployment-client</groupId>
 	<artifactId>deployment-client</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
@@ -18,7 +18,6 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>1.8</java.version>
 		<springfox.version>2.7.0</springfox.version>
 		<!-- Stand-alone RESTFul application -->
 		<start-class>org.acumos.deploymentclient.DeploymentClientApplication</start-class>
@@ -45,8 +44,8 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
-		
+
+
 		<dependency>
 			<groupId>org.acumos.common-dataservice</groupId>
 			<artifactId>cmn-data-svc-client</artifactId>
@@ -117,9 +116,9 @@
 					<groupId>org.slf4j</groupId>
 					<artifactId>slf4j-api</artifactId>
 				</exclusion>
-			</exclusions> 
+			</exclusions>
 		</dependency>
-		
+
 	</dependencies>
 
 	<build>
@@ -278,7 +277,7 @@
 							<!-- Specify a tag to avoid default tag "latest" -->
 							<name>deployment-client:${project.version}</name>
 							<build>
-								<from>openjdk:8-jre-slim</from>
+								<from>openjdk:11-jre-slim</from>
 								<tags>
 									<!-- Add tag with build number -->
 									<tag>${project.version}-b${build.number}</tag>
@@ -292,15 +291,19 @@
 												<destName>application.properties</destName>
 											</file>
 											<file>
-												<source>tools/setup-docker.sh</source>
-												<outputDirectory />
-												<destName>setup-docker.sh</destName>
-											</file>
-											<file>
 												<source>target/${project.artifactId}-${project.version}.${project.packaging}</source>
 												<outputDirectory />
 											</file>
 										</files>
+                    <fileSets>
+                      <fileSet>
+                        <directory>config/jobs/solution_deploy</directory>
+                        <outputDirectory>config/jobs/solution_deploy</outputDirectory>
+                        <includes>
+                          <include>*/**</include>
+                        </includes>
+                      </fileSet>
+                    </fileSets>
 									</inline>
 								</assembly>
 								<cmd>
