@@ -1,0 +1,297 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "12046491_f4ad78e6",
+        "filename": ".project",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-09-30T13:37:43Z",
+      "side": 1,
+      "message": "No, do not commit eclipse metadata. Not ever.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 1
+      },
+      "revId": "6f9ac650feca8cc8680f9b4edfba5b2765fd55ad",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "18ba9be4_f4af3c64",
+        "filename": "application.properties",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-09-30T13:37:43Z",
+      "side": 1,
+      "message": "Never commit an Azure URL to Linux Foundation gerrit.",
+      "range": {
+        "startLine": 2,
+        "startChar": 0,
+        "endLine": 2,
+        "endChar": 1
+      },
+      "revId": "6f9ac650feca8cc8680f9b4edfba5b2765fd55ad",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "91b16615_a232fe6d",
+        "filename": "application.properties",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-09-30T13:37:43Z",
+      "side": 1,
+      "message": "Never ever commit real usernames and passwords to Linux Foundation gerrit.",
+      "range": {
+        "startLine": 4,
+        "startChar": 0,
+        "endLine": 4,
+        "endChar": 1
+      },
+      "revId": "6f9ac650feca8cc8680f9b4edfba5b2765fd55ad",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "59441335_bfa4532b",
+        "filename": "application.properties",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-09-30T13:37:43Z",
+      "side": 1,
+      "message": "See above",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 5,
+        "endChar": 1
+      },
+      "revId": "6f9ac650feca8cc8680f9b4edfba5b2765fd55ad",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7a6ed93f_22c7aef7",
+        "filename": "application.properties",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-09-30T13:37:43Z",
+      "side": 1,
+      "message": "See above",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 1
+      },
+      "revId": "6f9ac650feca8cc8680f9b4edfba5b2765fd55ad",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "caa2aac0_f4b5ff1c",
+        "filename": "application.properties",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-09-30T13:37:43Z",
+      "side": 1,
+      "message": "See above",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 1
+      },
+      "revId": "6f9ac650feca8cc8680f9b4edfba5b2765fd55ad",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5a2aee9c_d7e813d0",
+        "filename": "pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-09-30T13:37:43Z",
+      "side": 1,
+      "message": "Missing license header",
+      "range": {
+        "startLine": 4,
+        "startChar": 1,
+        "endLine": 4,
+        "endChar": 4
+      },
+      "revId": "6f9ac650feca8cc8680f9b4edfba5b2765fd55ad",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5831d549_a848b4db",
+        "filename": "src/main/java/org/acumos/deploymentclient/bean/DeploymentBean.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-09-30T13:37:43Z",
+      "side": 1,
+      "message": "Missing license header",
+      "revId": "6f9ac650feca8cc8680f9b4edfba5b2765fd55ad",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "183aa646_ff0a4c1f",
+        "filename": "src/main/java/org/acumos/deploymentclient/bean/MLNotification.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-09-30T13:37:43Z",
+      "side": 1,
+      "message": "Poor whitespace practice.  Use the Eclipse formatter to clean.",
+      "range": {
+        "startLine": 37,
+        "startChar": 1,
+        "endLine": 37,
+        "endChar": 2
+      },
+      "revId": "6f9ac650feca8cc8680f9b4edfba5b2765fd55ad",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e402ab40_21aa10f7",
+        "filename": "src/main/java/org/acumos/deploymentclient/controller/DeploymentController.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-09-30T13:37:43Z",
+      "side": 1,
+      "message": "Missing license header.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 2
+      },
+      "revId": "6f9ac650feca8cc8680f9b4edfba5b2765fd55ad",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cd831c50_8d9de300",
+        "filename": "src/main/java/org/acumos/deploymentclient/controller/DeploymentController.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-09-30T13:37:43Z",
+      "side": 1,
+      "message": "Bad practice, string catenation and thrown away, instead use standard SLF4J/logback feature:\n\n    log.debug(\"foo {}\", object);",
+      "range": {
+        "startLine": 56,
+        "startChar": 3,
+        "endLine": 56,
+        "endChar": 6
+      },
+      "revId": "6f9ac650feca8cc8680f9b4edfba5b2765fd55ad",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9eba0ea8_cc541a4b",
+        "filename": "src/main/java/org/acumos/deploymentclient/controller/DeploymentController.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-09-30T13:37:43Z",
+      "side": 1,
+      "message": "Oh goodness gracious NO, never ever and I mean NOT EVER can you use system.out.  You have a logger, use it.",
+      "range": {
+        "startLine": 71,
+        "startChar": 3,
+        "endLine": 71,
+        "endChar": 6
+      },
+      "revId": "6f9ac650feca8cc8680f9b4edfba5b2765fd55ad",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c2008d0c_4bda4c7d",
+        "filename": "src/main/java/org/acumos/deploymentclient/controller/DeploymentController.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-09-30T13:37:43Z",
+      "side": 1,
+      "message": "See above",
+      "range": {
+        "startLine": 112,
+        "startChar": 4,
+        "endLine": 112,
+        "endChar": 7
+      },
+      "revId": "6f9ac650feca8cc8680f9b4edfba5b2765fd55ad",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
