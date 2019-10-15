@@ -146,10 +146,15 @@ function deploy_solution() {
 
   for pod in $pods; do
     status=$(kubectl get pods -n $NAMESPACE | awk "/$pod/ {print \$3}")
+    t=0
     while [[ "$status" != "Running" ]]; do
+      if [[ $t -gt 300 ]]; then
+        fail "$pod did not start successfully after 5 minutes"
+      fi
       log "$pod status is $status. Waiting 10 seconds"
       sleep 10
       status=$(kubectl get pods -n $NAMESPACE | awk "/$pod/ {print \$3}")
+      t=$((t+1))
     done
     log "$pod status is $status"
   done
