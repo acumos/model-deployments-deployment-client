@@ -26,23 +26,16 @@
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
-          <name>TRACKING_ID</name>
+          <name>taskId</name>
           <description></description>
           <defaultValue></defaultValue>
-          <trim>false</trim>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>SOLUTION_ZIP_API</name>
-          <description></description>
-          <defaultValue>http://deployment-client:8080</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
   <scm class="hudson.scm.NullSCM"/>
-  <assignedNode>opnfvadmin</assignedNode>
-  <canRoam>false</canRoam>
+  <canRoam>true</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
@@ -50,12 +43,54 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>set -x -e
-curl -o $TRACKING_ID.zip $SOLUTION_ZIP_API/$TRACKING_ID -d @task.json
-rm -rf deploy
-unzip $TASK_ID.zip -d deploy
-bash deploy/deploy.sh</command>
+      <command>#!/bin/bash
+set -x -e
+
+function fail() {
+  if [[ ! -e status.json ]]; then
+  cat &lt;&lt;EOF &gt;status.json
+{&quot;status&quot;: &quot;FA&quot;, &quot;reason&quot;: &quot;Unknown failure in Jenkins deployment task&quot;, &quot;ingress&quot;: &quot;&quot;}
+EOF
+  fi
+  cat status.json
+  curl -X POST -H &quot;Content-Type:application/json&quot; $DEPLOYMENT_CLIENT/status/$taskId -d @status.json}
+  exit 1
+}
+
+trap &apos;fail&apos; ERR
+
+rm -rf *
+DEPLOYMENT_CLIENT=http://deployment-client-service:8337
+curl -o solution.zip $DEPLOYMENT_CLIENT/getSolutionZip/$taskId/
+unzip solution.zip -d deploy
+cd deploy
+source deploy_env.sh
+
+case &quot;$K8S_CLUSTER&quot; in
+  default)
+    SOLUTION_DOMAIN=replace-with-k8s-master-domain
+    NAMESPACE=acumos
+    FILEBEAT_DATA_PVC_STORAGE_CLASS_NAME=
+    FILEBEAT_DATA_PVC_SIZE=1Gi
+    NGINX_PROXY_LOG_PVC_STORAGE_CLASS_NAME=
+    NGINX_PROXY_LOG_PVC_SIZE=1Gi
+    ;;
+  *)
+    exit 1
+esac
+
+echo &quot;export SOLUTION_DOMAIN=$SOLUTION_DOMAIN&quot; &gt;&gt;deploy_env.sh
+echo &quot;export NAMESPACE=$NAMESPACE&quot; &gt;&gt;deploy_env.sh
+echo &quot;export FILEBEAT_DATA_PVC_STORAGE_CLASS_NAME=$FILEBEAT_DATA_PVC_STORAGE_CLASS_NAME&quot; &gt;&gt;deploy_env.sh
+echo &quot;export FILEBEAT_DATA_PVC_SIZE=$FILEBEAT_DATA_PVC_SIZE&quot; &gt;&gt;deploy_env.sh
+echo &quot;export NGINX_PROXY_LOG_PVC_STORAGE_CLASS_NAME=$NGINX_PROXY_LOG_PVC_STORAGE_CLASS_NAME&quot; &gt;&gt;deploy_env.sh
+echo &quot;export NGINX_PROXY_LOG_PVC_SIZE=$NGINX_PROXY_LOG_PVC_SIZE&quot; &gt;&gt;deploy_env.sh
+
+bash deploy.sh
+cat status.json
+curl -X POST -H &quot;Content-Type:application/json&quot; $DEPLOYMENT_CLIENT/status/$taskId -d @status.json</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
   <buildWrappers/>
+</project>
