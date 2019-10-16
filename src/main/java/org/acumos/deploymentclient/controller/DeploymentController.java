@@ -56,6 +56,7 @@ public class DeploymentController {
       dBean.setRevisionId(deployBean.getRevisionId());
       dBean.setUserId(deployBean.getUserId());
       deploymentService.setDeploymentBeanProperties(dBean, env);
+      log.debug("Spring Env properties");
       MLPTask mlpTask = deploymentService.createTaskDetails(deployBean, dBean);
       log.debug("mlpTask created taskId" + mlpTask.getTaskId());
       String solutionToolKitType =
