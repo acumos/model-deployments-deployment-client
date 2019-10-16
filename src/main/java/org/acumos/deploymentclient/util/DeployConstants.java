@@ -28,7 +28,7 @@ public class DeployConstants {
   public static final String NAMESPACE_VALUE_YML = "<NAMESPACE>";
   public static final String ACUMOS_DOMAIN = "$ACUMOS_DOMAIN";
   public static final String ACUMOS_DOCKER_PROXY_PORT = "$ACUMOS_DOCKER_PROXY_PORT";
-  public static final String ML_TARGET_PORT = "mlTargetPort";
+  
 
   public static final String APIVERSION_DEP_YML = "apiVersion";
   public static final String APPS_V1_DEP_YML = "apps/v1";
@@ -199,22 +199,24 @@ public class DeployConstants {
   public static final String PROBEIMAGE_PORT = "probe.probeImagePORT";
   public static final String SINGLE_MODEL_PORT = "kube.singleModelPort";
   public static final String SINGLE_NODE_PORT = "kube.singleNodePort";
-  public static final String SINGLE_TARGET_PORT = "singleTargetPort";
+  public static final String SINGLE_TARGET_PORT = "kube.singleTargetPort";
   public static final String DATABROKER_MODEL_PORT = "kube.dataBrokerModelPort";
   public static final String DATABROKER_NODE_PORT = "kube.dataBrokerNodePort";
   public static final String DATABROKER_TARGET_PORT = "kube.dataBrokerTargetPort";
   public static final String INCREMENT_PORT = "kube.incrementPort";
-  public static final String FOLDERPATH = "folderPath";
-  public static final String TEMPLATE_YML_DIRECTORY = "templateYmlDirectory";
+  public static final String FOLDERPATH = "kube.folderPath";
+  public static final String TEMPLATE_YML_DIRECTORY = "kube.templateYmlDirectory";
+  public static final String ML_TARGET_PORT = "kube.mlTargetPort";
+  public static final String DEPLOYMENT_CLIENT_API_BASE_URL = "kube.deploymentClientApiBaseUrl";
   public static final String NEXUS_URL_PROP = "nexus.url";
   public static final String NEXUS_USERNAME_PROP = "nexus.username";
   public static final String NEXUS_PD_PROP = "nexus.password";
-  public static final String NGINX_IMAGE_NAME = "nginxImageName";
+  public static final String NGINX_IMAGE_NAME = "kube.nginxImageName";
   public static final String LOGSTASH_IP = "logstash.ip";
   public static final String LOGSTASH_PORT = "logstash.port";
   public static final String LOGSTASH_HOST = "logstash.host";
   public static final String DOCKER_REGISTRY_NAME = "dockerRegistry.url";
   public static final String DOCKER_REGISTRY_USER = "dockerRegistry.username";
   public static final String DOCKER_REGISTRY_PD = "dockerRegistry.password";
-  public static final String DEPLOYMENT_CLIENT_API_BASE_URL = "api.baseUrl";
+  
 }

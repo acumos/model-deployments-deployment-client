@@ -665,7 +665,7 @@ public class DeploymentServiceImpl implements DeploymentService {
     if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)) {
       // portsNode.put(DeployConstants.NODEPORT_YML, dBen.getBluePrintNodePort());
     } else if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)) {
-      portsNode.put(DeployConstants.NODEPORT_YML, dBen.getDataBrokerNodePort());
+      portsNode.put(DeployConstants.NODEPORT_YML, dBen.getDataBrokerModelPort());
     } else if (nodeType != null
         && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)) {
       portsNode.put(DeployConstants.NODEPORT_YML, dBen.getProbeNodePort());
@@ -1287,11 +1287,11 @@ public class DeploymentServiceImpl implements DeploymentService {
         (env.getProperty(DeployConstants.LOGSTASH_IP) != null)
             ? env.getProperty(DeployConstants.LOGSTASH_IP)
             : "";
-    String logstashHost =
+    String logstashPort =
         (env.getProperty(DeployConstants.LOGSTASH_PORT) != null)
             ? env.getProperty(DeployConstants.LOGSTASH_PORT)
             : "";
-    String logstashPort =
+    String logstashHost =
         (env.getProperty(DeployConstants.LOGSTASH_HOST) != null)
             ? env.getProperty(DeployConstants.LOGSTASH_HOST)
             : "";
@@ -1366,16 +1366,42 @@ public class DeploymentServiceImpl implements DeploymentService {
     dBean.setAcumosRegistryPd(acumosRegistryPd);
     dBean.setTemplateYmlDirectory(templateYmlDirectory);
 
-    logger.debug("cmnDataUrl " + cmnDataUrl);
-    logger.debug("cmnDataUser " + cmnDataUser);
-    logger.debug("cmnDataPd " + cmnDataPd);
-    logger.debug("jenkinUrl " + jenkinUrl);
-    logger.debug("jenkinUserName " + jenkinUserName);
-    logger.debug("jenkinPassword " + jenkinPassword);
-    /*logger.debug("jenkinJobSimple "+jenkinJobSimple);
-    logger.debug("jenkinJobComposite "+jenkinJobComposite);
-    logger.debug("jenkinJobNifi "+jenkinJobNifi);*/
-    logger.debug("jenkinJob " + jenkinJob);
+    logger.debug("deploymentClientApiBaseUrl: "+dBean.getDeploymentClientApiBaseUrl());
+    logger.debug("mlTargetPort: "+dBean.getMlTargetPort());
+    logger.debug("bluePrintImage: "+dBean.getBluePrintImage());
+    logger.debug("bluePrintPort: "+dBean.getBluePrintPort());
+    logger.debug("bluePrintNodePort: "+dBean.getBluePrintNodePort());
+    logger.debug("probeModelPort: "+dBean.getProbeModelPort());
+    logger.debug("probeTargetPort: "+dBean.getProbeTargetPort());
+    logger.debug("probeApiPort: "+dBean.getProbeApiPort());
+    logger.debug("probeImageName: "+dBean.getProbeImageName());
+    logger.debug("singleModelPort: "+dBean.getSingleModelPort());
+    logger.debug("singleTargetPort: "+dBean.getSingleTargetPort());
+    logger.debug("incrementPort: "+dBean.getIncrementPort());
+    logger.debug("folderPath: "+dBean.getFolderPath());
+    logger.debug("dataBrokerModelPort: "+dBean.getDataBrokerModelPort());
+    logger.debug("dataBrokerTargetPort: "+dBean.getDataBrokerTargetPort());
+    logger.debug("nginxImageName: "+dBean.getNginxImageName());
+    logger.debug("nexusUrl: "+dBean.getNexusUrl());
+    logger.debug("nexusUsername: "+dBean.getNexusUserName());
+    //logger.debug("nexusPd: "+dBean.getNexusPd());
+    logger.debug("cmnDataUrl: "+dBean.getDatasource());
+    logger.debug("cmnDataUser: "+dBean.getDataUserName());
+    //logger.debug("cmnDataPd: "+dBean.getDataPd());
+    logger.debug("jenkinUrl: "+dBean.getJenkinUrl());
+    logger.debug("jenkinUserName: "+dBean.getJenkinUserName());
+    //logger.debug("jenkinPassword: "+dBean.getJenkinPassword());
+    logger.debug("jenkinJobSimple: "+dBean.getJenkinJobSimple());
+    logger.debug("jenkinJobComposite: "+dBean.getJenkinJobComposite());
+    logger.debug("jenkinJobComposite: "+dBean.getJenkinJobNifi());
+    logger.debug("logstashIP: "+dBean.getLogstashIP());
+    logger.debug("logstashHost: "+dBean.getLogstashHost());
+    logger.debug("logstashPort: "+dBean.getLogstashPort());
+    logger.debug("acumosRegistryName: "+dBean.getAcumosRegistryName());
+    logger.debug("acumosRegistryUser: "+dBean.getAcumosRegistryUser());
+    //logger.debug("acumosRegistryPd: "+dBean.getAcumosRegistryPd());
+    logger.debug("templateYmlDirectory: "+dBean.getTemplateYmlDirectory());
+    //logger.debug(dBean.getDataBrokerNodePort());
 
     logger.debug("setDeploymentBeanProperties End");
   }
@@ -1400,9 +1426,9 @@ public class DeploymentServiceImpl implements DeploymentService {
             + "export ACUMOS_DOCKER_REGISTRY_PASSWORD="
             + dBean.getAcumosRegistryPd()
             + " \n"
-            //		+ "export K8S_CLUSTER="+dBean.getEnvId()+"\n"
-            + "export K8S_CLUSTER=default"
-            + "\n"
+            + "export K8S_CLUSTER="+dBean.getEnvId()+"\n"
+            // + "export K8S_CLUSTER=default"
+            // + "\n"
             + "export TRACKING_ID="
             + dBean.getTrackingId()
             + "\n"
