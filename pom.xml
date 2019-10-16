@@ -5,7 +5,7 @@
 
 	<groupId>org.acumos.deployment-client</groupId>
 	<artifactId>deployment-client</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<name>deployment-client</name>
 	<description>Demo project for Spring Boot</description>
 	<parent>
