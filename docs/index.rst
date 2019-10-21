@@ -25,3 +25,4 @@ Deployment Client
 
        release-notes.rst
        deployment-client-developer-guide.rst
+       deployment-client-user-guide.rst
