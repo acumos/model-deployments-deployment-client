@@ -71,7 +71,7 @@ EOF
 
 trap &apos;fail&apos; ERR
 
-rm -rf *
+rm -rf deploy
 DEPLOYMENT_CLIENT=http://deployment-client-service:8337
 curl -o solution.zip $DEPLOYMENT_CLIENT/getSolutionZip/$taskId/
 unzip solution.zip -d deploy

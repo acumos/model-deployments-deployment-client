@@ -258,7 +258,6 @@ function deploy_logging() {
 
 set -x
 WORK_DIR=$(pwd)
-cd $(dirname "$0")
 if [[ -e deploy ]]; then rm -rf deploy; fi
 mkdir deploy
 source ./deploy_env.sh
