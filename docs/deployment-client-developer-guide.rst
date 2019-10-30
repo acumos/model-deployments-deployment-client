@@ -363,15 +363,17 @@ k8sCluster Site Config
 
 On startup, the Deployment Client will create or update a new site-config key,
 "k8sCluster" as described below. The default value for this key will be provided
-in the Spring environment variable k8sCluster:
+in the Spring environment variable siteConfig.k8sCluster:
 
 .. code-block:: json
 
-  "k8sCluster": "[
-    { \"name\": \"cluster1\" },
-    { \"name\": \"cluster2\" },
-    { \"name\": \"cluster3\" }
-  ]"
+  "siteConfig": {
+    "k8sCluster": "[
+      { \"name\": \"cluster1\" },
+      { \"name\": \"cluster2\" },
+      { \"name\": \"cluster3\" }
+    ]"
+  }
 ..
 
 The example above is simply a placeholder, expected to be updated by the
