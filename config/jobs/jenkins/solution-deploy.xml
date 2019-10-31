@@ -31,18 +31,6 @@
           <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>DEFAULT_SOLUTION_DOMAIN</name>
-          <description></description>
-          <defaultValue>acumos-domain</defaultValue>
-          <trim>false</trim>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>DEFAULT_NAMESPACE</name>
-          <description></description>
-          <defaultValue>acumos-namespace</defaultValue>
-          <trim>false</trim>
-        </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -71,7 +59,7 @@ EOF
 
 trap &apos;fail&apos; ERR
 
-rm -rf deploy
+rm -rf *
 DEPLOYMENT_CLIENT=http://deployment-client-service:8337
 curl -o solution.zip $DEPLOYMENT_CLIENT/getSolutionZip/$taskId/
 unzip solution.zip -d deploy
@@ -80,8 +68,8 @@ source deploy_env.sh
 
 case &quot;$K8S_CLUSTER&quot; in
   default)
-    SOLUTION_DOMAIN=$DEFAULT_SOLUTION_DOMAIN
-    NAMESPACE=$DEFAULT_NAMESPACE
+    SOLUTION_DOMAIN=acumos.example.com
+    NAMESPACE=acumos
     FILEBEAT_DATA_PVC_STORAGE_CLASS_NAME=
     FILEBEAT_DATA_PVC_SIZE=1Gi
     NGINX_PROXY_LOG_PVC_STORAGE_CLASS_NAME=
