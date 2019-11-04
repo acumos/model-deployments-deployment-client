@@ -133,6 +133,10 @@ function update_dockerinfo() {
 function deploy_solution() {
   trap 'fail' ERR
   log "invoke kubectl to deploy the services and deployments in solution.yaml"
+  if [[ ${#SOLUTION_NAME} -gt 63 ]]; then
+    SOLUTION_NAME_TRUNC=${SOLUTION_NAME:1:63}
+    sed -i -- "s/$SOLUTION_NAME/$SOLUTION_NAME_TRUNC/g" solution.yaml
+  fi
   cp solution.yaml deploy/.
   replace_env deploy
   kubectl create -f deploy/solution.yaml
@@ -261,6 +265,10 @@ WORK_DIR=$(pwd)
 if [[ -e deploy ]]; then rm -rf deploy; fi
 mkdir deploy
 source ./deploy_env.sh
+
+UNIQUE_ID=$(date +%y%m%d)-$(date +%H%M%S)
+sed -i -- "/  annotations:/a\ \ \ \ trackingid: $TRACKING_ID" templates/ingress.yaml
+TRACKING_ID=$UNIQUE_ID
 
 update_blueprint
 update_dockerinfo
