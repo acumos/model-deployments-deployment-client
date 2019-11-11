@@ -67,6 +67,10 @@ provided under the system-integration repo as
 Configuring Jenkins
 ...................
 
+****************************************
+Creating the Jenkins solution-deploy job
+****************************************
+
 The Deployment Client also depends upon configuration of a Jenkins job named
 "solution-deploy", in a Jenkins server that is accessible from the
 Deployment Client. By default, the OneClick toolset will install a Jenkins server
@@ -138,26 +142,123 @@ required to complete the configuration. Use these steps to complete it:
   * once you have completed the customization, select 'Save'
 
 
-*******************************************
-Customizing the Jenkins solution-deploy job
-*******************************************
-
 The actual deployment process occurs through a combination of the Acumos
 `solution-deploy Jenkins job <https://github.com/acumos/model-deployments-deployment-client/blob/master/config/jobs/jenkins/solution-deploy.xml>`_
 and the `deploy.sh <https://github.com/acumos/model-deployments-deployment-client/blob/master/config/jobs/solution_deploy/deploy.sh>`_
 script that it calls to execute the deployment. Note that both the Jenkins job
 and the deploy.sh script can be customized to fit the specific requirements of
-your target k8s environments.
+your target k8s environments. Customizing the Jenkins solution-deploy job is
+beyond the scope of this document.
 
-TODO: this section will describe the customization process, in general.
+****************************************
+Configure Jenkins Access to k8s Clusters
+****************************************
 
-......................................
-Configuring Target Kubernetes Clusters
-......................................
+In order to access the k8s cluster API, the Jenkins server needs to be configured
+to operate as a kubernetes client, and for access to other tools that are used by
+the default "solution-deploy" Jenkins job and 'deploy.sh' script that is used
+by it, both of which are available in the
+`deployment-client repo <https://github.com/acumos/model-deployments-deployment-client/tree/clio/config/jobs>`_.
 
-*************************
+Note that the guide below assumes you are using k8s cluster(s) compatible with
+the default design of the Acumos Clio release, which is based upon the generic
+k8s distribution version 1.13.8, and has not been tested on other k8s versions,
+or k8s distributions such as OpenShift or Azure-AKS (those are planned for the
+next release). If you need to use some other k8s version:
+
+* in order to install a compatible kubectl version, you will need to ensure you
+  use a kubectl version within one minor version of the k8s server
+* you can customize the 'initial-setup' job described below, to use another
+  supported k8s version
+* if you have multiple target k8s clusters that you want to configure, you
+  will need to ensure that they are all the same version, or customize
+  the default Acumos "solution-deploy" Jenkins job to be capable of switching
+  between k8s client versions on a per-deployment-job basis
+* any other differences may require that you customize both the "solution-deploy"
+  Jenkins job and the 'deploy.sh' script it calls
+
+How you prepare the Jenkins server depends upon how your Jenkins server was
+installed:
+
+* if you installed your Jenkins server via the
+  `Acumos OneClick toolset <https://docs.acumos.org/en/latest/submodules/system-integration/docs/oneclick-deploy/index.html>`_,
+  Jenkins will have been fully configured by installation and execution of the
+  Jenkins job
+  `initial-setup <https://github.com/acumos/system-integration/blob/master/charts/jenkins/jobs/initial-setup.xml>`_
+
+* if you installed your Jenkins server manually, or are using an existing Jenkins
+  service
+
+  * If your Jenkins server is capable of running privileged jobs, you can create
+    a job similar to the 'initial-setup' job described above, or run these
+    commands directly in the Jenkins server's shell
+
+    * Note: this an Ubuntu example; update as needed for Centos
+
+    .. code-block:: bash
+
+      apt-get update
+      apt-get install -y jq uuid-runtime
+      # Install kubectl per https://kubernetes.io/docs/setup/independent/install-kubeadm/
+      KUBE_VERSION=1.13.8
+      apt-get install -y apt-transport-https
+      curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+      cat &lt;&lt;EOF | tee /etc/apt/sources.list.d/kubernetes.list
+      deb http://apt.kubernetes.io/ kubernetes-xenial main
+      EOF
+      apt-get update
+      apt-get -y install --allow-downgrades kubectl=${KUBE_VERSION}-00
+      mkdir ~/.kube
+
+    ..
+
+  * if your Jenkins server restricts privileged jobs, you can either run the
+    commands above manually, or build and use an updated Jenkins docker image,
+    e.g. as built using the `Dockerfile <https://github.com/acumos/system-integration/blob/master/charts/jenkins/Dockerfile>`_
+    in the system-integration repo
+
+Once you have completed the basic configuration of the Jenkins server, you will
+need to provide a k8s config file ('kube config') that contains the token(s)
+used by the kubectl client to connect to your k8s server(s). If you used the OneClick
+toolset to deploy the Jenkins service under your Acumos platform, it will have
+already been configured to use the same k8s cluster and namespace for deploying
+solutions. But for access to other clusters, you will need to update the client
+configuration also, as described below.
+
+* it's assumed that you have access to the k8s cluster(s) from your workstation,
+  and have the current context set to the default cluster you want to use for
+  deploying Acumos solutions
+* copy the 'config' file in the '.kube' folder of your home folder, to the
+  home folder of the Jenkins user in your Jenkins server. For example, if you
+  are using the default Jenkins server installed by the OneClick toolset and want
+  to update the kube config,
+
+  * login to the k8s cluster(s) using a kubectl client on your workstation, and
+    save the resulting kube config as e.g. 'kube-config', e.g.
+
+    .. code-block:: bash
+
+      kubectl config use-context <context name>
+      Switched to context "<context name>".
+      cp ~/.kube/config kube-config
+    ..
+
+  * login into your Acumos platform k8s cluster, and copy the saved kube-config
+    into the running Jenkins server
+
+    .. code-block:: bash
+
+      kubectl config use-context <Acumos platform context name>
+      Switched to context "<Acumos platform context name>".
+      pod=$(kubectl get pods | awk '/jenkins/{print $1}')
+      kubectl exec -it $pod -- bash -c 'mkdir /var/jenkins_home/.kube'
+      kubectl kube-config $pod:/var/jenkins_home/.kube/.
+      kubectl exec -it $pod -- bash -c 'ls /var/jenkins_home/.kube'
+    ..
+
+.........................
 Acumos Site Configuration
-*************************
+.........................
 
 The "deploy to k8s" feature supports provisioning of a set of k8s clusters to
 be offered to users as deployment target environments.
@@ -212,9 +313,9 @@ be aligned with the solution-deploy Jenkins job as described under
     }
   ..
 
-********************************
+................................
 Kubernetes Cluster Configuration
-********************************
+................................
 
 Following are prerequisite requirements for k8s cluster configuration per the
 default design:
@@ -271,8 +372,119 @@ default design:
         OpenShift clusters, additional actions may be needed to restore the
         cluster and services running under it
 
+* configure the "acumos-registry" secret in the target namespace to include a
+  docker client token for the the Acumos platform's docker registry; the process
+  for this is supported by the Acumos OneClick utility "create_acumos_registry_secret",
+  which you can use as below to update the secret, if you deployed your platform
+  using the `Acumos OneClick toolset <https://docs.acumos.org/en/latest/submodules/system-integration/docs/oneclick-deploy/index.html>`_.
+
+  .. code-block:: bash
+
+    docker login http://<docker registry domain>:<docker registry port> -u <username> -p <password>
+    cd system-integration/AIO
+    source utils.sh
+    create_acumos_registry_secret <acumos platform namespace>
+  ..
+
+
+..............................
+Kubernetes Cluster Maintenance
+..............................
+
+The Clio release does not include any platform capabilities or specific tools
+that enable Admins to manage the Acumos solutions deployed in k8s clusters, once
+those solutions have been deployed. Such capabilities are planned for the next
+release. For Clio, Admins and/or users will need to know the following and take
+action as needed to manage consumed resources in the k8s cluster:
+
+* a variety of k8s resources are created during solution deployment. These
+  resources are specific to the particular solution and deployment job, and will
+  not be deleted automatically. When the deployed solution is no longer needed,
+  Admins and/or users should clean up the resources e.g. using the kubectl client
+  and a script such as the following:
+
+  .. code-block:: bash
+
+    #!/bin/bash
+    id=$1
+    if [[ "$2" != "" ]]; then ns="-n $2"; fi
+    if [[ "$id" != "" ]]; then
+      ts="deployments daemonset service configmap serviceaccount clusterrole clusterrolebinding configmap pvc ingress"
+      for t in $ts; do
+        rs=$(kubectl get $t $ns | awk "/$id/{print \$1}")
+        for r in $rs; do
+          kubectl delete $t $ns $r
+        done
+      done
+    else
+      echo "usage: bash clean_solution.sh <id> [namespace]"
+    fi
+
+  ..
+
+* in order to identify a specific deployment job and its resources, use the
+  "ingress URL" provided to the user when the deployment job completion
+  notification was provided on the Acumos platform, e.g.
+
+  .. code-block:: text
+
+    square deployment is complete. The solution can be accessed at the ingress
+    URL https://acumos.example.com/square/191111-162114/
+  ..
+
+  * The URL part after the model name is the unique ID assigned to the
+    deployment job, and provides a timestamp when the deployment job was
+    invoked by the default deploy,sh deployment script:
+
+    .. code-block:: text
+
+      UNIQUE_ID=$(date +%y%m%d)-$(date +%H%M%S)
+    ..
+
+
+* given the unique ID, you should be able to clean up all related resources
+  as needed, using the example script above
+
 ------------------
 For Platform Users
 ------------------
 
-To be provided.
+In the Clio release, a solution is deployed using these steps:
+
+* select a solution you want to deploy, and ensure that microservice images
+  have been built for all models included in the solution
+* in the upper-right of the screen, select "Deploy to Cloud" and in the list
+  of target cloud types, select "Kubernetes"
+* You will see a disclaimer e.g.
+
+  .. code-block:: text
+
+    Deploying this model outside the Acumos system may expose its information to
+    third parties. Please click OK to confirm this deployment is being done in
+    compliance with all local policies.
+  ..
+
+* Click-thru the disclaimer, and you will see a "Select Kubernetes cluster"
+  drop-down, from which you can select the target k8s cluster
+* Select the target cluster, and and select "Deploy"
+* You will see a briefly presented notification ala
+
+  .. code-block:: text
+
+    The deployment process has been started, will take some time to complete.
+    Notification will be sent on completion.
+  ..
+
+* Watch for updates in the Notification list, accessed by the "bell" icon in the
+  top menu bar. When deployment is complete, you should see a notice e.g.
+
+  .. code-block:: text
+
+    <model name> deployment is complete. The solution can be accessed at the ingress
+    URL https://acumos.example.com/<model name>/<unique id>/
+  ..
+
+* in the notification, the URL is the API where you should be able to send
+  data to the solution, and get results. The 'model name' is the displayed
+  name of the model on the Acumos platform. The 'unique id' is an identifier
+  for the specific deployment job, in the form of a timestamp.

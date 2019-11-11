@@ -43,7 +43,7 @@ function fail() {
   reason="$1"
   if [[ "$reason" == "" ]]; then reason="Unknown failure in deployment script"; fi
   cat <<EOF >status.json
-{"status": "FA", "reason": "$1", "ingress": ""}
+{"status": "FA", "reason": "$reason", "ingress": "not available (failed)"}
 EOF
   log "$reason"
   exit 1

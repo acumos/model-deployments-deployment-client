@@ -53,7 +53,7 @@ function fail() {
 EOF
   fi
   cat status.json
-  curl -X POST -H &quot;Content-Type:application/json&quot; $DEPLOYMENT_CLIENT/status/$taskId -d @status.json}
+  curl -X POST -H &quot;Content-Type:application/json&quot; $DEPLOYMENT_CLIENT/status/$taskId -d @status.json
   exit 1
 }
 
