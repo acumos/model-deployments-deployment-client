@@ -276,7 +276,7 @@
 					<images>
 						<image>
 							<!-- Specify a tag to avoid default tag "latest" -->
-							<name>deployment-client:${project.version}</name>
+							<name>acumos/deployment-client:${project.version}</name>
 							<build>
 								<from>openjdk:8-jre-slim</from>
 								<tags>
@@ -323,7 +323,7 @@
 							<goal>push</goal>
 						</goals>
 					</execution>
-				</executions> 
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
