@@ -44,6 +44,9 @@ Current release features include:
 
 * deployment of Acumos solutions (simple models, composite models, and NiFi
   pipelines) into pre-configured kubernetes clusters
+
+  * NOTE: NiFi pipeline support was deferred to a future release
+
 * use of Jenkins as a job executor for deployment tasks
 
 ------------
@@ -59,10 +62,11 @@ kubernetes environment, and dependencies of that kubernetes environment and
 solution/support components deployed in it, on the Acumos platform and its
 dependencies (e.g. a docker registry, and ELK stack).
 
-
 .. image:: images/deployment-clio.png
    :width: 100 %
 
+NOTE: MLWB use of the Deployment Client API was planned but deferred to a future
+release.
 
 The typical sequence of messages across Acumos components for a solution
 deployment is shown in the figure below.
@@ -115,6 +119,9 @@ and the assigned ingress URL.
 ************
 ML Workbench
 ************
+
+*NOTE: MLWB use of the Deployment Client API was planned but deferred to a future
+release.*
 
 When a Predictor is created, the MLWB will provide a "deploy to k8s" option
 to the user. When the user selects it, the MLWB will:
@@ -232,7 +239,7 @@ updates on the status of solution deployment.
 
     * Body
 
-      * {"status": "<status>", "reason": "<reason>"}
+      * {"status": "<status>", "reason": "<reason>", "ingress": "<ingress>"}
 
         * status: status of the job
 
@@ -241,7 +248,25 @@ updates on the status of solution deployment.
           * complete: job is complete
           * failed: job has failed
 
-        * reason: for failed jobs, an explanatory reason if available
+        * reason: text to be presented to the user as a notification
+
+          * for failed jobs, an explanatory reason if available
+          * for successful jobs, info on how the user can access the solution:
+
+            * "<SOLUTION_NAME> deployment is complete. The solution can be
+              accessed at the ingress URL <ingress>"
+
+         * ingress: URL where the solution can be accessed, in the form
+           https://<SOLUTION_DOMAIN>/<SOLUTION_NAME>/<UNIQUE_ID>/, where
+
+           * SOLUTION_DOMAIN: k8s cluster ingress FQDN, as configured for the
+             selected cluster in the Jenkins solution-deploy job
+           * SOLUTION_NAME: name of the solution as provided by the
+             Deployment Client in deploy_env.sh in the solution.zip package,
+             truncated to 63 characters if needed
+           * UNIQUE_ID: timestamp (in bash: $(date +%y%m%d)-$(date +%H%M%S))
+             of the deployment, used to ensure that multiple deployments of the
+             same solution have distinct ingresses
 
     * Response
 
@@ -391,12 +416,9 @@ and applying the changes, to restart the Deployment Client.
 Solution Package Preparation
 ****************************
 
-Solution packages will be prepared on-demand, and will be cached until Jenkins
-retrieves the package, in the folder /app/cache with the name <taskId>.zip, where
-taskId is the id of the task related to the deployment.
-
-The Deployment Client will follow the steps below in preparing the solution
-deployment package:
+Solution packages will be prepared when the Jenkins job invokes the
+`Get Solution Zip`_ API. The Deployment Client will follow the steps below in
+preparing the solution deployment package:
 
 * get the following artifacts if existing from Nexus, by querying the CDS for
   the set of solution/revision artifacts
@@ -752,3 +774,6 @@ and will take the following actions to deploy the solution:
   * send dockerinfo.json to the Model Connector service via the /putDockerInfo
     API
   * send blueprint.json to the Model Connector service via the /putBlueprint API
+
+* invoke the `Deployment Status`_ API to convey the job result back to the
+  Deployment Client

@@ -21,6 +21,34 @@ Deployment Client Release Notes
 ===============================
 
 --------------------------
+Version 1.0.1, 05 Dec 2019
+--------------------------
+
+This is the Clio maintenance release of the Deployment Client. The current
+k8s and docker-compose templates are at:
+
+* `deployment-client-deployment.yaml <https://github.com/acumos/system-integration/blob/master/AIO/kubernetes/deployment/deployment-client-deployment.yaml>`_
+* `deployment-client.yml <https://github.com/acumos/system-integration/blob/master/AIO/docker/acumos/deployment-client.yml>`_
+
+* `ACUMOS-3677: Ensure all resources have names with max length 63 chars <https://jira.acumos.org/browse/ACUMOS-3677>`_
+
+  * `5816: Max resource name length 63 chars <https://gerrit.acumos.org/r/#/c/model-deployments/deployment-client/+/5816/>`_
+  * `5873: Admin/user guide updates <https://gerrit.acumos.org/r/#/c/model-deployments/deployment-client/+/5873/>`_
+  * `5983: deployment-client release 1.0.1 <https://gerrit.acumos.org/r/#/c/model-deployments/deployment-client/+/5983/>`_
+  * `5996: deployment-client release 1.0.1 <https://gerrit.acumos.org/r/#/c/model-deployments/deployment-client/+/5996/>`_
+
+* `ACUMOS-3188: Invoke Jenkins Job for Model deployment <https://jira.acumos.org/browse/ACUMOS-3188>`_
+
+  * `5606: Update spring env file <https://gerrit.acumos.org/r/#/c/model-deployments/deployment-client/+/5606/>`_
+
+* `ACUMOS-3133: Migrate Solution/Pipeline deployment to Jenkins-based process <https://jira.acumos.org/browse/ACUMOS-3133>`_
+
+  * `5589: Complete deployment job template <https://gerrit.acumos.org/r/#/c/model-deployments/deployment-client/+/5589/>`_
+  * `5652: Add link to user guide <https://gerrit.acumos.org/r/#/c/model-deployments/deployment-client/+/5652/>`_
+  * `5716: Fix XML file format <https://gerrit.acumos.org/r/#/c/model-deployments/deployment-client/+/5716/>`_
+  * `5749: Add more content in docs <https://gerrit.acumos.org/r/#/c/model-deployments/deployment-client/+/5749/>`_
+
+--------------------------
 Version 1.0.0, 01 Oct 2019
 --------------------------
 
