@@ -1,20 +1,21 @@
 Note over Portal_BE: User selects\n "deploy to k8s"
 Portal_BE->Deployment\nClient: POST /deploy \n{solutionId, revisionId,\n envId, userId}
-Deployment\nClient->Jenkins: Start Jenkins job with parameter taskId
-Jenkins->Deployment\nClient: Job created
-Deployment\nClient->CDS: POST /task {solId, revId, "taskCode": "DP",\n "statusCode": "IP", ...}
+Deployment\nClient->CDS: POST /task {solId, revId, "taskCode": "DP",\n "statusCode": "ST", ...}
+CDS->Deployment\nClient: 201 Created { ..., "taskId": <id>, ...}
+Note over Deployment\nClient: Select job name per\n solution type\n(future feature)
+Note over Jenkins: Jenkins jobs are preconfigured\n (simple, composite, pipeline)
+Deployment\nClient->Jenkins: POST /job/solution-deploy/buildWithParameters?taskId=<id>
+Jenkins->Deployment\nClient: 201 Created
 Deployment\nClient->Portal_BE: 202 Accepted\n {taskId}
 Note over Portal_BE: Monitor task/stepresult\n and update UI as needed
-Note over Jenkins: Jenkins jobs are preconfigured\n (simple, composite,\n pipeline) in configmap
-Note over Jenkins: Execute deployment script
-Jenkins->Deployment\nClient: POST /status/<taskId> {"status": "in-progress"}
-Deployment\nClient->CDS: PUT /task/<taskId> {"statusCode": "IP", ...}
-Deployment\nClient->CDS: POST /task/stepresult {taskId, "name": "DEP",\n "statusCode": "IP", ...}
-Jenkins->Deployment\nClient: GET /getSolutionZip/taskId
+Note over Jenkins: Execute deployment job
+Jenkins->Deployment\nClient: GET /getSolutionZip/<taskId>
+Note over Deployment\nClient: package solution deployment\ntemplates etc for the\ntype of solution
 Deployment\nClient->Jenkins: 202 OK (solution.zip)
+Note over Jenkins: Unpack solution.zip,\nprepare for deployment
 Jenkins->k8s_Master: Create solution deployment
-Note over Jenkins: Monitor progress
-Jenkins->Deployment\nClient: POST /status/<taskId>\n {"status": "complete", "ingress": "<url>"}
+Note over Jenkins: When deployment is complete provide\n notification text ("reason") ala\n'<SOLUTION_NAME> deployment is complete.\n The solution can be accessed at the\ningress URL <ingress>'
+Jenkins->Deployment\nClient: POST /status/<taskId>\n {"status": "SU", "reason": "<reason>", ingress": "<url>"}
 Deployment\nClient->CDS: POST /task/stepresult {taskId, "name": "DEP",\n "statusCode": "SU", ...}
 Deployment\nClient->CDS: PUT /task/<taskId> {"statusCode": "SU", ...}
-Deployment\nClient->CDS: POST /notif\n {"message": "Deployment succeeded", "url": <url>, ...}
+Deployment\nClient->CDS: POST /notif\n {"message": "<reason>", "url": <url>, ...}

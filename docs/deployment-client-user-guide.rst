@@ -326,19 +326,97 @@ default design:
   `setup_ingress_controller.sh <https://github.com/acumos/system-integration/blob/master/charts/ingress/setup_ingress_controller.sh>`_
 * persistent volumes available for use by the ML solution logging support
   components
-* as needed, configure your k8s cluster to use the docker registry for Acumos
-  solution docker images as an insecure registry; by default, the Nexus service
-  is used as the docker registry for the Acumos platform. If the Nexus service or
-  other docker registry being used was deployed as an insecure registry (e.g.
-  using self-signed certs), you must configure the docker daemon for the k8s
-  cluster to accept insecure connections to the registry. Below is the process
-  for that configuration:
 
-  * add the docker registry to /etc/docker/daemon.json, and restart the docker
-    service
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Configure k8s cluster access to Acumos solution docker registry
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    * edit /etc/docker/daemon.json (requires root or sudo permission)
-    * if /etc/docker/daemon.json is a new file, enter this content
+A docker daemon service on each k8s cluster node is used by k8s to pull images
+that are being deployed on the k8s node. One or both of the following
+configuration updates are needed to ensure the cluster can pull solution images
+from the docker registry used by the Acumos platform:
+
+* create a k8s secret with a valid access token for the Acumos project docker
+  registry and your Acumos platform docker registry
+* IF your Acumos docker registry service is installed in insecure mode,
+  configure the docker daemon on each k8s cluster node to be able to access the
+  registry as an insecure registry
+
+*****************************************************
+Create a k8s secret for Acumos docker registry access
+*****************************************************
+
+Deploying Acumos project and platform docker images into k8s clusters requires
+that the cluster be pre-configured with access tokens for the registries, since
+they are password-protected. This is a two-step process, with the second step
+being applied for each namespace under which Acumos solutions will be deployed:
+
+* create a docker client configuration file (~/.docker/config.json) by logging
+  into the Acumos project and Acumos platform docker registry; this can be done
+  from any host that has access to the k8s cluster via kubectl, e.g. your
+  workstation or the k8s cluster master node
+
+  .. code-block:: bash
+
+    docker login nexus3.acumos.org:10002 -u docker -p docker
+    docker login nexus3.acumos.org:10003 -u docker -p docker
+    docker login nexus3.acumos.org:10004 -u docker -p docker
+    docker login http://<docker registry domain>:<docker registry port> -u <username> -p <password>
+  ..
+
+  * where:
+
+    * <docker registry domain> is the host/FQDN of your Acumos platform docker registry
+    * <docker registry port> is the port of your Acumos platform docker registry
+    * <username> is a username with access to the Acumos platform docker registry
+    * <password> is the password for the username
+
+* create/update the "acumos-registry" secret in the target namespace with the
+  content of the docker config updated above
+
+  .. code-block:: bash
+
+    b64=$(cat $HOME/.docker/config.json | base64 -w 0)
+    cat <<EOF >acumos-registry.yaml
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: acumos-registry
+      namespace: <namespace>
+    data:
+      .dockerconfigjson: $b64
+    type: kubernetes.io/dockerconfigjson
+    EOF
+
+    kubectl create -f acumos-registry.yaml
+  ..
+
+  * where <namespace> is the k8s namespace under which you plan to deploy
+    solutions, as described in `Creating the Jenkins solution-deploy job`_
+  * NOTE: if you are running the commands above under MacOS, remove the option
+    '-w 0' in the base64 command shown above
+
+*************************************************************
+Configure docker daemon to access your Acumos docker registry
+*************************************************************
+
+If your Acumos solution docker registry is configured in either of the
+following ways, it is an insecure registry from the docker daemon's perspective
+and must be configured specifically for access as an insecure registry:
+
+* accessed over HTTP (vs HTTP), e.g. per the default for the OneClick toolset
+  deployment of Nexus as a platform-internal docker registry
+* accessed over HTTPS without a commercial cert, i.e. with no cert or a
+  self-signed cert
+
+Configuring the docker daemon to access your Acumos solution docker registry
+as an insecure registry requires host admin (root or sudo user), and the
+following actions:
+
+* add the docker registry to /etc/docker/daemon.json
+
+  * edit /etc/docker/daemon.json)
+  * if /etc/docker/daemon.json is a new file, enter this content
 
       .. code-block:: json
 
@@ -349,101 +427,106 @@ default design:
 
       ..
 
-      * where
+    * where
 
-        * ACUMOS_DOCKER_REGISTRY_HOST is the domain name or IP address of your
-          docker registry service
-        * ACUMOS_DOCKER_MODEL_PORT is the TCP port where the docker registry
-          service is provided
+      * ACUMOS_DOCKER_REGISTRY_HOST is the domain name or IP address of your
+        docker registry service
+      * ACUMOS_DOCKER_MODEL_PORT is the TCP port where the docker registry
+        service is provided
 
-    * if /etc/docker/daemon.json already has values for "insecure-registries",
-      add the additional <ACUMOS_DOCKER_REGISTRY_HOST>:<ACUMOS_DOCKER_MODEL_PORT>
-      to the list
-    * enter the following commands to restart the docker daemon service
+  * if /etc/docker/daemon.json already has values for "insecure-registries",
+    add the additional <ACUMOS_DOCKER_REGISTRY_HOST>:<ACUMOS_DOCKER_MODEL_PORT>
+    to the list
 
-      .. code-block:: json
+* restart the docker service
 
-        sudo systemctl daemon-reload
-        sudo service docker restart
-      ..
+  .. code-block:: json
 
-      * NOTE: this restart action will restart your k8s cluster, and may be
-        disruptive to any running services under the cluster; ALSO note that for
-        OpenShift clusters, additional actions may be needed to restore the
-        cluster and services running under it
-
-* configure the "acumos-registry" secret in the target namespace to include a
-  docker client token for the the Acumos platform's docker registry; the process
-  for this is supported by the Acumos OneClick utility "create_acumos_registry_secret",
-  which you can use as below to update the secret, if you deployed your platform
-  using the `Acumos OneClick toolset <https://docs.acumos.org/en/latest/submodules/system-integration/docs/oneclick-deploy/index.html>`_.
-
-  .. code-block:: bash
-
-    docker login http://<docker registry domain>:<docker registry port> -u <username> -p <password>
-    cd system-integration/AIO
-    source utils.sh
-    create_acumos_registry_secret <acumos platform namespace>
+    sudo systemctl daemon-reload
+    sudo service docker restart
   ..
 
+  * NOTE: this restart action will restart your k8s service on the updated
+    node, and may be disruptive to any running services on that node; ALSO note
+    that for OpenShift clusters, additional actions may be needed to restore the
+    cluster and services running under it
 
 ..............................
 Kubernetes Cluster Maintenance
 ..............................
 
-The Clio release does not include any platform capabilities or specific tools
-that enable Admins to manage the Acumos solutions deployed in k8s clusters, once
-those solutions have been deployed. Such capabilities are planned for the next
-release. For Clio, Admins and/or users will need to know the following and take
-action as needed to manage consumed resources in the k8s cluster:
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Updating Docker Daemon Insecure Registry Configuration
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-* a variety of k8s resources are created during solution deployment. These
-  resources are specific to the particular solution and deployment job, and will
-  not be deleted automatically. When the deployed solution is no longer needed,
-  Admins and/or users should clean up the resources e.g. using the kubectl client
-  and a script such as the following:
+If there is a change to your Acumos docker registry host or port, e.g. you have
+redeployed the Acumos platform or the Nexus service resulting in assignment of
+a new nodePort value for the Nexus service at ACUMOS_DOCKER_MODEL_PORT, you will
+need to update the docker daemon configuration for k8s clusters that are used
+for solution deployment, as described in
+`Configure docker daemon to access your Acumos docker registry`_.
 
-  .. code-block:: bash
++++++++++++++++++++++++++++
+Cleaning Solution Resources
++++++++++++++++++++++++++++
 
-    #!/bin/bash
-    id=$1
-    if [[ "$2" != "" ]]; then ns="-n $2"; fi
-    if [[ "$id" != "" ]]; then
-      ts="deployments daemonset service configmap serviceaccount clusterrole clusterrolebinding configmap pvc ingress"
-      for t in $ts; do
-        rs=$(kubectl get $t $ns | awk "/$id/{print \$1}")
-        for r in $rs; do
-          kubectl delete $t $ns $r
-        done
-      done
-    else
-      echo "usage: bash clean_solution.sh <id> [namespace]"
-    fi
+The Clio release does not include any platform capabilities or specific solution
+lifecycle management tools enabling Admins to manage the Acumos solutions once
+the solutions have been deployed in k8s clusters, other than as described below.
+Platform-integrated tools are planned for the next release (Demeter).
 
-  ..
+In the meantime, Admins or users (if they have access to the k8s clusters via
+kubectl) will need to manually manage deployed solution resources, e.g. when the
+running solution is no longer needed, removing all solution-specific resources
+created during deployment.
 
-* in order to identify a specific deployment job and its resources, use the
-  "ingress URL" provided to the user when the deployment job completion
-  notification was provided on the Acumos platform, e.g.
+One tool is provided in the deployment-client repo to simplify cleaning up
+solution resources, as
+deployment-client/config/jobs/solution_deploy/clean_solution.sh. To run that
+tool:
 
-  .. code-block:: text
+.. code-block:: bash
 
-    square deployment is complete. The solution can be accessed at the ingress
-    URL https://acumos.example.com/square/191111-162114/
-  ..
+  $ bash clean_solution.sh [ns=<namespace>] [days=<days>] [match=<match>] [--dry-run] [--force]
+..
 
-  * The URL part after the model name is the unique ID assigned to the
-    deployment job, and provides a timestamp when the deployment job was
-    invoked by the default deploy,sh deployment script:
+  * where:
 
-    .. code-block:: text
+    * namespace: k8s namespace under which the solution is deployed, in the
+      cluster to which the user is currently connected, as the active
+      context for the kubectl client (run 'kubectl config current-context' to
+      see the current active context)
+    * days: select all solutions that are <days> old or older
+    * match: select solutions that match <pattern>
 
-      UNIQUE_ID=$(date +%y%m%d)-$(date +%H%M%S)
-    ..
+      * If no <match> is specified, resources that match the default pattern
+        [0-9]{5}-[0-9]{5} will be selected. These are resources for solutions
+        identified by the uniqueid value generated by the deploy.sh script.
 
+    * --dry-run: show what would be deleted only
+    * --force: do not prompt for confirmation of resource deletion
 
-* given the unique ID, you should be able to clean up all related resources
-  as needed, using the example script above
+In order to identify a specific deployment job and its resources, use the
+"ingress URL" provided to the user when the deployment job completion
+notification was provided on the Acumos platform, e.g.
+
+.. code-block:: text
+
+  square deployment is complete. The solution can be accessed at the ingress
+  URL https://acumos.example.com/square/191111-162114/
+..
+
+The URL part after the model name is the unique ID assigned to the
+deployment job, and provides a timestamp when the deployment job was
+invoked by the default deploy,sh deployment script:
+
+.. code-block:: text
+
+  UNIQUE_ID=$(date +%y%m%d)-$(date +%H%M%S)
+..
+
+Using the unique ID as the "match=" parameter shown above, you should be able
+to clean up all related resources as needed.
 
 ------------------
 For Platform Users
