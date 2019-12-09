@@ -21,7 +21,7 @@ Deployment Client Release Notes
 ===============================
 
 --------------------------
-Version 1.0.1, 05 Dec 2019
+Version 1.0.1, 09 Dec 2019
 --------------------------
 
 This is the Clio maintenance release of the Deployment Client. The current
@@ -29,6 +29,8 @@ k8s and docker-compose templates are at:
 
 * `deployment-client-deployment.yaml <https://github.com/acumos/system-integration/blob/master/AIO/kubernetes/deployment/deployment-client-deployment.yaml>`_
 * `deployment-client.yml <https://github.com/acumos/system-integration/blob/master/AIO/docker/acumos/deployment-client.yml>`_
+
+Jira items:
 
 * `ACUMOS-3677: Ensure all resources have names with max length 63 chars <https://jira.acumos.org/browse/ACUMOS-3677>`_
 
@@ -43,6 +45,8 @@ k8s and docker-compose templates are at:
 
 * `ACUMOS-3133: Migrate Solution/Pipeline deployment to Jenkins-based process <https://jira.acumos.org/browse/ACUMOS-3133>`_
 
+  * `Fix deploy flow image <>`_
+  * `6048: Add clean_solution.sh, update docs <https://gerrit.acumos.org/r/#/c/model-deployments/deployment-client/+/6048/>`_
   * `5589: Complete deployment job template <https://gerrit.acumos.org/r/#/c/model-deployments/deployment-client/+/5589/>`_
   * `5652: Add link to user guide <https://gerrit.acumos.org/r/#/c/model-deployments/deployment-client/+/5652/>`_
   * `5716: Fix XML file format <https://gerrit.acumos.org/r/#/c/model-deployments/deployment-client/+/5716/>`_
