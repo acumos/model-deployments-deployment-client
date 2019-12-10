@@ -60,6 +60,7 @@ EOF
 trap &apos;fail&apos; ERR
 
 rm -rf *
+export KUBECONFIG=/var/jenkins_home/.kube/config
 DEPLOYMENT_CLIENT=http://deployment-client-service:8337
 curl -o solution.zip $DEPLOYMENT_CLIENT/getSolutionZip/$taskId/
 unzip solution.zip -d deploy
@@ -67,7 +68,7 @@ cd deploy
 source deploy_env.sh
 
 case &quot;$K8S_CLUSTER&quot; in
-  default)
+  cluster1)
     SOLUTION_DOMAIN=acumos.example.com
     NAMESPACE=acumos
     FILEBEAT_DATA_PVC_STORAGE_CLASS_NAME=
