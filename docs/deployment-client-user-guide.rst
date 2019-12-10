@@ -396,6 +396,44 @@ being applied for each namespace under which Acumos solutions will be deployed:
   * NOTE: if you are running the commands above under MacOS, remove the option
     '-w 0' in the base64 command shown above
 
+* verify the acumos-registry secret now contains the correct address and
+  credentials for your docker registry
+
+  .. code-block:: bash
+
+    kubectl get secret -n acumos acumos-registry -o yaml | \
+      awk '/.dockerconfigjson:/{print $2}' | base64 --decode
+  ..
+
+  * to verify the credentials, copy the "auth" value from the "auths" array
+    member for the updated registry and decode it, e.g.
+
+    .. code-block:: bash
+
+      $ kubectl get secret -n acumos acumos-registry -o yaml | awk '/.dockerconfigjson:/{print $2}' | base64 --decode
+      {
+        "auths": {
+          "nexus3.acumos.org:10002": {
+            "auth": "ZG9ja2VyOmRvY2tlcg=="
+          },
+          "nexus3.acumos.org:10003": {
+            "auth": "ZG9ja2VyOmRvY2tlcg=="
+          },
+          "nexus3.acumos.org:10004": {
+            "auth": "ZG9ja2VyOmRvY2tlcg=="
+          },
+          "opnfv04:30908": {
+            "auth": "YWN1bW9zX3J3OmQ3YTkxODcyLWFmNWItNDhkNi1hMGViLWU0ODdhN2YwNmYzZg=="
+          }
+        },
+        "HttpHeaders": {
+          "User-Agent": "Docker-Client/18.06.3-ce (linux)"
+        }
+      }
+      $ echo YWN1bW9zX3J3OmQ3YTkxODcyLWFmNWItNDhkNi1hMGViLWU0ODdhN2YwNmYzZg== | base64 --decode
+      acumos_rw:d7a91872-af5b-48d6-a0eb-e487a7f06f3f
+    ..
+
 *************************************************************
 Configure docker daemon to access your Acumos docker registry
 *************************************************************
