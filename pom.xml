@@ -5,7 +5,7 @@
 
 	<groupId>org.acumos.deployment-client</groupId>
 	<artifactId>deployment-client</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.2-SNAPSHOT</version>
 	<name>deployment-client</name>
 	<description>Demo project for Spring Boot</description>
 	<parent>
@@ -50,7 +50,7 @@
 		<dependency>
 			<groupId>org.acumos.common-dataservice</groupId>
 			<artifactId>cmn-data-svc-client</artifactId>
-			<version>3.0.0</version>
+			<version>3.1.0</version>
 		</dependency>
 		<dependency>
 		    <groupId>com.fasterxml.jackson.dataformat</groupId>
