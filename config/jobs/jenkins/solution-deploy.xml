@@ -67,7 +67,7 @@ cd deploy
 source deploy_env.sh
 
 case &quot;$K8S_CLUSTER&quot; in
-  default)
+  cluster1)
     SOLUTION_DOMAIN=acumos.example.com
     NAMESPACE=acumos
     FILEBEAT_DATA_PVC_STORAGE_CLASS_NAME=
@@ -79,12 +79,15 @@ case &quot;$K8S_CLUSTER&quot; in
     exit 1
 esac
 
-echo &quot;export SOLUTION_DOMAIN=$SOLUTION_DOMAIN&quot; &gt;&gt;deploy_env.sh
-echo &quot;export NAMESPACE=$NAMESPACE&quot; &gt;&gt;deploy_env.sh
-echo &quot;export FILEBEAT_DATA_PVC_STORAGE_CLASS_NAME=$FILEBEAT_DATA_PVC_STORAGE_CLASS_NAME&quot; &gt;&gt;deploy_env.sh
-echo &quot;export FILEBEAT_DATA_PVC_SIZE=$FILEBEAT_DATA_PVC_SIZE&quot; &gt;&gt;deploy_env.sh
-echo &quot;export NGINX_PROXY_LOG_PVC_STORAGE_CLASS_NAME=$NGINX_PROXY_LOG_PVC_STORAGE_CLASS_NAME&quot; &gt;&gt;deploy_env.sh
-echo &quot;export NGINX_PROXY_LOG_PVC_SIZE=$NGINX_PROXY_LOG_PVC_SIZE&quot; &gt;&gt;deploy_env.sh
+export KUBECONFIG=/var/jenkins_home/kube-config-$SOLUTION_DOMAIN
+cat &lt;&lt;EOF &gt;&gt;deploy_env.sh
+export SOLUTION_DOMAIN=$SOLUTION_DOMAIN
+export NAMESPACE=$NAMESPACE
+export FILEBEAT_DATA_PVC_STORAGE_CLASS_NAME=$FILEBEAT_DATA_PVC_STORAGE_CLASS_NAME
+export FILEBEAT_DATA_PVC_SIZE=$FILEBEAT_DATA_PVC_SIZE
+export NGINX_PROXY_LOG_PVC_STORAGE_CLASS_NAME=$NGINX_PROXY_LOG_PVC_STORAGE_CLASS_NAME
+export NGINX_PROXY_LOG_PVC_SIZE=$NGINX_PROXY_LOG_PVC_SIZE
+EOF
 
 bash deploy.sh
 cat status.json
