@@ -90,6 +90,13 @@ export NGINX_PROXY_LOG_PVC_SIZE=$NGINX_PROXY_LOG_PVC_SIZE
 EOF
 
 bash deploy.sh
+echo; echo &quot;***** ALL FILES IN SOLUTION.ZIP, AS DEPLOYED *****&quot;
+ls -latR /var/jenkins_home/workspace/solution-deploy/deploy
+fs=$(find /var/jenkins_home/workspace/solution-deploy/deploy/. -type f)
+for f in $fs; do
+  echo; echo &quot;***** $f *****&quot;
+  cat $f
+done
 cat status.json
 curl -X POST -H &quot;Content-Type:application/json&quot; $DEPLOYMENT_CLIENT/status/$taskId -d @status.json</command>
     </hudson.tasks.Shell>
