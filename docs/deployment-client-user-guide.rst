@@ -80,20 +80,27 @@ Future releases are expected to support use of an external Jenkins server.
 The default Jenkins job template is available as
 `solution-deploy.xml <https://raw.githubusercontent.com/acumos/model-deployments-deployment-client/master/config/jobs/jenkins/solution-deploy.xml>`_ in the
 `model-deployments-deployment-client repo <https://github.com/acumos/model-deployments-deployment-client>`_.
-By default, the OneClick toolset will install this template as a Jenkins job,
-unless the template is pre-existing under charts/jenkins/jobs in the
-system-integration clone used to execute the OneClick-based deployment, with
-the following values set per your selection in the environment file
-acumos_env.sh:
+By default, the OneClick toolset script
+`setup_jenkins.sh <https://raw.githubusercontent.com/acumos/system-integration/master/AIO/jenkins/setup_jenkins.sh>`_
+will install this template as a Jenkins job, with the following values
+as set in the environment file acumos_env.sh:
 
 * ACUMOS_DEFAULT_SOLUTION_DOMAIN: by default set the same as ACUMOS_DOMAIN
-* ACUMOS_DEFAULT_SOLUTION_NAMESPACE by default set the same as ACUMOS_NAMESPACE
+* ACUMOS_DEFAULT_SOLUTION_NAMESPACE: by default set the same as ACUMOS_NAMESPACE
+
+These values will be used in the first target cluster configuration block of the
+case statement in the solution-deploy job, in place of "acumos.example.com" and
+"acumos". If you also specify a value for ACUMOS_DEFAULT_SOLUTION_KUBE_CONFIG in
+acumos_env.sh, setup_jenkins.sh will also copy that kube-config file into the
+Jenkins configuration as "kube-config-<ACUMOS_DEFAULT_SOLUTION_DOMAIN>" so that
+when a solution-deploy job is executed for that cluster, the correct kube-config
+is used to interact with that cluster via kubectl.
 
 If you deployed the platform using some other method, you will need to manually
-create and configure the solution-deploy job, and can use the example commands from
-`oneclick_deploy.sh <https://raw.githubusercontent.com/acumos/system-integration/master/AIO/oneclick_deploy.sh>`_
-(see function "setup_jenkins"). Once the solution-deploy job is created under Jenkins, there is one manual step
-required to complete the configuration. Use these steps to complete it:
+create and configure the solution-deploy job, similar to how it is configured in
+setup_jenkins.sh. Once the solution-deploy job is created under Jenkins, there
+is one manual step required to complete the configuration. Use these steps to
+complete it:
 
 * login to the Jenkins UI, by default https://<ACUMOS_DOMAIN/jenkins
 * select the solution-deploy job link
@@ -117,14 +124,15 @@ required to complete the configuration. Use these steps to complete it:
       *)
         exit 1
     esac
-
   ..
 
   * There should be one case block per configured k8s cluster, with each block
     named per the "name" values for your k8s clusters. For example, if you have
     only one configured cluster:
 
-    * replace "default" with the "name" value of the cluster
+    * replace "cluster1" with the "name" value of a cluster that you have
+      cofigured in the Acumos platform site-config (by default, "cluster1" is
+      configured)
     * set SOLUTION_DOMAIN to the ingress domain name assigned for interaction with
       ML solutions deployed under the cluster
     * set NAMESPACE to the k8s namespace to use for the cluster
@@ -140,7 +148,6 @@ required to complete the configuration. Use these steps to complete it:
       NGINX_PROXY_LOG_PVC_SIZE
 
   * once you have completed the customization, select 'Save'
-
 
 The actual deployment process occurs through a combination of the Acumos
 `solution-deploy Jenkins job <https://github.com/acumos/model-deployments-deployment-client/blob/master/config/jobs/jenkins/solution-deploy.xml>`_
@@ -208,52 +215,95 @@ installed:
       EOF
       apt-get update
       apt-get -y install --allow-downgrades kubectl=${KUBE_VERSION}-00
-      mkdir ~/.kube
-
     ..
 
   * if your Jenkins server restricts privileged jobs, you can either run the
     commands above manually, or build and use an updated Jenkins docker image,
     e.g. as built using the `Dockerfile <https://github.com/acumos/system-integration/blob/master/charts/jenkins/Dockerfile>`_
-    in the system-integration repo
+    in the system-integration repo.
+
+    * NOTE: a pre-built Jenkins image customized for Acumos as above is
+      available under Docker Hub as blsaws/jenkins, and is the image use by
+      default in the OneClick toolset installation of Jenkins. In future
+      releases, it's expected that a similarly-prepared image will be provided
+      through the Acumos project Nexus repository.
 
 Once you have completed the basic configuration of the Jenkins server, you will
 need to provide a k8s config file ('kube config') that contains the token(s)
 used by the kubectl client to connect to your k8s server(s). If you used the OneClick
 toolset to deploy the Jenkins service under your Acumos platform, it will have
-already been configured to use the same k8s cluster and namespace for deploying
-solutions. But for access to other clusters, you will need to update the client
-configuration also, as described below.
+already been configured by default to use the same k8s cluster and namespace
+for deploying solutions, unless you specified values for the following in
+acumos_env.sh:
 
-* it's assumed that you have access to the k8s cluster(s) from your workstation,
-  and have the current context set to the default cluster you want to use for
-  deploying Acumos solutions
-* copy the 'config' file in the '.kube' folder of your home folder, to the
-  home folder of the Jenkins user in your Jenkins server. For example, if you
-  are using the default Jenkins server installed by the OneClick toolset and want
-  to update the kube config,
+* ACUMOS_DEFAULT_SOLUTION_DOMAIN: by default set the same as ACUMOS_DOMAIN
+* ACUMOS_DEFAULT_SOLUTION_NAMESPACE: by default set the same as ACUMOS_NAMESPACE
+* ACUMOS_DEFAULT_SOLUTION_KUBE_CONFIG: by default empty, which causes
+  setup_jenkins.sh to use the kube-config for the Acumos platform k8s cluster
 
-  * login to the k8s cluster(s) using a kubectl client on your workstation, and
-    save the resulting kube config as e.g. 'kube-config', e.g.
+You can add other target k8s clusters to the solution-deploy job through the
+Jenkins admin UI or by preparing a customized solution-deploy.xml file as
+AIO/jenkins/deploy/jobs/solution-deploy.xml in the system-integration
+clone used to execute the OneClick-based deployment. To do that, you should:
+
+* add additional target cluster case blocks to solution-deploy as described in
+  `Creating the Jenkins solution-deploy job`_, updating at least the first two
+  lines in the case block as shown below for a "cluster2" that has been added:
+
+  .. code-block:: bash
+
+    case "$K8S_CLUSTER"; in
+      cluster1)
+        SOLUTION_DOMAIN=acumos-1.example.com
+        NAMESPACE=acumos-1
+        FILEBEAT_DATA_PVC_STORAGE_CLASS_NAME=
+        FILEBEAT_DATA_PVC_SIZE=1Gi
+        NGINX_PROXY_LOG_PVC_STORAGE_CLASS_NAME=
+        NGINX_PROXY_LOG_PVC_SIZE=1Gi
+        ;;
+      cluster2)
+        SOLUTION_DOMAIN=acumos-2.example.com
+        NAMESPACE=acumos-2
+        FILEBEAT_DATA_PVC_STORAGE_CLASS_NAME=
+        FILEBEAT_DATA_PVC_SIZE=1Gi
+        NGINX_PROXY_LOG_PVC_STORAGE_CLASS_NAME=
+        NGINX_PROXY_LOG_PVC_SIZE=1Gi
+        ;;
+      *)
+        exit 1
+    esac
+  ..
+
+* create and/or copy an applicable kube-config file for the additional clusters
+  into the Jenkins container; to do that for the "cluster2" example above:
+
+  * it's assumed that you have access to the k8s cluster(s) from your workstation,
+    and have the current context set as needed
 
     .. code-block:: bash
 
-      kubectl config use-context <context name>
-      Switched to context "<context name>".
-      cp ~/.kube/config kube-config
+      kubectl config use-context cluster2-acumos
+      Switched to context "cluster2-acumos".
+      $ kubectl config get-contexts cluster2-acumos
+      CURRENT   NAME             CLUSTER   AUTHINFO   NAMESPACE
+      *         cluster2-acumos  cluster2  <your id>  acumos
     ..
 
-  * login into your Acumos platform k8s cluster, and copy the saved kube-config
-    into the running Jenkins server
+  * once you have set the context, copy ~/.kube/config to the home folder of
+    the Jenkins user in your Jenkins server, identifying the config file as
+    related to the solution domain for "cluster2". For example, if you are using
+    the default Jenkins server installed by the OneClick toolset and want
+    to update the kube config,
 
     .. code-block:: bash
 
+      cp ~/.kube/config kube-config-acumos-2.example.com
+      # Switch back to using the Acumos platform kube config
       kubectl config use-context <Acumos platform context name>
       Switched to context "<Acumos platform context name>".
       pod=$(kubectl get pods | awk '/jenkins/{print $1}')
-      kubectl exec -it $pod -- bash -c 'mkdir /var/jenkins_home/.kube'
-      kubectl kube-config $pod:/var/jenkins_home/.kube/.
-      kubectl exec -it $pod -- bash -c 'ls /var/jenkins_home/.kube'
+      kubectl cp kube-config-acumos-2.example.com $pod:/var/jenkins_home/.
+      kubectl exec -it $pod -- bash -c 'ls /var/jenkins_home/'
     ..
 
 .........................
@@ -262,10 +312,6 @@ Acumos Site Configuration
 
 The "deploy to k8s" feature supports provisioning of a set of k8s clusters to
 be offered to users as deployment target environments.
-
-NOTE: as of the Clio release, automatic configuration of the Acumos site
-configuration is not yet supported, but is planned for the maintenance release
-of Clio.
 
 Admins will have two methods to configure the k8s clusters to be offered to users
 for solution deployment. In the examples below, the "name" values should
@@ -286,7 +332,6 @@ be aligned with the solution-deploy Jenkins job as described under
             { \"name\": \"cluster2\" }, \
             { \"name\": \"cluster3\" } ]", \
             "userId": "<ACUMOS_ADMIN_USER_ID>" }'
-
   ..
 
   where:
@@ -350,16 +395,19 @@ restarted by docker. FOR TEST PURPOSES ONLY. To run that tool:
 
 .. code-block:: bash
 
-   $ bash update_k8s_config.sh <user@host> <namespace> <registry> <registry_user> <registry_password>
+   $ bash update_k8s_config.sh <kube-context> <k8s-host> <admin-user>
+      <solution-namespace> <registry-host> <nexus-namespace> <acumos-namespace>
 ..
 
 * where:
 
-  * user@host: user account and hostname in "user@host" form
-  * namespace: k8s namespace
-  * registry: host:port of the docker registry for the Acumos platform
-  * registry_user: username for access to the docker registry
-  * registry_password: passwsord for access to the docker registry..
+  * kube-context: name of k8s context for Acumos platform
+  * k8s-host: target k8s cluster hostname/FQDN
+  * admin-user: admin username on k8s host
+  * solution-namespace: namespace for creating acumos-registry secret on k8s-host
+  * registry-host: hostname/FQDN of the docker registry
+  * nexus-namespace: namespace of the Nexus service on the Acumos platform
+  * acumos-namespace: namespace of the Acumos core on the Acumos platform
 
 The following sections describe the actions in detail.
 
