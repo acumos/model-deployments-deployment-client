@@ -19,6 +19,15 @@
 ===============================
 Deployment Client Release Notes
 ===============================
+
+
+--------------------------------
+Version 1.0.3, 30 December 2019
+-----------------------------
+* update acumos-azure-client, acumos-openstack-client,kubernetis-client and deployment-client for logging library 3.0.5(`ACUMOS-3880 <https://jira.acumos.org/browse/ACUMOS-3880>`_)
+
+
+
 --------------------------------
 Version 1.0.2, 11 December 2019
 -----------------------------
