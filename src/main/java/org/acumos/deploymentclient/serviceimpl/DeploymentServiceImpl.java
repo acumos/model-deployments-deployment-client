@@ -98,10 +98,10 @@ public class DeploymentServiceImpl implements DeploymentService {
 
   public CommonDataServiceRestClientImpl getClient(
       String datasource, String userName, String dataPd) {
-    System.out.println("getClient start");
+    logger.debug("getClient start");
     CommonDataServiceRestClientImpl client =
         new CommonDataServiceRestClientImpl(datasource, userName, dataPd, null);
-    System.out.println("getClient End");
+    logger.debug("getClient End");
     return client;
   }
 
@@ -120,20 +120,20 @@ public class DeploymentServiceImpl implements DeploymentService {
 
   public String getSolutionCode(
       String solutionId, String datasource, String userName, String dataPd) {
-    System.out.println("getSolution start");
+    logger.debug("getSolution start");
     String toolKitTypeCode = "";
     try {
       CommonDataServiceRestClientImpl cmnDataService = getClient(datasource, userName, dataPd);
       MLPSolution mlpSolution = cmnDataService.getSolution(solutionId);
       if (mlpSolution != null) {
-        System.out.println("mlpSolution.getToolkitTypeCode() " + mlpSolution.getToolkitTypeCode());
+        logger.debug("mlpSolution.getToolkitTypeCode() " + mlpSolution.getToolkitTypeCode());
         toolKitTypeCode = mlpSolution.getToolkitTypeCode();
       }
     } catch (Exception e) {
-      System.out.println("Error in get solution " + e.getMessage());
+      logger.debug("Error in get solution " + e.getMessage());
       toolKitTypeCode = "";
     }
-    System.out.println("getSolution End toolKitTypeCode " + toolKitTypeCode);
+    logger.debug("getSolution End toolKitTypeCode " + toolKitTypeCode);
     return toolKitTypeCode;
   }
 
@@ -165,8 +165,8 @@ public class DeploymentServiceImpl implements DeploymentService {
 
   public byte[] singleSolutionDetails(DeploymentBean dBean, String imageTag, String singleModelPort)
       throws Exception {
-    System.out.println("singleSolutionDetails start");
-    System.out.println("imageTag " + imageTag + " singleModelPort " + singleModelPort);
+    logger.debug("singleSolutionDetails start");
+    logger.debug("imageTag " + imageTag + " singleModelPort " + singleModelPort);
     byte[] solutionZip = null;
     String solutionName = getModelName(imageTag, dBean.getSolutionId());
 
@@ -174,9 +174,9 @@ public class DeploymentServiceImpl implements DeploymentService {
     dBean.setSolutionName(solutionName);
     String solutionYaml = getSingleSolutionYMLFile(imageTag, singleModelPort, dBean);
     dBean.setSolutionYml(solutionYaml);
-    System.out.println("solutionYaml " + solutionYaml);
+    logger.debug("solutionYaml " + solutionYaml);
     solutionZip = createSingleSolutionZip(dBean);
-    System.out.println("singleSolutionDetails End");
+    logger.debug("singleSolutionDetails End");
     return solutionZip;
   }
 
@@ -1018,7 +1018,7 @@ public class DeploymentServiceImpl implements DeploymentService {
     MLPTask mlpTask = new MLPTask();
     String trackingID = UUID.randomUUID().toString();
     logger.debug("trackingID " + trackingID);
-    mlpTask.setTaskCode("OB");
+    mlpTask.setTaskCode("DP");
     mlpTask.setStatusCode("ST");
     mlpTask.setName("DEP-" + dBean.getEnvId());
     mlpTask.setCreated(Instant.now());

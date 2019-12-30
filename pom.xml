@@ -5,7 +5,7 @@
 
 	<groupId>org.acumos.deployment-client</groupId>
 	<artifactId>deployment-client</artifactId>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.0.3-SNAPSHOT</version>
 	<name>deployment-client</name>
 	<description>Demo project for Spring Boot</description>
 	<parent>
@@ -118,6 +118,11 @@
 					<artifactId>slf4j-api</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.acumos.platform-oam</groupId>
+			<artifactId>logging-demo</artifactId>
+			<version>3.0.5</version>
 		</dependency>
 
 	</dependencies>

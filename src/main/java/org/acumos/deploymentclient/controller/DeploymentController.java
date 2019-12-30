@@ -59,7 +59,8 @@ public class DeploymentController {
     log.debug("Start deploy API ");
     JSONObject jsonOutput = new JSONObject();
     DeploymentBean dBean = new DeploymentBean();
-
+    String taskId="";
+    String trackingId="";
     try {
       log.debug("solutionId " + deployBean.getSolutionId());
       log.debug("revisionId " + deployBean.getRevisionId());
@@ -79,13 +80,21 @@ public class DeploymentController {
       log.debug("Spring Env properties");
       MLPTask mlpTask = deploymentService.createTaskDetails(deployBean, dBean);
       log.debug("mlpTask created taskId" + mlpTask.getTaskId());
+      if(mlpTask.getTaskId()!=null) {
+    	  taskId=String.valueOf(mlpTask.getTaskId()); 
+      }
+      if(mlpTask.getTrackingId()!=null) {
+    	  trackingId=String.valueOf(mlpTask.getTrackingId()); 
+      }
+      log.debug("taskId: " + taskId);
+      log.debug("trackingId: " + trackingId);
       String solutionToolKitType =
           deploymentService.getSolutionCode(
               dBean.getSolutionId(),
               dBean.getDatasource(),
               dBean.getDataUserName(),
               dBean.getDataPd());
-      System.out.println("solutionToolKitType " + solutionToolKitType);
+      log.debug("solutionToolKitType " + solutionToolKitType);
       if (solutionToolKitType != null
           && !"".equals(solutionToolKitType)
           && "CP".equalsIgnoreCase(solutionToolKitType)) {
@@ -97,10 +106,14 @@ public class DeploymentController {
       }
 
       jsonOutput.put("status", "SUCCESS");
+      jsonOutput.put("taskId", taskId);
+      jsonOutput.put("trackingId", trackingId);
       response.setStatus(202);
     } catch (Exception e) {
       log.error("deploy API failed", e);
       jsonOutput.put("status", "FAIL");
+      jsonOutput.put("taskId", "");
+      jsonOutput.put("trackingId", "");
       response.setStatus(400);
     }
     log.debug("End deploy API ");
@@ -139,15 +152,15 @@ public class DeploymentController {
               dBean.getDatasource(),
               dBean.getDataUserName(),
               dBean.getDataPd());
-      System.out.println("solutionToolKitType " + solutionToolKitType);
+      log.debug("solutionToolKitType " + solutionToolKitType);
       if (solutionToolKitType != null
           && !"".equals(solutionToolKitType)
           && "CP".equalsIgnoreCase(solutionToolKitType)) {
-        System.out.println("Composite Solution Details Start");
+        log.debug("Composite Solution Details Start");
         solutionZip = deploymentService.compositeSolutionDetails(dBean);
-        System.out.println("Composite Solution Deployment End");
+        log.debug("Composite Solution Deployment End");
       } else {
-        System.out.println("Single Solution Details Start");
+        log.debug("Single Solution Details Start");
         String imageTag =
             deploymentService.getSingleImageData(
                 dBean.getSolutionId(),
@@ -155,8 +168,15 @@ public class DeploymentController {
                 dBean.getDatasource(),
                 dBean.getDataUserName(),
                 dBean.getDataPd());
-        solutionZip = deploymentService.singleSolutionDetails(dBean, imageTag, singleModelPort);
-        System.out.println("Single Solution Details End");
+        if(imageTag!=null && !"".equals(imageTag)) {
+        	solutionZip = deploymentService.singleSolutionDetails(dBean, imageTag, singleModelPort);
+            log.debug("Single Solution Details End");
+        }else {
+        	log.debug("imageTag : "+imageTag);
+        	log.error("imageTag : "+imageTag);
+        	throw new Exception("Simple Solution Image is not available");
+        }
+        
       }
       jsonOutput.put("status", "OK");
       response.setStatus(200);
