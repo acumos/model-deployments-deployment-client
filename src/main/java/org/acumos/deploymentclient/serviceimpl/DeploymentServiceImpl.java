@@ -3,6 +3,7 @@
  * Acumos
  * ===================================================================================
  * Copyright (C) 2017 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+ * Modifications Copyright (C) 2020 Nordix Foundation.
  * ===================================================================================
  * This Acumos software file is distributed by AT&T and Tech Mahindra
  * under the Apache License, Version 2.0 (the "License");
@@ -65,6 +66,7 @@ import org.acumos.deploymentclient.parsebean.DataBrokerBean;
 import org.acumos.deploymentclient.service.DeploymentService;
 import org.acumos.deploymentclient.util.DeployConstants;
 import org.acumos.deploymentclient.util.JenkinsJobBuilder;
+import org.acumos.deploymentclient.util.ParseDockerImageTag;
 import org.acumos.deploymentclient.util.ParseJSON;
 import org.acumos.nexus.client.NexusArtifactClient;
 import org.acumos.nexus.client.RepositoryLocation;
@@ -106,8 +108,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 
 	public CommonDataServiceRestClientImpl getClient(String datasource, String userName, String dataPd) {
 		logger.debug("getClient start");
-		CommonDataServiceRestClientImpl client = new CommonDataServiceRestClientImpl(datasource, userName, dataPd,
-				null);
+		CommonDataServiceRestClientImpl client = new CommonDataServiceRestClientImpl(datasource, userName, dataPd, null);
 		logger.debug("getClient End");
 		return client;
 	}
@@ -166,8 +167,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 		return imageTag;
 	}
 
-	public byte[] singleSolutionDetails(DeploymentBean dBean, String imageTag, String singleModelPort)
-			throws Exception {
+	public byte[] singleSolutionDetails(DeploymentBean dBean, String imageTag, String singleModelPort) throws Exception {
 		logger.debug("singleSolutionDetails start");
 		logger.debug("imageTag " + imageTag + " singleModelPort " + singleModelPort);
 		byte[] solutionZip = null;
@@ -200,8 +200,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 		logger.debug("getSingleSolutionService Start");
 		String serviceYml = "";
 		ObjectMapper objectMapper = new ObjectMapper();
-		YAMLMapper yamlMapper = new YAMLMapper(
-				new YAMLFactory().configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true));
+		YAMLMapper yamlMapper = new YAMLMapper(new YAMLFactory().configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true));
 		ObjectNode apiRootNode = objectMapper.createObjectNode();
 		apiRootNode.put(DeployConstants.APIVERSION_YML, DeployConstants.V_YML);
 
@@ -213,12 +212,10 @@ public class DeploymentServiceImpl implements DeploymentService {
 
 		ObjectNode metadataNode = objectMapper.createObjectNode();
 		metadataNode.put(DeployConstants.NAMESPACE_YML, DeployConstants.NAMESPACE_VALUE_YML);
-		metadataNode.put(DeployConstants.NAME_YML,
-				dBean.getSolutionName() + "-" + DeployConstants.TRACKINGID_VALUE_YML);
+		metadataNode.put(DeployConstants.NAME_YML, dBean.getSolutionName() + "-" + DeployConstants.TRACKINGID_VALUE_YML);
 
 		ObjectNode labelsNode = objectMapper.createObjectNode();
-		labelsNode.put(DeployConstants.APP_DEP_YML,
-				dBean.getSolutionName() + "-" + DeployConstants.TRACKINGID_VALUE_YML);
+		labelsNode.put(DeployConstants.APP_DEP_YML, dBean.getSolutionName() + "-" + DeployConstants.TRACKINGID_VALUE_YML);
 		labelsNode.put(DeployConstants.TRACKINGID_YML, DeployConstants.TRACKINGID_VALUE_YML);
 		metadataNode.put(DeployConstants.LABELS_DEP_YML, labelsNode);
 
@@ -254,8 +251,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 		logger.debug("getSingleSolutionDeployment Start");
 		ObjectMapper objectMapper = new ObjectMapper();
 		// CommonUtil cutil=new CommonUtil();
-		YAMLMapper yamlMapper = new YAMLMapper(
-				new YAMLFactory().configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true));
+		YAMLMapper yamlMapper = new YAMLMapper(new YAMLFactory().configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true));
 		ObjectNode kindRootNode = objectMapper.createObjectNode();
 		kindRootNode.put(DeployConstants.APIVERSION_DEP_YML, DeployConstants.APPS_V1_DEP_YML);
 		kindRootNode.put(DeployConstants.KIND_DEP_YML, DeployConstants.DEPLOYMENT_DEP_YML);
@@ -266,8 +262,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 				dBean.getSolutionName() + "-" + DeployConstants.TRACKINGID_VALUE_YML);
 
 		ObjectNode labelsNode = objectMapper.createObjectNode();
-		labelsNode.put(DeployConstants.APP_DEP_YML,
-				dBean.getSolutionName() + "-" + DeployConstants.TRACKINGID_VALUE_YML);
+		labelsNode.put(DeployConstants.APP_DEP_YML, dBean.getSolutionName() + "-" + DeployConstants.TRACKINGID_VALUE_YML);
 		labelsNode.put(DeployConstants.TRACKINGID_YML, DeployConstants.TRACKINGID_VALUE_YML);
 		metadataNode.put(DeployConstants.LABELS_DEP_YML, labelsNode);
 
@@ -392,8 +387,9 @@ public class DeploymentServiceImpl implements DeploymentService {
 			// 3. Get the list of Artifiact for the SolutionId and SolutionRevisionId.
 			mlpArtifactList = cmnDataService.getSolutionRevisionArtifacts(solutionId, solutionRevisionId);
 			if (null != mlpArtifactList && !mlpArtifactList.isEmpty()) {
-				nexusURI = mlpArtifactList.stream().filter(mlpArt -> mlpArt.getArtifactTypeCode()
-						.equalsIgnoreCase(DeployConstants.ARTIFACT_TYPE_BLUEPRINT)).findFirst().get().getUri();
+				nexusURI = mlpArtifactList.stream()
+						.filter(mlpArt -> mlpArt.getArtifactTypeCode().equalsIgnoreCase(DeployConstants.ARTIFACT_TYPE_BLUEPRINT))
+						.findFirst().get().getUri();
 				logger.debug(" Nexus URI : " + nexusURI);
 				if (null != nexusURI) {
 					NexusArtifactClient nexusArtifactClient = nexusArtifactClient(nexusUrl, nexusUserName, nexusPd);
@@ -412,8 +408,8 @@ public class DeploymentServiceImpl implements DeploymentService {
 				ContainerBean contbean = contList.get(j);
 				if (contbean != null && contbean.getContainerName() != null && !"".equals(contbean.getContainerName())
 						&& contbean.getProtoUriPath() != null && !"".equals(contbean.getProtoUriPath())) {
-					ByteArrayOutputStream byteArrayOutputStream = getNexusUrlFile(dBean.getNexusUrl(),
-							dBean.getNexusUserName(), dBean.getNexusPd(), contbean.getProtoUriPath());
+					ByteArrayOutputStream byteArrayOutputStream = getNexusUrlFile(dBean.getNexusUrl(), dBean.getNexusUserName(),
+							dBean.getNexusPd(), contbean.getProtoUriPath());
 					logger.debug(contbean.getProtoUriPath() + "byteArrayOutputStream " + byteArrayOutputStream);
 					contbean.setProtoUriDetails(byteArrayOutputStream.toString());
 				}
@@ -440,8 +436,8 @@ public class DeploymentServiceImpl implements DeploymentService {
 		DataBrokerBean dataBrokerBean = parseJson.getDataBrokerContainer(jsonString);
 		if (dataBrokerBean != null) {
 			if (dataBrokerBean != null) {
-				ByteArrayOutputStream byteArrayOutputStream = getNexusUrlFile(dBean.getNexusUrl(),
-						dBean.getNexusUserName(), dBean.getNexusPd(), dataBrokerBean.getProtobufFile());
+				ByteArrayOutputStream byteArrayOutputStream = getNexusUrlFile(dBean.getNexusUrl(), dBean.getNexusUserName(),
+						dBean.getNexusPd(), dataBrokerBean.getProtobufFile());
 				logger.debug("byteArrayOutputStream " + byteArrayOutputStream);
 				if (byteArrayOutputStream != null) {
 					dataBrokerBean.setProtobufFile(byteArrayOutputStream.toString());
@@ -512,16 +508,15 @@ public class DeploymentServiceImpl implements DeploymentService {
 				}
 
 				logger.debug("imagePort " + imagePort);
-				String serviceYml = getCompositeSolutionService(depBen.getContainerName(), imagePort,
+				String serviceYml = getCompositeSolutionService(depBen.getContainerName(), imagePort, depBen.getNodeType(),
+						dBean);
+				String deploymentYml = getCompositeSolutionDeployment(depBen.getImage(), depBen.getContainerName(), imagePort,
 						depBen.getNodeType(), dBean);
-				String deploymentYml = getCompositeSolutionDeployment(depBen.getImage(), depBen.getContainerName(),
-						imagePort, depBen.getNodeType(), dBean);
 
 				if (depBen.getNodeType() != null
 						&& depBen.getNodeType().equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)) {
 					portDockerInfo = dBean.getBluePrintPort();
-				} else if (depBen.getNodeType() != null
-						&& depBen.getNodeType().equalsIgnoreCase(DeployConstants.DATA_BROKER)) {
+				} else if (depBen.getNodeType() != null && depBen.getNodeType().equalsIgnoreCase(DeployConstants.DATA_BROKER)) {
 					portDockerInfo = dBean.getDataBrokerTargetPort();
 				} else if (depBen.getNodeType() != null
 						&& depBen.getNodeType().equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)) {
@@ -568,8 +563,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 		String serviceYml = "";
 
 		ObjectMapper objectMapper = new ObjectMapper();
-		YAMLMapper yamlMapper = new YAMLMapper(
-				new YAMLFactory().configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true));
+		YAMLMapper yamlMapper = new YAMLMapper(new YAMLFactory().configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true));
 		ObjectNode apiRootNode = objectMapper.createObjectNode();
 		apiRootNode.put(DeployConstants.APIVERSION_YML, DeployConstants.V_YML);
 		apiRootNode.put(DeployConstants.KIND_YML, DeployConstants.SERVICE_YML);
@@ -649,12 +643,11 @@ public class DeploymentServiceImpl implements DeploymentService {
 		return serviceYml;
 	}
 
-	public String getCompositeSolutionDeployment(String imageTag, String containerName, String imagePort,
-			String nodeType, DeploymentBean dBean) throws Exception {
+	public String getCompositeSolutionDeployment(String imageTag, String containerName, String imagePort, String nodeType,
+			DeploymentBean dBean) throws Exception {
 		logger.debug("getSingleSolutionDeployment Start");
 		ObjectMapper objectMapper = new ObjectMapper();
-		YAMLMapper yamlMapper = new YAMLMapper(
-				new YAMLFactory().configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true));
+		YAMLMapper yamlMapper = new YAMLMapper(new YAMLFactory().configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true));
 		ObjectNode kindRootNode = objectMapper.createObjectNode();
 		kindRootNode.put(DeployConstants.APIVERSION_DEP_YML, DeployConstants.APPS_V1_DEP_YML);
 		kindRootNode.put(DeployConstants.KIND_DEP_YML, DeployConstants.DEPLOYMENT_DEP_YML);
@@ -701,8 +694,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 			matchLabelsNode.put(DeployConstants.APP_DEP_YML,
 					DeployConstants.DATABROKER_NAME_YML + "-" + DeployConstants.TRACKINGID_VALUE_YML);
 		} else {
-			matchLabelsNode.put(DeployConstants.APP_DEP_YML,
-					containerName + "-" + DeployConstants.TRACKINGID_VALUE_YML);
+			matchLabelsNode.put(DeployConstants.APP_DEP_YML, containerName + "-" + DeployConstants.TRACKINGID_VALUE_YML);
 		}
 
 		selectorNode.set(DeployConstants.MATCHLABELS_DEP_YML, matchLabelsNode);
@@ -721,8 +713,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 					DeployConstants.DATABROKER_NAME_YML + "-" + DeployConstants.TRACKINGID_VALUE_YML);
 			labelsTemplateNode.put(DeployConstants.TRACKINGID_YML, DeployConstants.TRACKINGID_VALUE_YML);
 		} else {
-			labelsTemplateNode.put(DeployConstants.APP_DEP_YML,
-					containerName + "-" + DeployConstants.TRACKINGID_VALUE_YML);
+			labelsTemplateNode.put(DeployConstants.APP_DEP_YML, containerName + "-" + DeployConstants.TRACKINGID_VALUE_YML);
 			labelsTemplateNode.put(DeployConstants.TRACKINGID_YML, DeployConstants.TRACKINGID_VALUE_YML);
 		}
 
@@ -941,8 +932,8 @@ public class DeploymentServiceImpl implements DeploymentService {
 		return mlpTask;
 	}
 
-	public MLPTask getTaskDetails(String datasource, String userName, String dataPd, long taskIdNum,
-			DeploymentBean dBean) throws Exception {
+	public MLPTask getTaskDetails(String datasource, String userName, String dataPd, long taskIdNum, DeploymentBean dBean)
+			throws Exception {
 		logger.debug("getTaskDetails start");
 		MLPTask mlpTask = null;
 		CommonDataServiceRestClientImpl cmnDataService = getClient(datasource, userName, dataPd);
@@ -968,18 +959,22 @@ public class DeploymentServiceImpl implements DeploymentService {
 			if (mlpTask.getName() != null && !"".equalsIgnoreCase(mlpTask.getName().trim())) {
 				dBean.setEnvId(mlpTask.getName().trim().substring(4));
 			}
+			logger.debug("mlpTask.getUserId() " + mlpTask.getUserId());
+			if (mlpTask.getUserId() != null && !"".equalsIgnoreCase(mlpTask.getUserId())) {
+				dBean.setUserId(mlpTask.getUserId());
+			}
 		}
 		logger.debug("getTaskDetails end");
 		return mlpTask;
 	}
 
 	public void updateTaskDetails(String datasource, String dataUserName, String dataPd, long taskIdNum, String status,
-			String reason, String ingress, MLPTask mlpTask,DeploymentBean dBean) throws Exception {
+			String reason, String ingress, MLPTask mlpTask, DeploymentBean dBean) throws Exception {
 		logger.debug("updateTaskDetails Start");
 		DeploymentDetailBean deploymentDetailBean = null;
-		String target=null;
+		String target = null;
 		CommonDataServiceRestClientImpl cmnDataService = getClient(datasource, dataUserName, dataPd);
-		String deploymentStatusCode="";
+		String deploymentStatusCode = "";
 		mlpTask.setStatusCode(status);
 		mlpTask.setModified(Instant.now());
 		cmnDataService.updateTask(mlpTask);
@@ -988,15 +983,15 @@ public class DeploymentServiceImpl implements DeploymentService {
 		logger.debug("reason before : " + reason);
 		logger.debug("status before : " + status);
 		logger.debug("ingress before : " + ingress);
-		
+
 		if (status != null && status.equalsIgnoreCase(DeployConstants.DEPLOYMENT_FAILED)) {
 			reason = "Unknown failure in Jenkins deployment task";
-			deploymentStatusCode=DeployConstants.DEPLOYMENT_FAILED;
-		} else if (status != null && status.equalsIgnoreCase(DeployConstants.DEPLOYMENT_COMPLETE))  {
-			deploymentStatusCode=DeployConstants.DEPLOYMENT_PROCESS;
+			deploymentStatusCode = DeployConstants.DEPLOYMENT_FAILED;
+		} else if (status != null && status.equalsIgnoreCase(DeployConstants.DEPLOYMENT_COMPLETE)) {
+			deploymentStatusCode = DeployConstants.DEPLOYMENT_PROCESS;
 			deploymentDetailBean = new DeploymentDetailBean();
 			deploymentDetailBean.setJenkinUrl(dBean.getJenkinDetailUrl());
-			if(ingress!=null && !"".equals(ingress)) {
+			if (ingress != null && !"".equals(ingress)) {
 				deploymentDetailBean.setDeploymentUrl(ingress);
 			}
 			logger.debug("deploymentDetailBean.getJenkinUrl() : " + deploymentDetailBean.getJenkinUrl());
@@ -1006,26 +1001,27 @@ public class DeploymentServiceImpl implements DeploymentService {
 		logger.debug("status : " + status);
 		logger.debug("ingress : " + ingress);
 		generateNotification(reason, mlpTask.getUserId(), datasource, dataUserName, dataPd);
-        if(mlpTask!=null && mlpTask.getName()!=null) {
-        	target=mlpTask.getName();
-        }
-        logger.debug("target : " + target);
-        logger.debug("reason : " + reason);
-        logger.debug("mlpTask.getSolutionId() : " + mlpTask.getSolutionId());
-        logger.debug("mlpTask.getRevisionId() : " + mlpTask.getRevisionId());
-        logger.debug("mlpTask.getUserId() : " + mlpTask.getUserId());
-        logger.debug("mlpTask.getTrackingId() : " + mlpTask.getTrackingId());
-        logger.debug("reason : " + reason);
-        if (status != null && (status.equalsIgnoreCase(DeployConstants.DEPLOYMENT_FAILED) || status.equalsIgnoreCase(DeployConstants.DEPLOYMENT_COMPLETE))) {
-        	createDeploymentData(datasource, dataUserName, dataPd,deploymentDetailBean,mlpTask.getSolutionId(),mlpTask.getRevisionId(),
-            		mlpTask.getUserId(),mlpTask.getTrackingId(), deploymentStatusCode,target);
-        }
+		if (mlpTask != null && mlpTask.getName() != null) {
+			target = mlpTask.getName();
+		}
+		logger.debug("target : " + target);
+		logger.debug("reason : " + reason);
+		logger.debug("mlpTask.getSolutionId() : " + mlpTask.getSolutionId());
+		logger.debug("mlpTask.getRevisionId() : " + mlpTask.getRevisionId());
+		logger.debug("mlpTask.getUserId() : " + mlpTask.getUserId());
+		logger.debug("mlpTask.getTrackingId() : " + mlpTask.getTrackingId());
+		logger.debug("reason : " + reason);
+		if (status != null && (status.equalsIgnoreCase(DeployConstants.DEPLOYMENT_FAILED)
+				|| status.equalsIgnoreCase(DeployConstants.DEPLOYMENT_COMPLETE))) {
+			createDeploymentData(datasource, dataUserName, dataPd, deploymentDetailBean, mlpTask.getSolutionId(),
+					mlpTask.getRevisionId(), mlpTask.getUserId(), mlpTask.getTrackingId(), deploymentStatusCode, target);
+		}
 		logger.debug("updateTaskDetails End");
 	}
 
 	public MLPSolutionDeployment createDeploymentData(String dataSource, String dataUserName, String dataPd,
 			DeploymentDetailBean deploymentDetailBean, String solutionId, String solutionRevisionId, String userId,
-			String uidNumber, String deploymentStatusCode,String target) throws Exception {
+			String uidNumber, String deploymentStatusCode, String target) throws Exception {
 		logger.debug(" createDeploymentData Start");
 		logger.debug("solutionId " + solutionId);
 		logger.debug("solutionRevisionId " + solutionRevisionId);
@@ -1043,7 +1039,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 			mlp.setDeploymentId(uidNumber);
 			mlp.setDeploymentStatusCode(deploymentStatusCode);
 			logger.debug("target " + target);
-			if(target!=null && !"".equals(target)) {
+			if (target != null && !"".equals(target)) {
 				mlp.setTarget(target);
 			}
 			String details = mapper.writeValueAsString(deploymentDetailBean);
@@ -1072,8 +1068,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 				notification.setCreated(startDate);
 				CommonDataServiceRestClientImpl client = getClient(dataSource, dataUserName, dataPassword);
 				notification.setMsgSeverityCode(DeployConstants.MSG_SEVERITY_ME);
-				MLNotification mLNotification = createNotification(notification, dataSource, dataUserName,
-						dataPassword);
+				MLNotification mLNotification = createNotification(notification, dataSource, dataUserName, dataPassword);
 				logger.debug("mLNotification.getNotificationId() " + mLNotification.getNotificationId());
 				client.addUserToNotification(mLNotification.getNotificationId(), userId);
 			}
@@ -1347,7 +1342,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 		// logger.debug("acumosRegistryPd: "+dBean.getAcumosRegistryPd());
 		logger.debug("templateYmlDirectory: " + dBean.getTemplateYmlDirectory());
 		logger.debug("jenkinDetailUrl: " + dBean.getJenkinDetailUrl());
-		
+
 		// logger.debug(dBean.getDataBrokerNodePort());
 
 		logger.debug("setDeploymentBeanProperties End");
@@ -1356,33 +1351,26 @@ public class DeploymentServiceImpl implements DeploymentService {
 	public String createEnvFile(DeploymentBean dBean, String solType) throws Exception {
 		logger.debug("createEnvFile Start");
 		StringBuffer envBuffer = new StringBuffer();
-		String simpEnv = "";
-		String compEnv = "";
 		String setEnvDeploy = "" + "#!/bin/bash \n" + "export DEPLOYMENT_CLIENT_API_BASE_URL="
 				+ dBean.getDeploymentClientApiBaseUrl() + " \n" + "export ACUMOS_DOCKER_REGISTRY="
-				+ dBean.getAcumosRegistryName() + " \n" + "export ACUMOS_DOCKER_REGISTRY_USER="
-				+ dBean.getAcumosRegistryUser() + " \n" + "export ACUMOS_DOCKER_REGISTRY_PASSWORD="
-				+ dBean.getAcumosRegistryPd() + " \n" + "export K8S_CLUSTER=" + dBean.getEnvId()
+				+ dBean.getAcumosRegistryName() + " \n" + "export ACUMOS_DOCKER_REGISTRY_USER=" + dBean.getAcumosRegistryUser()
+				+ " \n" + "export ACUMOS_DOCKER_REGISTRY_PASSWORD=" + dBean.getAcumosRegistryPd() + " \n"
+				+ "export K8S_CLUSTER=" + dBean.getEnvId() + " \n" + "export USER_ID=" + dBean.getUserId() + " \n"
 				// + "export K8S_CLUSTER=default"
-				+ "\n" + "export TRACKING_ID=" + dBean.getTrackingId() + "\n" + "export TASK_ID=" + dBean.getTaskId()
-				+ "\n" + "export SOLUTION_TYPE=" + solType + "\n" + "export SOLUTION_NAME=" + dBean.getSolutionName()
-				+ " \n"
+				+ "\n" + "export TRACKING_ID=" + dBean.getTrackingId() + "\n" + "export TASK_ID=" + dBean.getTaskId() + "\n"
+				+ "export SOLUTION_TYPE=" + solType + "\n" + "export SOLUTION_NAME=" + dBean.getSolutionName() + " \n"
 				// TODO: figure out how to determine the actual model runner version
-				+ "export SOLUTION_MODEL_RUNNER_STANDARD=v2\n" + "export LOGSTASH_HOST=" + dBean.getLogstashHost()
-				+ "\n" + "export LOGSTASH_IP=" + dBean.getLogstashIP() + "\n" + "export LOGSTASH_PORT="
-				+ dBean.getLogstashPort() + "\n";
-
-		if (solType != null && "simple".equalsIgnoreCase(solType)) {
-			simpEnv = "export SOLUTION_ID=" + dBean.getSolutionId() + " \n";
-		} else {
-			compEnv = "export COMP_SOLUTION_ID=" + dBean.getLogstashPort() + " \n" + "export COMP_REVISION_ID="
-					+ dBean.getLogstashPort() + " \n";
-		}
+				+ "export SOLUTION_MODEL_RUNNER_STANDARD=v2\n" + "export LOGSTASH_HOST=" + dBean.getLogstashHost() + "\n"
+				+ "export LOGSTASH_IP=" + dBean.getLogstashIP() + "\n" + "export LOGSTASH_PORT=" + dBean.getLogstashPort()
+				+ "\n";
 		envBuffer.append(setEnvDeploy);
-		envBuffer.append(simpEnv);
+		ParseDockerImageTag util = new ParseDockerImageTag();
+		String dockerEnv = util.getEnvFileDetails(dBean);
+		envBuffer.append(setEnvDeploy);
+		envBuffer.append(dockerEnv);
 		logger.debug("dBean.getEnvId()" + dBean.getEnvId());
-		logger.debug("createEnvFile End" + setEnvDeploy);
-		return setEnvDeploy;
+		logger.debug("createEnvFile End" + envBuffer);
+		return envBuffer.toString();
 	}
 
 	public byte[] createSingleSolutionZip(DeploymentBean dBean) throws Exception {
@@ -1531,15 +1519,13 @@ public class DeploymentServiceImpl implements DeploymentService {
 					int j = 0;
 					while (contList.size() > j) {
 						ContainerBean contbean = contList.get(j);
-						if (contbean != null && contbean.getProtoUriPath() != null
-								&& !"".equals(contbean.getProtoUriPath()) && contbean.getProtoUriDetails() != null
-								&& !"".equals(contbean.getProtoUriDetails())) {
+						if (contbean != null && contbean.getProtoUriPath() != null && !"".equals(contbean.getProtoUriPath())
+								&& contbean.getProtoUriDetails() != null && !"".equals(contbean.getProtoUriDetails())) {
 							int index = contbean.getProtoUriPath().lastIndexOf("/");
 							String protoFileName = contbean.getProtoUriPath().substring(index + 1);
 							bOutput = new ByteArrayOutputStream(12);
 							bOutput.write(contbean.getProtoUriDetails().getBytes());
-							String protoFolderName = "microservice" + "/" + contbean.getContainerName() + "/"
-									+ "model.proto";
+							String protoFolderName = "microservice" + "/" + contbean.getContainerName() + "/" + "model.proto";
 							logger.debug(protoFolderName + "  " + protoFolderName);
 							hmap.put(protoFolderName, bOutput);
 							logger.debug(contbean.getProtoUriPath() + " " + bOutput);
@@ -1644,4 +1630,32 @@ public class DeploymentServiceImpl implements DeploymentService {
 		logger.debug(" End-getModelName " + modelName);
 		return modelName;
 	}
+
+	public void getSolutionRevisionMap(DeploymentBean dBean) throws Exception {
+		logger.debug("getSolutionRevisionMap - start");
+		// ACUMOS-2782 - create map of solutionId and revisionId to export
+		// (deploy_env.sh)
+		Map<String, String> solRevMap = new HashMap<String, String>();
+		solRevMap.put(dBean.getSolutionId(), dBean.getRevisionId());
+		List<ContainerBean> containerBeans = dBean.getContainerBeanList();
+
+		if (containerBeans != null) {
+			CommonDataServiceRestClientImpl cmnDataService = getClient(dBean.getDatasource(), dBean.getDataUserName(),
+					dBean.getDataPd());
+			for (ContainerBean containerBean : containerBeans) {
+				String image = containerBean.getImage();
+				Map<String, String> imageMetaMap = ParseDockerImageTag.parseImageToken(image);
+				String solutionId = imageMetaMap.get(DeployConstants.SOLUTION_ID);
+				String solVersion = imageMetaMap.get(DeployConstants.VERSION);
+				List<MLPSolutionRevision> revisions = cmnDataService.getSolutionRevisions(solutionId);
+				for (MLPSolutionRevision revision : revisions) {
+					if (revision.getVersion().equals(solVersion)) {
+						solRevMap.put(solutionId, revision.getRevisionId());
+						break;
+					}
+				}
+			}
+		}
+	}
+
 }

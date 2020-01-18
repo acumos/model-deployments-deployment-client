@@ -20,22 +20,24 @@
 Deployment Client Release Notes
 ===============================
 
-
---------------------------------
+------------------------------
 Version 1.0.4, 22 January 2020
------------------------------
+------------------------------
 * deployment client api changes(`ACUMOS-3934 <https://jira.acumos.org/browse/ACUMOS-3934>`_)
-
---------------------------------
-Version 1.0.3, 30 December 2019
------------------------------
 * update acumos-azure-client, acumos-openstack-client,kubernetis-client and deployment-client for logging library 3.0.5(`ACUMOS-3880 <https://jira.acumos.org/browse/ACUMOS-3880>`_)
+* Refactored some of the bash shell scripts to not require python
+* Adding support for model usage tracking (that was brought over from kubernetes-client) -  (`ACUMOS-3925 <https://jira.acumos.org/browse/ACUMOS-3925>`_)
+  - Added support for USER_ID (not user name) to be recorded
+  - Added support for simple model SOLUTION_ID and REVISION_ID to be
+  supported by nginx proxy
+  - Added support for composite model SOLUTION_ID and REVISION_ID
+  to be supported by nginx proxy
+* Updated deployment-client to be using java 11 - (`ACUMOS-3323 <https://jira.acumos.org/browse/ACUMOS-3323>`_)
 
 
-
---------------------------------
+-------------------------------
 Version 1.0.2, 11 December 2019
------------------------------
+-------------------------------
 * update acumos-azure-client, acumos-openstack-client,kubernetis-client and deployment-client for cds 3.1.0 (`ACUMOS-3835 <https://jira.acumos.org/browse/ACUMOS-3835>`_)
 
 

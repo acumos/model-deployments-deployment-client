@@ -3,6 +3,7 @@
  * Acumos
  * ===================================================================================
  * Copyright (C) 2017 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+ * Modifications Copyright (C) 2020 Nordix Foundation.
  * ===================================================================================
  * This Acumos software file is distributed by AT&T and Tech Mahindra
  * under the Apache License, Version 2.0 (the "License");
@@ -145,6 +146,7 @@ public class DeployConstants {
   public static final String CONTAINER_NAME = "container_name";
   public static final String IMAGE = "image";
   public static final String NAME = "name";
+  public static final String SOLUTION_ID = "solutionId";
   public static final String VERSION = "version";
   public static final String ORCHESTRATOR = "orchestrator";
   public static final String INPUT_OPERATION_SIGNATURES = "input_operation_signatures";
