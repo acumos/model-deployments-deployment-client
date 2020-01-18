@@ -3,6 +3,7 @@
  * Acumos
  * ===================================================================================
  * Copyright (C) 2017 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+ * Modifications Copyright (C) 2020 Nordix Foundation.
  * ===================================================================================
  * This Acumos software file is distributed by AT&T and Tech Mahindra
  * under the Apache License, Version 2.0 (the "License");
@@ -22,6 +23,7 @@ package org.acumos.deploymentclient.bean;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class DeploymentBean {
 
@@ -85,6 +87,8 @@ public class DeploymentBean {
   private String deploymentClientApiBaseUrl;
   private String solutionName;
   private List<ArrayList> kubernetesClusterList;
+  private Map<String, String> solutionRevisionIdMap;
+
 
   public List<ArrayList> getKubernetesClusterList() {
     return kubernetesClusterList;
@@ -538,4 +542,11 @@ public class DeploymentBean {
   public void setSolutionYml(String solutionYml) {
     this.solutionYml = solutionYml;
   }
+
+  public Map<String, String> getSolutionRevisionIdMap() {
+		return solutionRevisionIdMap;
+	}
+	public void setSolutionRevisionIdMap(Map<String, String> solutionRevisionIdMap) {
+		this.solutionRevisionIdMap = solutionRevisionIdMap;
+	}
 }
