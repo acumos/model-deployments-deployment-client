@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
+	<!--<![CDATA[
+	===============LICENSE_START=======================================================
+	Acumos
+	===================================================================================
+	Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+	Modifications Copyright (C) 2020 Nordix Foundation.
+	===================================================================================
+	This Acumos software file is distributed by AT&T and Tech Mahindra
+	under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+	This file is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+	===============LICENSE_END=========================================================
+	]]>-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.acumos.deployment-client</groupId>
 	<artifactId>deployment-client</artifactId>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.0.3-SNAPSHOT</version>
 	<name>deployment-client</name>
 	<description>Demo project for Spring Boot</description>
 	<parent>
@@ -125,10 +145,44 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.0.0-M2</version>
+				<executions>
+					<execution>
+						<id>enforce-versions</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<bannedPlugins>
+									<!-- will only display a warning but does not fail the build. -->
+									<level>WARN</level>
+									<excludes>
+										<exclude>org.apache.maven.plugins:maven-verifier-plugin</exclude>
+									</excludes>
+									<message>Please consider using the maven-invoker-plugin (http://maven.apache.org/plugins/maven-invoker-plugin/)!</message>
+								</bannedPlugins>
+								<requireMavenVersion>
+									<version>3.0.3</version>
+								</requireMavenVersion>
+								<requireJavaVersion>
+									<version>11</version>
+								</requireJavaVersion>
+								<!-- <requireOS>
+									<family>unix</family>
+								</requireOS> -->
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>license-maven-plugin</artifactId>
-				<version>1.14</version>
-				<configuration>
+				<version>1.17</version>
+					<configuration>
 					<licenseName>acumos</licenseName>
 					<licenseResolver>${project.baseUri}/src/license</licenseResolver>
 					<addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
@@ -278,7 +332,7 @@
 							<!-- Specify a tag to avoid default tag "latest" -->
 							<name>acumos/deployment-client:${project.version}</name>
 							<build>
-								<from>openjdk:8-jre-slim</from>
+								<from>adoptopenjdk/openjdk11-openj9:alpine-jre</from>
 								<tags>
 									<!-- Add tag with build number -->
 									<tag>${project.version}-b${build.number}</tag>

@@ -88,7 +88,7 @@ data:
       default_type application/octet-stream;
 
       # logging custom format for model methods
-      log_format  acumos  '{ "model": { "solutionId": "<SOLUTION_ID>", "revisionId": "<REVISION_ID>", "name": "$server_name", "operationName": "$request_uri", "userId": "<USER_ID>" }, '
+      log_format  acumos  '{ "model": { "solutionId": "<SOLUTION_ID>", "revisionId": "<REVISION_ID>", "name": "<MODEL_NAME>", "operationName": "$request_uri", "userId": "<USER_ID>" }, '
                         ' "remoteInfo": { "remoteAddr": "$remote_addr", "remoteUser": "$remote_user", "timeLocal": "$time_local", "reqStr": "$request", "httpReferer": "$http_referer", "userAgent": "$http_user_agent", "http_x_forwarded_for": "$http_x_forwarded_for" },  '
                         ' "request": { "scheme": "$scheme", "length": $request_length }, '
                         ' "response": { "status": "$status", "bytesSent": $body_bytes_sent, "time": $request_time } '

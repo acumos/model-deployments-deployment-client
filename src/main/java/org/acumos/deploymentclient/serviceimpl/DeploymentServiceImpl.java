@@ -3,6 +3,7 @@
  * Acumos
  * ===================================================================================
  * Copyright (C) 2017 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+ * Modifications Copyright (C) 2020 Nordix Foundation.
  * ===================================================================================
  * This Acumos software file is distributed by AT&T and Tech Mahindra
  * under the Apache License, Version 2.0 (the "License");
@@ -62,6 +63,7 @@ import org.acumos.deploymentclient.parsebean.DataBrokerBean;
 import org.acumos.deploymentclient.service.DeploymentService;
 import org.acumos.deploymentclient.util.DeployConstants;
 import org.acumos.deploymentclient.util.JenkinsJobBuilder;
+import org.acumos.deploymentclient.util.ParseDockerImageTag;
 import org.acumos.deploymentclient.util.ParseJSON;
 import org.acumos.nexus.client.NexusArtifactClient;
 import org.acumos.nexus.client.RepositoryLocation;
@@ -79,10 +81,14 @@ public class DeploymentServiceImpl implements DeploymentService {
   public boolean deployValidation(DeployBean deployBean) {
     boolean valid = true;
     if (deployBean != null) {
-      if (isNullOrEmpty(deployBean.getEnvId())) valid = false;
-      if (isNullOrEmpty(deployBean.getRevisionId())) valid = false;
-      if (isNullOrEmpty(deployBean.getSolutionId())) valid = false;
-      if (isNullOrEmpty(deployBean.getUserId())) valid = false;
+      if (isNullOrEmpty(deployBean.getEnvId()))
+        valid = false;
+      if (isNullOrEmpty(deployBean.getRevisionId()))
+        valid = false;
+      if (isNullOrEmpty(deployBean.getSolutionId()))
+        valid = false;
+      if (isNullOrEmpty(deployBean.getUserId()))
+        valid = false;
 
     } else {
       valid = false;
@@ -92,21 +98,19 @@ public class DeploymentServiceImpl implements DeploymentService {
   }
 
   public boolean isNullOrEmpty(String str) {
-    if (str != null && !str.trim().isEmpty()) return false;
+    if (str != null && !str.trim().isEmpty())
+      return false;
     return true;
   }
 
-  public CommonDataServiceRestClientImpl getClient(
-      String datasource, String userName, String dataPd) {
+  public CommonDataServiceRestClientImpl getClient(String datasource, String userName, String dataPd) {
     System.out.println("getClient start");
-    CommonDataServiceRestClientImpl client =
-        new CommonDataServiceRestClientImpl(datasource, userName, dataPd, null);
+    CommonDataServiceRestClientImpl client = new CommonDataServiceRestClientImpl(datasource, userName, dataPd, null);
     System.out.println("getClient End");
     return client;
   }
 
-  public NexusArtifactClient nexusArtifactClient(
-      String nexusUrl, String nexusUserName, String nexusPd) {
+  public NexusArtifactClient nexusArtifactClient(String nexusUrl, String nexusUserName, String nexusPd) {
     logger.debug("nexusArtifactClient start");
     RepositoryLocation repositoryLocation = new RepositoryLocation();
     repositoryLocation.setId("1");
@@ -118,8 +122,7 @@ public class DeploymentServiceImpl implements DeploymentService {
     return nexusArtifactClient;
   }
 
-  public String getSolutionCode(
-      String solutionId, String datasource, String userName, String dataPd) {
+  public String getSolutionCode(String solutionId, String datasource, String userName, String dataPd) {
     System.out.println("getSolution start");
     String toolKitTypeCode = "";
     try {
@@ -137,9 +140,8 @@ public class DeploymentServiceImpl implements DeploymentService {
     return toolKitTypeCode;
   }
 
-  public String getSingleImageData(
-      String solutionId, String revisionId, String datasource, String userName, String dataPd)
-      throws Exception {
+  public String getSingleImageData(String solutionId, String revisionId, String datasource, String userName,
+      String dataPd) throws Exception {
     logger.debug("Start getSingleImageData");
     String imageTag = "";
     CommonDataServiceRestClientImpl cmnDataService = getClient(datasource, userName, dataPd);
@@ -152,8 +154,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         artifact.setName(name);
         logger.debug("ArtifactTypeCode" + artifact.getArtifactTypeCode());
         logger.debug("URI" + artifact.getUri());
-        if (artifact.getArtifactTypeCode() != null
-            && artifact.getArtifactTypeCode().equalsIgnoreCase("DI")) {
+        if (artifact.getArtifactTypeCode() != null && artifact.getArtifactTypeCode().equalsIgnoreCase("DI")) {
           imageTag = artifact.getUri();
         }
       }
@@ -163,8 +164,7 @@ public class DeploymentServiceImpl implements DeploymentService {
     return imageTag;
   }
 
-  public byte[] singleSolutionDetails(DeploymentBean dBean, String imageTag, String singleModelPort)
-      throws Exception {
+  public byte[] singleSolutionDetails(DeploymentBean dBean, String imageTag, String singleModelPort) throws Exception {
     System.out.println("singleSolutionDetails start");
     System.out.println("imageTag " + imageTag + " singleModelPort " + singleModelPort);
     byte[] solutionZip = null;
@@ -180,8 +180,8 @@ public class DeploymentServiceImpl implements DeploymentService {
     return solutionZip;
   }
 
-  public String getSingleSolutionYMLFile(
-      String imageTag, String singleModelPort, DeploymentBean dBean) throws Exception {
+  public String getSingleSolutionYMLFile(String imageTag, String singleModelPort, DeploymentBean dBean)
+      throws Exception {
     logger.debug("getSingleSolutionYMLFile Start");
     String solutionYaml = "";
     String serviceYml = getSingleSolutionService(singleModelPort, dBean);
@@ -197,25 +197,22 @@ public class DeploymentServiceImpl implements DeploymentService {
     logger.debug("getSingleSolutionService Start");
     String serviceYml = "";
     ObjectMapper objectMapper = new ObjectMapper();
-    YAMLMapper yamlMapper =
-        new YAMLMapper(new YAMLFactory().configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true));
+    YAMLMapper yamlMapper = new YAMLMapper(new YAMLFactory().configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true));
     ObjectNode apiRootNode = objectMapper.createObjectNode();
     apiRootNode.put(DeployConstants.APIVERSION_YML, DeployConstants.V_YML);
 
-    /*ObjectNode kindDataNode = objectMapper.createObjectNode();
-    kindDataNode.put(DeployConstants.KIND_YML, DeployConstants.SERVICE_YML);*/
+    /*
+     * ObjectNode kindDataNode = objectMapper.createObjectNode();
+     * kindDataNode.put(DeployConstants.KIND_YML, DeployConstants.SERVICE_YML);
+     */
     apiRootNode.put(DeployConstants.KIND_YML, DeployConstants.SERVICE_YML);
 
     ObjectNode metadataNode = objectMapper.createObjectNode();
     metadataNode.put(DeployConstants.NAMESPACE_YML, DeployConstants.NAMESPACE_VALUE_YML);
-    metadataNode.put(
-        DeployConstants.NAME_YML,
-        dBean.getSolutionName() + "-" + DeployConstants.TRACKINGID_VALUE_YML);
+    metadataNode.put(DeployConstants.NAME_YML, dBean.getSolutionName() + "-" + DeployConstants.TRACKINGID_VALUE_YML);
 
     ObjectNode labelsNode = objectMapper.createObjectNode();
-    labelsNode.put(
-        DeployConstants.APP_DEP_YML,
-        dBean.getSolutionName() + "-" + DeployConstants.TRACKINGID_VALUE_YML);
+    labelsNode.put(DeployConstants.APP_DEP_YML, dBean.getSolutionName() + "-" + DeployConstants.TRACKINGID_VALUE_YML);
     labelsNode.put(DeployConstants.TRACKINGID_YML, DeployConstants.TRACKINGID_VALUE_YML);
     metadataNode.put(DeployConstants.LABELS_DEP_YML, labelsNode);
 
@@ -224,9 +221,7 @@ public class DeploymentServiceImpl implements DeploymentService {
     ObjectNode specNode = objectMapper.createObjectNode();
 
     ObjectNode selectorNode = objectMapper.createObjectNode();
-    selectorNode.put(
-        DeployConstants.APP_YML,
-        dBean.getSolutionName() + "-" + DeployConstants.TRACKINGID_VALUE_YML);
+    selectorNode.put(DeployConstants.APP_YML, dBean.getSolutionName() + "-" + DeployConstants.TRACKINGID_VALUE_YML);
     specNode.set(DeployConstants.SELECTOR_YML, selectorNode);
     specNode.put(DeployConstants.TYPE_YML, DeployConstants.NODE_TYPE_PORT_YML);
 
@@ -249,27 +244,22 @@ public class DeploymentServiceImpl implements DeploymentService {
     return serviceYml;
   }
 
-  public String getSingleSolutionDeployment(String imageTag, DeploymentBean dBean)
-      throws Exception {
+  public String getSingleSolutionDeployment(String imageTag, DeploymentBean dBean) throws Exception {
     logger.debug("getSingleSolutionDeployment Start");
     ObjectMapper objectMapper = new ObjectMapper();
     // CommonUtil cutil=new CommonUtil();
-    YAMLMapper yamlMapper =
-        new YAMLMapper(new YAMLFactory().configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true));
+    YAMLMapper yamlMapper = new YAMLMapper(new YAMLFactory().configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true));
     ObjectNode kindRootNode = objectMapper.createObjectNode();
     kindRootNode.put(DeployConstants.APIVERSION_DEP_YML, DeployConstants.APPS_V1_DEP_YML);
     kindRootNode.put(DeployConstants.KIND_DEP_YML, DeployConstants.DEPLOYMENT_DEP_YML);
 
     ObjectNode metadataNode = objectMapper.createObjectNode();
     metadataNode.put(DeployConstants.NAMESPACE_DEP_YML, DeployConstants.NAMESPACE_VALUE_YML);
-    metadataNode.put(
-        DeployConstants.NAME_DEP_YML,
+    metadataNode.put(DeployConstants.NAME_DEP_YML,
         dBean.getSolutionName() + "-" + DeployConstants.TRACKINGID_VALUE_YML);
 
     ObjectNode labelsNode = objectMapper.createObjectNode();
-    labelsNode.put(
-        DeployConstants.APP_DEP_YML,
-        dBean.getSolutionName() + "-" + DeployConstants.TRACKINGID_VALUE_YML);
+    labelsNode.put(DeployConstants.APP_DEP_YML, dBean.getSolutionName() + "-" + DeployConstants.TRACKINGID_VALUE_YML);
     labelsNode.put(DeployConstants.TRACKINGID_YML, DeployConstants.TRACKINGID_VALUE_YML);
     metadataNode.put(DeployConstants.LABELS_DEP_YML, labelsNode);
 
@@ -280,8 +270,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 
     ObjectNode selectorNode = objectMapper.createObjectNode();
     ObjectNode matchLabelsNode = objectMapper.createObjectNode();
-    matchLabelsNode.put(
-        DeployConstants.APP_DEP_YML,
+    matchLabelsNode.put(DeployConstants.APP_DEP_YML,
         dBean.getSolutionName() + "-" + DeployConstants.TRACKINGID_VALUE_YML);
     selectorNode.set(DeployConstants.MATCHLABELS_DEP_YML, matchLabelsNode);
 
@@ -290,8 +279,7 @@ public class DeploymentServiceImpl implements DeploymentService {
     ObjectNode templateNode = objectMapper.createObjectNode();
     ObjectNode metadataTemplateNode = objectMapper.createObjectNode();
     ObjectNode labelsTemplateNode = objectMapper.createObjectNode();
-    labelsTemplateNode.put(
-        DeployConstants.APP_DEP_YML,
+    labelsTemplateNode.put(DeployConstants.APP_DEP_YML,
         dBean.getSolutionName() + "-" + DeployConstants.TRACKINGID_VALUE_YML);
     labelsTemplateNode.put(DeployConstants.TRACKINGID_YML, DeployConstants.TRACKINGID_VALUE_YML);
     metadataTemplateNode.set(DeployConstants.LABELS_DEP_YML, labelsTemplateNode);
@@ -299,12 +287,14 @@ public class DeploymentServiceImpl implements DeploymentService {
     ObjectNode specTempNode = objectMapper.createObjectNode();
     ArrayNode containerArrayNode = templateNode.arrayNode();
     ObjectNode containerNode = objectMapper.createObjectNode();
-    containerNode.put(
-        DeployConstants.NAME_DEP_YML,
+    containerNode.put(DeployConstants.NAME_DEP_YML,
         dBean.getSolutionName() + "-" + DeployConstants.TRACKINGID_VALUE_YML);
     containerNode.put(DeployConstants.IMAGE_DEP_YML, imageTag);
-    /*containerNode.put(DeployConstants.IMAGE_DEP_YML,
-    cutil.getProxyImageName(imageTag, dBean.getDockerProxyHost(), dBean.getDockerProxyPort()));*/
+    /*
+     * containerNode.put(DeployConstants.IMAGE_DEP_YML,
+     * cutil.getProxyImageName(imageTag, dBean.getDockerProxyHost(),
+     * dBean.getDockerProxyPort()));
+     */
 
     ArrayNode portsArrayNode = containerNode.arrayNode();
     ObjectNode portsNode = objectMapper.createObjectNode();
@@ -343,20 +333,15 @@ public class DeploymentServiceImpl implements DeploymentService {
     List<ContainerBean> contList = null;
     ParseJSON parseJson = new ParseJSON();
     /** Blueprint.json* */
-    ByteArrayOutputStream byteArrayOutputStream =
-        getBluePrintNexus(
-            dBean.getSolutionId(),
-            dBean.getRevisionId(),
-            dBean.getDatasource(),
-            dBean.getDataUserName(),
-            dBean.getDataPd(),
-            dBean.getNexusUrl(),
-            dBean.getNexusUserName(),
-            dBean.getNexusPd());
+    ByteArrayOutputStream byteArrayOutputStream = getBluePrintNexus(dBean.getSolutionId(), dBean.getRevisionId(),
+        dBean.getDatasource(), dBean.getDataUserName(), dBean.getDataPd(), dBean.getNexusUrl(),
+        dBean.getNexusUserName(), dBean.getNexusPd());
     logger.debug("byteArrayOutputStream " + byteArrayOutputStream);
     String jsonString = byteArrayOutputStream.toString();
-    /*File file = new File("blueprint.json");
-    String jsonString = FileUtils.readFileToString(file);*/
+    /*
+     * File file = new File("blueprint.json"); String jsonString =
+     * FileUtils.readFileToString(file);
+     */
     // ByteArrayOutputStream byteArrayOutputStream=jsonString.getBytes();
     logger.debug("byteArrayOutputStream " + jsonString);
     dBean.setBluePrintjson(jsonString);
@@ -383,16 +368,8 @@ public class DeploymentServiceImpl implements DeploymentService {
     return solutionZip;
   }
 
-  public ByteArrayOutputStream getBluePrintNexus(
-      String solutionId,
-      String revisionId,
-      String datasource,
-      String userName,
-      String dataPd,
-      String nexusUrl,
-      String nexusUserName,
-      String nexusPd)
-      throws Exception {
+  public ByteArrayOutputStream getBluePrintNexus(String solutionId, String revisionId, String datasource,
+      String userName, String dataPd, String nexusUrl, String nexusUserName, String nexusPd) throws Exception {
     logger.debug(" getBluePrintNexus Start");
     logger.debug("solutionId " + solutionId);
     logger.debug("revisionId " + revisionId);
@@ -407,20 +384,12 @@ public class DeploymentServiceImpl implements DeploymentService {
       // 3. Get the list of Artifiact for the SolutionId and SolutionRevisionId.
       mlpArtifactList = cmnDataService.getSolutionRevisionArtifacts(solutionId, solutionRevisionId);
       if (null != mlpArtifactList && !mlpArtifactList.isEmpty()) {
-        nexusURI =
-            mlpArtifactList.stream()
-                .filter(
-                    mlpArt ->
-                        mlpArt
-                            .getArtifactTypeCode()
-                            .equalsIgnoreCase(DeployConstants.ARTIFACT_TYPE_BLUEPRINT))
-                .findFirst()
-                .get()
-                .getUri();
+        nexusURI = mlpArtifactList.stream()
+            .filter(mlpArt -> mlpArt.getArtifactTypeCode().equalsIgnoreCase(DeployConstants.ARTIFACT_TYPE_BLUEPRINT))
+            .findFirst().get().getUri();
         logger.debug(" Nexus URI : " + nexusURI);
         if (null != nexusURI) {
-          NexusArtifactClient nexusArtifactClient =
-              nexusArtifactClient(nexusUrl, nexusUserName, nexusPd);
+          NexusArtifactClient nexusArtifactClient = nexusArtifactClient(nexusUrl, nexusUserName, nexusPd);
           byteArrayOutputStream = nexusArtifactClient.getArtifact(nexusURI);
         }
       }
@@ -429,25 +398,16 @@ public class DeploymentServiceImpl implements DeploymentService {
     return byteArrayOutputStream;
   }
 
-  public List<ContainerBean> getprotoDetails(List<ContainerBean> contList, DeploymentBean dBean)
-      throws Exception {
+  public List<ContainerBean> getprotoDetails(List<ContainerBean> contList, DeploymentBean dBean) throws Exception {
     if (contList != null) {
       int j = 0;
       while (contList.size() > j) {
         ContainerBean contbean = contList.get(j);
-        if (contbean != null
-            && contbean.getContainerName() != null
-            && !"".equals(contbean.getContainerName())
-            && contbean.getProtoUriPath() != null
-            && !"".equals(contbean.getProtoUriPath())) {
-          ByteArrayOutputStream byteArrayOutputStream =
-              getNexusUrlFile(
-                  dBean.getNexusUrl(),
-                  dBean.getNexusUserName(),
-                  dBean.getNexusPd(),
-                  contbean.getProtoUriPath());
-          logger.debug(
-              contbean.getProtoUriPath() + "byteArrayOutputStream " + byteArrayOutputStream);
+        if (contbean != null && contbean.getContainerName() != null && !"".equals(contbean.getContainerName())
+            && contbean.getProtoUriPath() != null && !"".equals(contbean.getProtoUriPath())) {
+          ByteArrayOutputStream byteArrayOutputStream = getNexusUrlFile(dBean.getNexusUrl(), dBean.getNexusUserName(),
+              dBean.getNexusPd(), contbean.getProtoUriPath());
+          logger.debug(contbean.getProtoUriPath() + "byteArrayOutputStream " + byteArrayOutputStream);
           contbean.setProtoUriDetails(byteArrayOutputStream.toString());
         }
         j++;
@@ -456,31 +416,25 @@ public class DeploymentServiceImpl implements DeploymentService {
     return contList;
   }
 
-  public ByteArrayOutputStream getNexusUrlFile(
-      String nexusUrl, String nexusUserName, String nexusPassword, String nexusURI)
-      throws Exception {
+  public ByteArrayOutputStream getNexusUrlFile(String nexusUrl, String nexusUserName, String nexusPassword,
+      String nexusURI) throws Exception {
     logger.debug("getNexusUrlFile start");
     ByteArrayOutputStream byteArrayOutputStream = null;
-    NexusArtifactClient nexusArtifactClient =
-        nexusArtifactClient(nexusUrl, nexusUserName, nexusPassword);
+    NexusArtifactClient nexusArtifactClient = nexusArtifactClient(nexusUrl, nexusUserName, nexusPassword);
     byteArrayOutputStream = nexusArtifactClient.getArtifact(nexusURI);
     logger.debug("byteArrayOutputStream " + byteArrayOutputStream);
     logger.debug("getNexusUrlFile ");
     return byteArrayOutputStream;
   }
 
-  public void getDataBrokerFile(
-      List<ContainerBean> contList, DeploymentBean dBean, String jsonString) throws Exception {
+  public void getDataBrokerFile(List<ContainerBean> contList, DeploymentBean dBean, String jsonString)
+      throws Exception {
     ParseJSON parseJson = new ParseJSON();
     DataBrokerBean dataBrokerBean = parseJson.getDataBrokerContainer(jsonString);
     if (dataBrokerBean != null) {
       if (dataBrokerBean != null) {
-        ByteArrayOutputStream byteArrayOutputStream =
-            getNexusUrlFile(
-                dBean.getNexusUrl(),
-                dBean.getNexusUserName(),
-                dBean.getNexusPd(),
-                dataBrokerBean.getProtobufFile());
+        ByteArrayOutputStream byteArrayOutputStream = getNexusUrlFile(dBean.getNexusUrl(), dBean.getNexusUserName(),
+            dBean.getNexusPd(), dataBrokerBean.getProtobufFile());
         logger.debug("byteArrayOutputStream " + byteArrayOutputStream);
         if (byteArrayOutputStream != null) {
           dataBrokerBean.setProtobufFile(byteArrayOutputStream.toString());
@@ -531,12 +485,8 @@ public class DeploymentServiceImpl implements DeploymentService {
     while (itr.hasNext()) {
       String portDockerInfo = "";
       DeploymentKubeBean depBen = (DeploymentKubeBean) itr.next();
-      if (depBen != null
-          && depBen.getContainerName() != null
-          && !"".equals(depBen.getContainerName())
-          && depBen.getImage() != null
-          && !"".equals(depBen.getImage())
-          && depBen.getNodeType() != null
+      if (depBen != null && depBen.getContainerName() != null && !"".equals(depBen.getContainerName())
+          && depBen.getImage() != null && !"".equals(depBen.getImage()) && depBen.getNodeType() != null
           && !"".equals(depBen.getNodeType())) {
 
         String imagePort = "";
@@ -555,22 +505,15 @@ public class DeploymentServiceImpl implements DeploymentService {
         }
 
         logger.debug("imagePort " + imagePort);
-        String serviceYml =
-            getCompositeSolutionService(
-                depBen.getContainerName(), imagePort, depBen.getNodeType(), dBean);
-        String deploymentYml =
-            getCompositeSolutionDeployment(
-                depBen.getImage(),
-                depBen.getContainerName(),
-                imagePort,
-                depBen.getNodeType(),
-                dBean);
+        String serviceYml = getCompositeSolutionService(depBen.getContainerName(), imagePort, depBen.getNodeType(),
+            dBean);
+        String deploymentYml = getCompositeSolutionDeployment(depBen.getImage(), depBen.getContainerName(), imagePort,
+            depBen.getNodeType(), dBean);
 
         if (depBen.getNodeType() != null
             && depBen.getNodeType().equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)) {
           portDockerInfo = dBean.getBluePrintPort();
-        } else if (depBen.getNodeType() != null
-            && depBen.getNodeType().equalsIgnoreCase(DeployConstants.DATA_BROKER)) {
+        } else if (depBen.getNodeType() != null && depBen.getNodeType().equalsIgnoreCase(DeployConstants.DATA_BROKER)) {
           portDockerInfo = dBean.getDataBrokerTargetPort();
         } else if (depBen.getNodeType() != null
             && depBen.getNodeType().equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)) {
@@ -611,15 +554,13 @@ public class DeploymentServiceImpl implements DeploymentService {
     logger.debug("End getSolutionYMLFile");
   }
 
-  public String getCompositeSolutionService(
-      String containerName, String imagePort, String nodeType, DeploymentBean dBen)
-      throws Exception {
+  public String getCompositeSolutionService(String containerName, String imagePort, String nodeType,
+      DeploymentBean dBen) throws Exception {
     logger.debug("getSingleSolutionService Start");
     String serviceYml = "";
 
     ObjectMapper objectMapper = new ObjectMapper();
-    YAMLMapper yamlMapper =
-        new YAMLMapper(new YAMLFactory().configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true));
+    YAMLMapper yamlMapper = new YAMLMapper(new YAMLFactory().configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true));
     ObjectNode apiRootNode = objectMapper.createObjectNode();
     apiRootNode.put(DeployConstants.APIVERSION_YML, DeployConstants.V_YML);
     apiRootNode.put(DeployConstants.KIND_YML, DeployConstants.SERVICE_YML);
@@ -627,18 +568,13 @@ public class DeploymentServiceImpl implements DeploymentService {
     ObjectNode metadataNode = objectMapper.createObjectNode();
     metadataNode.put(DeployConstants.NAMESPACE_YML, DeployConstants.NAMESPACE_VALUE_YML);
     if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)) {
-      metadataNode.put(
-          DeployConstants.NAME_YML,
-          DeployConstants.BLUEPRINT_MODELCONNECTOR_NAME
-              + "-"
-              + DeployConstants.TRACKINGID_VALUE_YML);
+      metadataNode.put(DeployConstants.NAME_YML,
+          DeployConstants.BLUEPRINT_MODELCONNECTOR_NAME + "-" + DeployConstants.TRACKINGID_VALUE_YML);
     } else if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)) {
-      metadataNode.put(
-          DeployConstants.NAME_YML,
+      metadataNode.put(DeployConstants.NAME_YML,
           DeployConstants.DATABROKER_NAME_YML + "-" + DeployConstants.TRACKINGID_VALUE_YML);
     } else {
-      metadataNode.put(
-          DeployConstants.NAME_YML, containerName + "-" + DeployConstants.TRACKINGID_VALUE_YML);
+      metadataNode.put(DeployConstants.NAME_YML, containerName + "-" + DeployConstants.TRACKINGID_VALUE_YML);
     }
     apiRootNode.set(DeployConstants.METADATA_YML, metadataNode);
 
@@ -646,24 +582,18 @@ public class DeploymentServiceImpl implements DeploymentService {
 
     ObjectNode selectorNode = objectMapper.createObjectNode();
     if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)) {
-      selectorNode.put(
-          DeployConstants.APP_YML,
-          DeployConstants.BLUEPRINT_MODELCONNECTOR_NAME
-              + "-"
-              + DeployConstants.TRACKINGID_VALUE_YML);
+      selectorNode.put(DeployConstants.APP_YML,
+          DeployConstants.BLUEPRINT_MODELCONNECTOR_NAME + "-" + DeployConstants.TRACKINGID_VALUE_YML);
     } else if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)) {
-      selectorNode.put(
-          DeployConstants.APP_YML,
+      selectorNode.put(DeployConstants.APP_YML,
           DeployConstants.DATABROKER_NAME_YML + "-" + DeployConstants.TRACKINGID_VALUE_YML);
     } else {
-      selectorNode.put(
-          DeployConstants.APP_YML, containerName + "-" + DeployConstants.TRACKINGID_VALUE_YML);
+      selectorNode.put(DeployConstants.APP_YML, containerName + "-" + DeployConstants.TRACKINGID_VALUE_YML);
     }
     specNode.set(DeployConstants.SELECTOR_YML, selectorNode);
-    if (nodeType != null
-        && (nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)
-            || nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)
-            || nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME))) {
+    if (nodeType != null && (nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)
+        || nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)
+        || nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME))) {
       specNode.put(DeployConstants.TYPE_YML, DeployConstants.NODE_TYPE_PORT_YML);
     } else {
       specNode.put(DeployConstants.TYPE_YML, DeployConstants.CLUSTERIP_YML);
@@ -675,8 +605,7 @@ public class DeploymentServiceImpl implements DeploymentService {
       portsNode.put(DeployConstants.NAME_YML, DeployConstants.NAME_MCAPI_YML);
     } else if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)) {
       portsNode.put(DeployConstants.NAME_YML, DeployConstants.NAME_DATABROKER_YML);
-    } else if (nodeType != null
-        && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)) {
+    } else if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)) {
       // NA
     } else {
       portsNode.put(DeployConstants.NAME_YML, DeployConstants.PROTOBUF_API_DEP_YML);
@@ -686,8 +615,7 @@ public class DeploymentServiceImpl implements DeploymentService {
       // portsNode.put(DeployConstants.NODEPORT_YML, dBen.getBluePrintNodePort());
     } else if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)) {
       portsNode.put(DeployConstants.NODEPORT_YML, dBen.getDataBrokerModelPort());
-    } else if (nodeType != null
-        && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)) {
+    } else if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)) {
       portsNode.put(DeployConstants.NODEPORT_YML, dBen.getProbeNodePort());
     }
 
@@ -697,8 +625,7 @@ public class DeploymentServiceImpl implements DeploymentService {
     } else if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)) {
       portsNode.put(DeployConstants.PORT_YML, dBen.getDataBrokerModelPort());
       portsNode.put(DeployConstants.TARGETPORT_YML, dBen.getDataBrokerTargetPort());
-    } else if (nodeType != null
-        && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)) {
+    } else if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)) {
       portsNode.put(DeployConstants.PORT_YML, dBen.getProbeModelPort());
       portsNode.put(DeployConstants.TARGETPORT_YML, dBen.getProbeTargetPort());
     } else {
@@ -713,17 +640,11 @@ public class DeploymentServiceImpl implements DeploymentService {
     return serviceYml;
   }
 
-  public String getCompositeSolutionDeployment(
-      String imageTag,
-      String containerName,
-      String imagePort,
-      String nodeType,
-      DeploymentBean dBean)
-      throws Exception {
+  public String getCompositeSolutionDeployment(String imageTag, String containerName, String imagePort, String nodeType,
+      DeploymentBean dBean) throws Exception {
     logger.debug("getSingleSolutionDeployment Start");
     ObjectMapper objectMapper = new ObjectMapper();
-    YAMLMapper yamlMapper =
-        new YAMLMapper(new YAMLFactory().configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true));
+    YAMLMapper yamlMapper = new YAMLMapper(new YAMLFactory().configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true));
     ObjectNode kindRootNode = objectMapper.createObjectNode();
     kindRootNode.put(DeployConstants.APIVERSION_DEP_YML, DeployConstants.APPS_V1_DEP_YML);
     kindRootNode.put(DeployConstants.KIND_DEP_YML, DeployConstants.DEPLOYMENT_DEP_YML);
@@ -731,37 +652,27 @@ public class DeploymentServiceImpl implements DeploymentService {
     ObjectNode metadataNode = objectMapper.createObjectNode();
     metadataNode.put(DeployConstants.NAMESPACE_DEP_YML, DeployConstants.NAMESPACE_VALUE_YML);
     if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)) {
-      metadataNode.put(
-          DeployConstants.NAME_DEP_YML,
-          DeployConstants.BLUEPRINT_MODELCONNECTOR_NAME
-              + "-"
-              + DeployConstants.TRACKINGID_VALUE_YML);
+      metadataNode.put(DeployConstants.NAME_DEP_YML,
+          DeployConstants.BLUEPRINT_MODELCONNECTOR_NAME + "-" + DeployConstants.TRACKINGID_VALUE_YML);
     } else if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)) {
-      metadataNode.put(
-          DeployConstants.NAME_YML,
+      metadataNode.put(DeployConstants.NAME_YML,
           DeployConstants.DATABROKER_NAME_YML + "-" + DeployConstants.TRACKINGID_VALUE_YML);
     } else {
-      metadataNode.put(
-          DeployConstants.NAME_DEP_YML, containerName + "-" + DeployConstants.TRACKINGID_VALUE_YML);
+      metadataNode.put(DeployConstants.NAME_DEP_YML, containerName + "-" + DeployConstants.TRACKINGID_VALUE_YML);
     }
 
     ObjectNode labelsNode = objectMapper.createObjectNode();
 
     if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)) {
-      labelsNode.put(
-          DeployConstants.APP_DEP_YML,
-          DeployConstants.BLUEPRINT_MODELCONNECTOR_NAME
-              + "-"
-              + DeployConstants.TRACKINGID_VALUE_YML);
+      labelsNode.put(DeployConstants.APP_DEP_YML,
+          DeployConstants.BLUEPRINT_MODELCONNECTOR_NAME + "-" + DeployConstants.TRACKINGID_VALUE_YML);
       labelsNode.put(DeployConstants.TRACKINGID_YML, DeployConstants.TRACKINGID_VALUE_YML);
     } else if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)) {
-      labelsNode.put(
-          DeployConstants.APP_DEP_YML,
+      labelsNode.put(DeployConstants.APP_DEP_YML,
           DeployConstants.DATABROKER_NAME_YML + "-" + DeployConstants.TRACKINGID_VALUE_YML);
       labelsNode.put(DeployConstants.TRACKINGID_YML, DeployConstants.TRACKINGID_VALUE_YML);
     } else {
-      labelsNode.put(
-          DeployConstants.APP_DEP_YML, containerName + "-" + DeployConstants.TRACKINGID_VALUE_YML);
+      labelsNode.put(DeployConstants.APP_DEP_YML, containerName + "-" + DeployConstants.TRACKINGID_VALUE_YML);
       labelsNode.put(DeployConstants.TRACKINGID_YML, DeployConstants.TRACKINGID_VALUE_YML);
     }
     metadataNode.put(DeployConstants.LABELS_DEP_YML, labelsNode);
@@ -774,18 +685,13 @@ public class DeploymentServiceImpl implements DeploymentService {
     ObjectNode selectorNode = objectMapper.createObjectNode();
     ObjectNode matchLabelsNode = objectMapper.createObjectNode();
     if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)) {
-      matchLabelsNode.put(
-          DeployConstants.APP_DEP_YML,
-          DeployConstants.BLUEPRINT_MODELCONNECTOR_NAME
-              + "-"
-              + DeployConstants.TRACKINGID_VALUE_YML);
+      matchLabelsNode.put(DeployConstants.APP_DEP_YML,
+          DeployConstants.BLUEPRINT_MODELCONNECTOR_NAME + "-" + DeployConstants.TRACKINGID_VALUE_YML);
     } else if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)) {
-      matchLabelsNode.put(
-          DeployConstants.APP_DEP_YML,
+      matchLabelsNode.put(DeployConstants.APP_DEP_YML,
           DeployConstants.DATABROKER_NAME_YML + "-" + DeployConstants.TRACKINGID_VALUE_YML);
     } else {
-      matchLabelsNode.put(
-          DeployConstants.APP_DEP_YML, containerName + "-" + DeployConstants.TRACKINGID_VALUE_YML);
+      matchLabelsNode.put(DeployConstants.APP_DEP_YML, containerName + "-" + DeployConstants.TRACKINGID_VALUE_YML);
     }
 
     selectorNode.set(DeployConstants.MATCHLABELS_DEP_YML, matchLabelsNode);
@@ -796,20 +702,15 @@ public class DeploymentServiceImpl implements DeploymentService {
     ObjectNode metadataTemplateNode = objectMapper.createObjectNode();
     ObjectNode labelsTemplateNode = objectMapper.createObjectNode();
     if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)) {
-      labelsTemplateNode.put(
-          DeployConstants.APP_DEP_YML,
-          DeployConstants.BLUEPRINT_MODELCONNECTOR_NAME
-              + "-"
-              + DeployConstants.TRACKINGID_VALUE_YML);
+      labelsTemplateNode.put(DeployConstants.APP_DEP_YML,
+          DeployConstants.BLUEPRINT_MODELCONNECTOR_NAME + "-" + DeployConstants.TRACKINGID_VALUE_YML);
       labelsTemplateNode.put(DeployConstants.TRACKINGID_YML, DeployConstants.TRACKINGID_VALUE_YML);
     } else if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)) {
-      labelsTemplateNode.put(
-          DeployConstants.APP_DEP_YML,
+      labelsTemplateNode.put(DeployConstants.APP_DEP_YML,
           DeployConstants.DATABROKER_NAME_YML + "-" + DeployConstants.TRACKINGID_VALUE_YML);
       labelsTemplateNode.put(DeployConstants.TRACKINGID_YML, DeployConstants.TRACKINGID_VALUE_YML);
     } else {
-      labelsTemplateNode.put(
-          DeployConstants.APP_DEP_YML, containerName + "-" + DeployConstants.TRACKINGID_VALUE_YML);
+      labelsTemplateNode.put(DeployConstants.APP_DEP_YML, containerName + "-" + DeployConstants.TRACKINGID_VALUE_YML);
       labelsTemplateNode.put(DeployConstants.TRACKINGID_YML, DeployConstants.TRACKINGID_VALUE_YML);
     }
 
@@ -820,27 +721,22 @@ public class DeploymentServiceImpl implements DeploymentService {
     ObjectNode containerNode = objectMapper.createObjectNode();
     ObjectNode containerNodeNginx = objectMapper.createObjectNode();
     if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)) {
-      containerNode.put(
-          DeployConstants.NAME_DEP_YML,
-          DeployConstants.BLUEPRINT_MODELCONNECTOR_NAME
-              + "-"
-              + DeployConstants.TRACKINGID_VALUE_YML);
+      containerNode.put(DeployConstants.NAME_DEP_YML,
+          DeployConstants.BLUEPRINT_MODELCONNECTOR_NAME + "-" + DeployConstants.TRACKINGID_VALUE_YML);
     } else if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)) {
-      containerNode.put(
-          DeployConstants.NAME_DEP_YML,
+      containerNode.put(DeployConstants.NAME_DEP_YML,
           DeployConstants.DATABROKER_NAME_YML + "-" + DeployConstants.TRACKINGID_VALUE_YML);
     } else {
-      containerNode.put(
-          DeployConstants.NAME_DEP_YML, containerName + "-" + DeployConstants.TRACKINGID_VALUE_YML);
+      containerNode.put(DeployConstants.NAME_DEP_YML, containerName + "-" + DeployConstants.TRACKINGID_VALUE_YML);
     }
 
     if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.BLUEPRINT_CONTAINER)) {
       containerNode.put(DeployConstants.IMAGE_DEP_YML, imageTag);
     } else if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)) {
       // containerNode.put(DeployConstants.IMAGE_DEP_YML,
-      // getProxyImageName(imageTag, dBean.getDockerProxyHost(), dBean.getDockerProxyPort()));
-    } else if (nodeType != null
-        && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)) {
+      // getProxyImageName(imageTag, dBean.getDockerProxyHost(),
+      // dBean.getDockerProxyPort()));
+    } else if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)) {
       containerNode.put(DeployConstants.IMAGE_DEP_YML, imageTag);
     } else {
       containerNode.put(DeployConstants.IMAGE_DEP_YML, imageTag);
@@ -865,8 +761,7 @@ public class DeploymentServiceImpl implements DeploymentService {
       portsNode.put(DeployConstants.NAME_DEP_YML, DeployConstants.NAME_MCAPI_YML);
     } else if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)) {
       // NA
-    } else if (nodeType != null
-        && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)) {
+    } else if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)) {
       portsNode.put(DeployConstants.NAME_DEP_YML, DeployConstants.PROBEAPI_NAME);
     } else {
       portsNode.put(DeployConstants.NAME_DEP_YML, DeployConstants.PROTOBUF_API_DEP_YML);
@@ -875,20 +770,21 @@ public class DeploymentServiceImpl implements DeploymentService {
       portsNode.put(DeployConstants.CONTAINERPORT_DEP_YML, dBean.getBluePrintPort());
     } else if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.DATA_BROKER)) {
       portsNode.put(DeployConstants.CONTAINERPORT_DEP_YML, dBean.getDataBrokerTargetPort());
-    } else if (nodeType != null
-        && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)) {
+    } else if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)) {
       portsNode.put(DeployConstants.CONTAINERPORT_DEP_YML, dBean.getProbeApiPort());
     } else {
       portsNode.put(DeployConstants.CONTAINERPORT_DEP_YML, dBean.getMlTargetPort());
     }
 
     portsArrayNode.add(portsNode);
-    /*if(nodeType!=null && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)){
-    	ObjectNode portsNode2  = objectMapper.createObjectNode();
-    	portsNode2.put(DeployConstants.NAME_DEP_YML, DeployConstants.PROBEAPI_NAME);
-    	portsNode2.put(DeployConstants.CONTAINERPORT_DEP_YML, dBean.getProbeApiPort());
-    	portsArrayNode.add(portsNode2);
-    }*/
+    /*
+     * if(nodeType!=null &&
+     * nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)){ ObjectNode
+     * portsNode2 = objectMapper.createObjectNode();
+     * portsNode2.put(DeployConstants.NAME_DEP_YML, DeployConstants.PROBEAPI_NAME);
+     * portsNode2.put(DeployConstants.CONTAINERPORT_DEP_YML,
+     * dBean.getProbeApiPort()); portsArrayNode.add(portsNode2); }
+     */
 
     containerNode.set(DeployConstants.PORTS_DEP_YML, portsArrayNode);
     // for Nginx
@@ -914,8 +810,7 @@ public class DeploymentServiceImpl implements DeploymentService {
     if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.DATABROKER_NAME)) {
       ArrayNode volmeMountArrayNode = containerNode.arrayNode();
       ObjectNode volumeMountNode = objectMapper.createObjectNode();
-      volumeMountNode.put(
-          DeployConstants.MOUNTPATH_DEP_YML, DeployConstants.DATABROKER_PATHLOG_DEP_YML);
+      volumeMountNode.put(DeployConstants.MOUNTPATH_DEP_YML, DeployConstants.DATABROKER_PATHLOG_DEP_YML);
       volumeMountNode.put(DeployConstants.NAME_DEP_YML, DeployConstants.DATABROKER_LOGNAME);
       volmeMountArrayNode.add(volumeMountNode);
       containerNode.set(DeployConstants.VOLUMEMOUNTS_DEP_YML, volmeMountArrayNode);
@@ -923,8 +818,7 @@ public class DeploymentServiceImpl implements DeploymentService {
     if (nodeType != null && nodeType.equalsIgnoreCase(DeployConstants.PROBE_CONTAINER_NAME)) {
       ArrayNode volmeMountArrayNode = containerNodeNginx.arrayNode();
       ObjectNode volumeMountNode = objectMapper.createObjectNode();
-      volumeMountNode.put(
-          DeployConstants.MOUNTPATH_DEP_YML, DeployConstants.PROBE_MOUNTPATH_DEP_YML);
+      volumeMountNode.put(DeployConstants.MOUNTPATH_DEP_YML, DeployConstants.PROBE_MOUNTPATH_DEP_YML);
       volumeMountNode.put(DeployConstants.NAME_DEP_YML, DeployConstants.VOLUME_PROTO_YML);
       volmeMountArrayNode.add(volumeMountNode);
       containerNodeNginx.set(DeployConstants.VOLUMEMOUNTS_DEP_YML, volmeMountArrayNode);
@@ -993,8 +887,7 @@ public class DeploymentServiceImpl implements DeploymentService {
     return solutionDeployment;
   }
 
-  public String getProxyImageName(
-      String imageName, String dockerProxyHost, String dockerProxyPort) {
+  public String getProxyImageName(String imageName, String dockerProxyHost, String dockerProxyPort) {
     logger.debug("Start-geProxyImageName " + imageName);
     String dockerImage = "";
     String image = "";
@@ -1027,8 +920,8 @@ public class DeploymentServiceImpl implements DeploymentService {
     mlpTask.setUserId(deployBean.getUserId());
     mlpTask.setSolutionId(deployBean.getSolutionId());
     mlpTask.setRevisionId(deployBean.getRevisionId());
-    CommonDataServiceRestClientImpl cmnDataService =
-        getClient(dBean.getDatasource(), dBean.getDataUserName(), dBean.getDataPd());
+    CommonDataServiceRestClientImpl cmnDataService = getClient(dBean.getDatasource(), dBean.getDataUserName(),
+        dBean.getDataPd());
     mlpTask = cmnDataService.createTask(mlpTask);
     // mlpTask.setTaskId(Long.getLong("3155"));
     logger.debug("mlpTask.getTaskId() " + mlpTask.getTaskId());
@@ -1036,8 +929,7 @@ public class DeploymentServiceImpl implements DeploymentService {
     return mlpTask;
   }
 
-  public MLPTask getTaskDetails(
-      String datasource, String userName, String dataPd, long taskIdNum, DeploymentBean dBean)
+  public MLPTask getTaskDetails(String datasource, String userName, String dataPd, long taskIdNum, DeploymentBean dBean)
       throws Exception {
     logger.debug("getTaskDetails start");
     MLPTask mlpTask = null;
@@ -1064,39 +956,29 @@ public class DeploymentServiceImpl implements DeploymentService {
       if (mlpTask.getName() != null && !"".equalsIgnoreCase(mlpTask.getName().trim())) {
         dBean.setEnvId(mlpTask.getName().trim().substring(4));
       }
+      logger.debug("mlpTask.getUserId() " + mlpTask.getUserId());
+      if (mlpTask.getUserId() != null && !"".equalsIgnoreCase(mlpTask.getUserId())) {
+        dBean.setUserId(mlpTask.getUserId());
+      }
     }
     logger.debug("getTaskDetails end");
     return mlpTask;
   }
 
-  public void updateTaskDetails(
-      String datasource,
-      String userName,
-      String dataPd,
-      long taskIdNum,
-      String status,
-      String reason,
-      String ingress,
-      MLPTask mlpTask)
-      throws Exception {
+  public void updateTaskDetails(String datasource, String userName, String dataPd, long taskIdNum, String status,
+      String reason, String ingress, MLPTask mlpTask) throws Exception {
     logger.debug("updateTaskDetails Start");
     CommonDataServiceRestClientImpl cmnDataService = getClient(datasource, userName, dataPd);
     mlpTask.setStatusCode(status);
     mlpTask.setModified(Instant.now());
     cmnDataService.updateTask(mlpTask);
     logger.debug("updated task Id " + taskIdNum);
-    generateNotification(
-      reason,
-      mlpTask.getUserId(),
-      datasource,
-      userName,
-      dataPd);
+    generateNotification(reason, mlpTask.getUserId(), datasource, userName, dataPd);
     logger.debug("updateTaskDetails End");
   }
 
-  public void generateNotification(
-      String msg, String userId, String dataSource, String dataUserName, String dataPassword)
-      throws Exception {
+  public void generateNotification(String msg, String userId, String dataSource, String dataUserName,
+      String dataPassword) throws Exception {
     logger.debug("generateNotification Start");
     logger.debug("userId " + userId + "msg " + msg);
     MLPNotification notification = new MLPNotification();
@@ -1111,8 +993,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         notification.setCreated(startDate);
         CommonDataServiceRestClientImpl client = getClient(dataSource, dataUserName, dataPassword);
         notification.setMsgSeverityCode(DeployConstants.MSG_SEVERITY_ME);
-        MLNotification mLNotification =
-            createNotification(notification, dataSource, dataUserName, dataPassword);
+        MLNotification mLNotification = createNotification(notification, dataSource, dataUserName, dataPassword);
         logger.debug("mLNotification.getNotificationId() " + mLNotification.getNotificationId());
         client.addUserToNotification(mLNotification.getNotificationId(), userId);
       }
@@ -1123,15 +1004,11 @@ public class DeploymentServiceImpl implements DeploymentService {
     logger.debug("generateNotification End");
   }
 
-  public org.acumos.deploymentclient.bean.MLNotification createNotification(
-      MLPNotification mlpNotification,
-      String dataSource,
-      String dataUserName,
-      String dataPassword) {
+  public org.acumos.deploymentclient.bean.MLNotification createNotification(MLPNotification mlpNotification,
+      String dataSource, String dataUserName, String dataPassword) {
     logger.debug("createNotification Start");
     CommonDataServiceRestClientImpl client = getClient(dataSource, dataUserName, dataPassword);
-    MLNotification mlNotification =
-        convertToMLNotification(client.createNotification(mlpNotification));
+    MLNotification mlNotification = convertToMLNotification(client.createNotification(mlpNotification));
     logger.debug("createNotification End");
     return mlNotification;
   }
@@ -1167,15 +1044,10 @@ public class DeploymentServiceImpl implements DeploymentService {
     return isEmpty;
   }
 
-  public void createJenkinTask(DeploymentBean dBean, String taskId, String jobName)
-      throws Exception {
+  public void createJenkinTask(DeploymentBean dBean, String taskId, String jobName) throws Exception {
     logger.debug("createJenkinTask Start");
     JenkinsJobBuilder jobBuilder = new JenkinsJobBuilder();
-    jobBuilder.buildJenkinsJob(
-        dBean.getJenkinUrl(),
-        dBean.getJenkinUserName(),
-        dBean.getJenkinPassword(),
-        jobName,
+    jobBuilder.buildJenkinsJob(dBean.getJenkinUrl(), dBean.getJenkinUserName(), dBean.getJenkinPassword(), jobName,
         taskId);
     logger.debug("createJenkinTask End");
   }
@@ -1183,162 +1055,132 @@ public class DeploymentServiceImpl implements DeploymentService {
   public void setDeploymentBeanProperties(DeploymentBean dBean, Environment env) throws Exception {
     logger.debug("setDeploymentBeanProperties Start");
 
-    String bluePrintImage =
-        (env.getProperty(DeployConstants.BLUEPRINT_IMAGENAME_PROP) != null)
-            ? env.getProperty(DeployConstants.BLUEPRINT_IMAGENAME_PROP)
-            : "";
-    String bluePrintPort =
-        (env.getProperty(DeployConstants.BLUEPRINT_PORT_PROP) != null)
-            ? env.getProperty(DeployConstants.BLUEPRINT_PORT_PROP)
-            : "";
-    String bluePrintNodePort =
-        (env.getProperty(DeployConstants.BLUEPRINT_NODEPORT_PROP) != null)
-            ? env.getProperty(DeployConstants.BLUEPRINT_NODEPORT_PROP)
-            : "";
+    String bluePrintImage = (env.getProperty(DeployConstants.BLUEPRINT_IMAGENAME_PROP) != null)
+        ? env.getProperty(DeployConstants.BLUEPRINT_IMAGENAME_PROP)
+        : "";
+    String bluePrintPort = (env.getProperty(DeployConstants.BLUEPRINT_PORT_PROP) != null)
+        ? env.getProperty(DeployConstants.BLUEPRINT_PORT_PROP)
+        : "";
+    String bluePrintNodePort = (env.getProperty(DeployConstants.BLUEPRINT_NODEPORT_PROP) != null)
+        ? env.getProperty(DeployConstants.BLUEPRINT_NODEPORT_PROP)
+        : "";
 
-    String probeModelPort =
-        (env.getProperty(DeployConstants.PROBE_MODEL_PORT) != null)
-            ? env.getProperty(DeployConstants.PROBE_MODEL_PORT)
-            : "";
-    // String probeNodePort=(env.getProperty(DeployConstants.PROBE_NODE_PORT) != null) ?
+    String probeModelPort = (env.getProperty(DeployConstants.PROBE_MODEL_PORT) != null)
+        ? env.getProperty(DeployConstants.PROBE_MODEL_PORT)
+        : "";
+    // String probeNodePort=(env.getProperty(DeployConstants.PROBE_NODE_PORT) !=
+    // null) ?
     // env.getProperty(DeployConstants.PROBE_NODE_PORT) : "";
-    String probeTargetPort =
-        (env.getProperty(DeployConstants.PROBE_TARGET_PORT) != null)
-            ? env.getProperty(DeployConstants.PROBE_TARGET_PORT)
-            : "";
-    String probeApiPort =
-        (env.getProperty(DeployConstants.PROBE_API_PORT) != null)
-            ? env.getProperty(DeployConstants.PROBE_API_PORT)
-            : "";
-    String probeImageName =
-        (env.getProperty(DeployConstants.PROBEIMAGE_NAME) != null)
-            ? env.getProperty(DeployConstants.PROBEIMAGE_NAME)
-            : "";
+    String probeTargetPort = (env.getProperty(DeployConstants.PROBE_TARGET_PORT) != null)
+        ? env.getProperty(DeployConstants.PROBE_TARGET_PORT)
+        : "";
+    String probeApiPort = (env.getProperty(DeployConstants.PROBE_API_PORT) != null)
+        ? env.getProperty(DeployConstants.PROBE_API_PORT)
+        : "";
+    String probeImageName = (env.getProperty(DeployConstants.PROBEIMAGE_NAME) != null)
+        ? env.getProperty(DeployConstants.PROBEIMAGE_NAME)
+        : "";
 
-    String singleModelPort =
-        (env.getProperty(DeployConstants.SINGLE_MODEL_PORT) != null)
-            ? env.getProperty(DeployConstants.SINGLE_MODEL_PORT)
-            : "";
-    // String singleNodePort=(env.getProperty(DeployConstants.SINGLE_NODE_PORT) != null) ?
+    String singleModelPort = (env.getProperty(DeployConstants.SINGLE_MODEL_PORT) != null)
+        ? env.getProperty(DeployConstants.SINGLE_MODEL_PORT)
+        : "";
+    // String singleNodePort=(env.getProperty(DeployConstants.SINGLE_NODE_PORT) !=
+    // null) ?
     // env.getProperty(DeployConstants.SINGLE_NODE_PORT) : "";
-    String singleTargetPort =
-        (env.getProperty(DeployConstants.SINGLE_TARGET_PORT) != null)
-            ? env.getProperty(DeployConstants.SINGLE_TARGET_PORT)
-            : "";
-    String incrementPort =
-        (env.getProperty(DeployConstants.INCREMENT_PORT) != null)
-            ? env.getProperty(DeployConstants.INCREMENT_PORT)
-            : "";
-    String folderPath =
-        (env.getProperty(DeployConstants.FOLDERPATH) != null)
-            ? env.getProperty(DeployConstants.FOLDERPATH)
-            : "";
+    String singleTargetPort = (env.getProperty(DeployConstants.SINGLE_TARGET_PORT) != null)
+        ? env.getProperty(DeployConstants.SINGLE_TARGET_PORT)
+        : "";
+    String incrementPort = (env.getProperty(DeployConstants.INCREMENT_PORT) != null)
+        ? env.getProperty(DeployConstants.INCREMENT_PORT)
+        : "";
+    String folderPath = (env.getProperty(DeployConstants.FOLDERPATH) != null)
+        ? env.getProperty(DeployConstants.FOLDERPATH)
+        : "";
 
-    String dataBrokerModelPort =
-        (env.getProperty(DeployConstants.DATABROKER_MODEL_PORT) != null)
-            ? env.getProperty(DeployConstants.DATABROKER_MODEL_PORT)
-            : "";
-    // String dataBrokerNodePort=(env.getProperty(DeployConstants.DATABROKER_NODE_PORT) != null) ?
+    String dataBrokerModelPort = (env.getProperty(DeployConstants.DATABROKER_MODEL_PORT) != null)
+        ? env.getProperty(DeployConstants.DATABROKER_MODEL_PORT)
+        : "";
+    // String
+    // dataBrokerNodePort=(env.getProperty(DeployConstants.DATABROKER_NODE_PORT) !=
+    // null) ?
     // env.getProperty(DeployConstants.DATABROKER_NODE_PORT) : "";
-    String dataBrokerTargetPort =
-        (env.getProperty(DeployConstants.DATABROKER_TARGET_PORT) != null)
-            ? env.getProperty(DeployConstants.DATABROKER_TARGET_PORT)
-            : "";
+    String dataBrokerTargetPort = (env.getProperty(DeployConstants.DATABROKER_TARGET_PORT) != null)
+        ? env.getProperty(DeployConstants.DATABROKER_TARGET_PORT)
+        : "";
 
-    String nginxImageName =
-        (env.getProperty(DeployConstants.NGINX_IMAGE_NAME) != null)
-            ? env.getProperty(DeployConstants.NGINX_IMAGE_NAME)
-            : "";
+    String nginxImageName = (env.getProperty(DeployConstants.NGINX_IMAGE_NAME) != null)
+        ? env.getProperty(DeployConstants.NGINX_IMAGE_NAME)
+        : "";
 
-    String nexusUrl =
-        (env.getProperty(DeployConstants.NEXUS_URL_PROP) != null)
-            ? env.getProperty(DeployConstants.NEXUS_URL_PROP)
-            : "";
-    String nexusUsername =
-        (env.getProperty(DeployConstants.NEXUS_USERNAME_PROP) != null)
-            ? env.getProperty(DeployConstants.NEXUS_USERNAME_PROP)
-            : "";
-    String nexusPd =
-        (env.getProperty(DeployConstants.NEXUS_PD_PROP) != null)
-            ? env.getProperty(DeployConstants.NEXUS_PD_PROP)
-            : "";
+    String nexusUrl = (env.getProperty(DeployConstants.NEXUS_URL_PROP) != null)
+        ? env.getProperty(DeployConstants.NEXUS_URL_PROP)
+        : "";
+    String nexusUsername = (env.getProperty(DeployConstants.NEXUS_USERNAME_PROP) != null)
+        ? env.getProperty(DeployConstants.NEXUS_USERNAME_PROP)
+        : "";
+    String nexusPd = (env.getProperty(DeployConstants.NEXUS_PD_PROP) != null)
+        ? env.getProperty(DeployConstants.NEXUS_PD_PROP)
+        : "";
 
-    String cmnDataUrl =
-        (env.getProperty(DeployConstants.CMNDATASVC_CMNDATASVCENDPOINTURL_PROP) != null)
-            ? env.getProperty(DeployConstants.CMNDATASVC_CMNDATASVCENDPOINTURL_PROP)
-            : "";
-    String cmnDataUser =
-        (env.getProperty(DeployConstants.CMNDATASVC_CMNDATASVCUSER_PROP) != null)
-            ? env.getProperty(DeployConstants.CMNDATASVC_CMNDATASVCUSER_PROP)
-            : "";
-    String cmnDataPd =
-        (env.getProperty(DeployConstants.CMNDATASVC_CMNDATASVCPD_PROP) != null)
-            ? env.getProperty(DeployConstants.CMNDATASVC_CMNDATASVCPD_PROP)
-            : "";
-    String jenkinUrl =
-        (env.getProperty(DeployConstants.JENKINS_URL_PROP) != null)
-            ? env.getProperty(DeployConstants.JENKINS_URL_PROP)
-            : "";
-    String jenkinUserName =
-        (env.getProperty(DeployConstants.JENKINS_USER_PROP) != null)
-            ? env.getProperty(DeployConstants.JENKINS_USER_PROP)
-            : "";
-    String jenkinPassword =
-        (env.getProperty(DeployConstants.JENKINS_PASSWORD_PROP) != null)
-            ? env.getProperty(DeployConstants.JENKINS_PASSWORD_PROP)
-            : "";
+    String cmnDataUrl = (env.getProperty(DeployConstants.CMNDATASVC_CMNDATASVCENDPOINTURL_PROP) != null)
+        ? env.getProperty(DeployConstants.CMNDATASVC_CMNDATASVCENDPOINTURL_PROP)
+        : "";
+    String cmnDataUser = (env.getProperty(DeployConstants.CMNDATASVC_CMNDATASVCUSER_PROP) != null)
+        ? env.getProperty(DeployConstants.CMNDATASVC_CMNDATASVCUSER_PROP)
+        : "";
+    String cmnDataPd = (env.getProperty(DeployConstants.CMNDATASVC_CMNDATASVCPD_PROP) != null)
+        ? env.getProperty(DeployConstants.CMNDATASVC_CMNDATASVCPD_PROP)
+        : "";
+    String jenkinUrl = (env.getProperty(DeployConstants.JENKINS_URL_PROP) != null)
+        ? env.getProperty(DeployConstants.JENKINS_URL_PROP)
+        : "";
+    String jenkinUserName = (env.getProperty(DeployConstants.JENKINS_USER_PROP) != null)
+        ? env.getProperty(DeployConstants.JENKINS_USER_PROP)
+        : "";
+    String jenkinPassword = (env.getProperty(DeployConstants.JENKINS_PASSWORD_PROP) != null)
+        ? env.getProperty(DeployConstants.JENKINS_PASSWORD_PROP)
+        : "";
 
-    String jenkinJob =
-        (env.getProperty(DeployConstants.JENKINS_JOB) != null)
-            ? env.getProperty(DeployConstants.JENKINS_JOB)
-            : "";
-    String jenkinJobSimple =
-        (env.getProperty(DeployConstants.JENKINS_JOBSIMPLE_PROP) != null)
-            ? env.getProperty(DeployConstants.JENKINS_JOBSIMPLE_PROP)
-            : "";
-    String jenkinJobComposite =
-        (env.getProperty(DeployConstants.JENKINS_JOBCOMPOSITE_PROP) != null)
-            ? env.getProperty(DeployConstants.JENKINS_JOBCOMPOSITE_PROP)
-            : "";
-    // jenkinJobNifi=(env.getProperty(DeployConstants.JENKINS_JOBNIFI_PROP) != null) ?
+    String jenkinJob = (env.getProperty(DeployConstants.JENKINS_JOB) != null)
+        ? env.getProperty(DeployConstants.JENKINS_JOB)
+        : "";
+    String jenkinJobSimple = (env.getProperty(DeployConstants.JENKINS_JOBSIMPLE_PROP) != null)
+        ? env.getProperty(DeployConstants.JENKINS_JOBSIMPLE_PROP)
+        : "";
+    String jenkinJobComposite = (env.getProperty(DeployConstants.JENKINS_JOBCOMPOSITE_PROP) != null)
+        ? env.getProperty(DeployConstants.JENKINS_JOBCOMPOSITE_PROP)
+        : "";
+    // jenkinJobNifi=(env.getProperty(DeployConstants.JENKINS_JOBNIFI_PROP) != null)
+    // ?
     // env.getProperty(DeployConstants.JENKINS_JOBNIFI_PROP) : "";
 
-    String logstashIP =
-        (env.getProperty(DeployConstants.LOGSTASH_IP) != null)
-            ? env.getProperty(DeployConstants.LOGSTASH_IP)
-            : "";
-    String logstashPort =
-        (env.getProperty(DeployConstants.LOGSTASH_PORT) != null)
-            ? env.getProperty(DeployConstants.LOGSTASH_PORT)
-            : "";
-    String logstashHost =
-        (env.getProperty(DeployConstants.LOGSTASH_HOST) != null)
-            ? env.getProperty(DeployConstants.LOGSTASH_HOST)
-            : "";
-    String acumosRegistryName =
-        (env.getProperty(DeployConstants.DOCKER_REGISTRY_NAME) != null)
-            ? env.getProperty(DeployConstants.DOCKER_REGISTRY_NAME)
-            : "";
-    String acumosRegistryUser =
-        (env.getProperty(DeployConstants.DOCKER_REGISTRY_USER) != null)
-            ? env.getProperty(DeployConstants.DOCKER_REGISTRY_USER)
-            : "";
-    String acumosRegistryPd =
-        (env.getProperty(DeployConstants.DOCKER_REGISTRY_PD) != null)
-            ? env.getProperty(DeployConstants.DOCKER_REGISTRY_PD)
-            : "";
-    String templateYmlDirectory =
-        (env.getProperty(DeployConstants.TEMPLATE_YML_DIRECTORY) != null)
-            ? env.getProperty(DeployConstants.TEMPLATE_YML_DIRECTORY)
-            : "";
-    String mlTargetPort =
-        (env.getProperty(DeployConstants.ML_TARGET_PORT) != null)
-            ? env.getProperty(DeployConstants.ML_TARGET_PORT)
-            : "";
-    String deploymentClientApiBaseUrl =
-        (env.getProperty(DeployConstants.DEPLOYMENT_CLIENT_API_BASE_URL) != null)
-            ? env.getProperty(DeployConstants.DEPLOYMENT_CLIENT_API_BASE_URL)
-            : "";
+    String logstashIP = (env.getProperty(DeployConstants.LOGSTASH_IP) != null)
+        ? env.getProperty(DeployConstants.LOGSTASH_IP)
+        : "";
+    String logstashPort = (env.getProperty(DeployConstants.LOGSTASH_PORT) != null)
+        ? env.getProperty(DeployConstants.LOGSTASH_PORT)
+        : "";
+    String logstashHost = (env.getProperty(DeployConstants.LOGSTASH_HOST) != null)
+        ? env.getProperty(DeployConstants.LOGSTASH_HOST)
+        : "";
+    String acumosRegistryName = (env.getProperty(DeployConstants.DOCKER_REGISTRY_NAME) != null)
+        ? env.getProperty(DeployConstants.DOCKER_REGISTRY_NAME)
+        : "";
+    String acumosRegistryUser = (env.getProperty(DeployConstants.DOCKER_REGISTRY_USER) != null)
+        ? env.getProperty(DeployConstants.DOCKER_REGISTRY_USER)
+        : "";
+    String acumosRegistryPd = (env.getProperty(DeployConstants.DOCKER_REGISTRY_PD) != null)
+        ? env.getProperty(DeployConstants.DOCKER_REGISTRY_PD)
+        : "";
+    String templateYmlDirectory = (env.getProperty(DeployConstants.TEMPLATE_YML_DIRECTORY) != null)
+        ? env.getProperty(DeployConstants.TEMPLATE_YML_DIRECTORY)
+        : "";
+    String mlTargetPort = (env.getProperty(DeployConstants.ML_TARGET_PORT) != null)
+        ? env.getProperty(DeployConstants.ML_TARGET_PORT)
+        : "";
+    String deploymentClientApiBaseUrl = (env.getProperty(DeployConstants.DEPLOYMENT_CLIENT_API_BASE_URL) != null)
+        ? env.getProperty(DeployConstants.DEPLOYMENT_CLIENT_API_BASE_URL)
+        : "";
 
     dBean.setDeploymentClientApiBaseUrl(deploymentClientApiBaseUrl);
     dBean.setMlTargetPort(mlTargetPort);
@@ -1386,42 +1228,42 @@ public class DeploymentServiceImpl implements DeploymentService {
     dBean.setAcumosRegistryPd(acumosRegistryPd);
     dBean.setTemplateYmlDirectory(templateYmlDirectory);
 
-    logger.debug("deploymentClientApiBaseUrl: "+dBean.getDeploymentClientApiBaseUrl());
-    logger.debug("mlTargetPort: "+dBean.getMlTargetPort());
-    logger.debug("bluePrintImage: "+dBean.getBluePrintImage());
-    logger.debug("bluePrintPort: "+dBean.getBluePrintPort());
-    logger.debug("bluePrintNodePort: "+dBean.getBluePrintNodePort());
-    logger.debug("probeModelPort: "+dBean.getProbeModelPort());
-    logger.debug("probeTargetPort: "+dBean.getProbeTargetPort());
-    logger.debug("probeApiPort: "+dBean.getProbeApiPort());
-    logger.debug("probeImageName: "+dBean.getProbeImageName());
-    logger.debug("singleModelPort: "+dBean.getSingleModelPort());
-    logger.debug("singleTargetPort: "+dBean.getSingleTargetPort());
-    logger.debug("incrementPort: "+dBean.getIncrementPort());
-    logger.debug("folderPath: "+dBean.getFolderPath());
-    logger.debug("dataBrokerModelPort: "+dBean.getDataBrokerModelPort());
-    logger.debug("dataBrokerTargetPort: "+dBean.getDataBrokerTargetPort());
-    logger.debug("nginxImageName: "+dBean.getNginxImageName());
-    logger.debug("nexusUrl: "+dBean.getNexusUrl());
-    logger.debug("nexusUsername: "+dBean.getNexusUserName());
-    //logger.debug("nexusPd: "+dBean.getNexusPd());
-    logger.debug("cmnDataUrl: "+dBean.getDatasource());
-    logger.debug("cmnDataUser: "+dBean.getDataUserName());
-    //logger.debug("cmnDataPd: "+dBean.getDataPd());
-    logger.debug("jenkinUrl: "+dBean.getJenkinUrl());
-    logger.debug("jenkinUserName: "+dBean.getJenkinUserName());
-    //logger.debug("jenkinPassword: "+dBean.getJenkinPassword());
-    logger.debug("jenkinJobSimple: "+dBean.getJenkinJobSimple());
-    logger.debug("jenkinJobComposite: "+dBean.getJenkinJobComposite());
-    logger.debug("jenkinJobComposite: "+dBean.getJenkinJobNifi());
-    logger.debug("logstashIP: "+dBean.getLogstashIP());
-    logger.debug("logstashHost: "+dBean.getLogstashHost());
-    logger.debug("logstashPort: "+dBean.getLogstashPort());
-    logger.debug("acumosRegistryName: "+dBean.getAcumosRegistryName());
-    logger.debug("acumosRegistryUser: "+dBean.getAcumosRegistryUser());
-    //logger.debug("acumosRegistryPd: "+dBean.getAcumosRegistryPd());
-    logger.debug("templateYmlDirectory: "+dBean.getTemplateYmlDirectory());
-    //logger.debug(dBean.getDataBrokerNodePort());
+    logger.debug("deploymentClientApiBaseUrl: " + dBean.getDeploymentClientApiBaseUrl());
+    logger.debug("mlTargetPort: " + dBean.getMlTargetPort());
+    logger.debug("bluePrintImage: " + dBean.getBluePrintImage());
+    logger.debug("bluePrintPort: " + dBean.getBluePrintPort());
+    logger.debug("bluePrintNodePort: " + dBean.getBluePrintNodePort());
+    logger.debug("probeModelPort: " + dBean.getProbeModelPort());
+    logger.debug("probeTargetPort: " + dBean.getProbeTargetPort());
+    logger.debug("probeApiPort: " + dBean.getProbeApiPort());
+    logger.debug("probeImageName: " + dBean.getProbeImageName());
+    logger.debug("singleModelPort: " + dBean.getSingleModelPort());
+    logger.debug("singleTargetPort: " + dBean.getSingleTargetPort());
+    logger.debug("incrementPort: " + dBean.getIncrementPort());
+    logger.debug("folderPath: " + dBean.getFolderPath());
+    logger.debug("dataBrokerModelPort: " + dBean.getDataBrokerModelPort());
+    logger.debug("dataBrokerTargetPort: " + dBean.getDataBrokerTargetPort());
+    logger.debug("nginxImageName: " + dBean.getNginxImageName());
+    logger.debug("nexusUrl: " + dBean.getNexusUrl());
+    logger.debug("nexusUsername: " + dBean.getNexusUserName());
+    // logger.debug("nexusPd: "+dBean.getNexusPd());
+    logger.debug("cmnDataUrl: " + dBean.getDatasource());
+    logger.debug("cmnDataUser: " + dBean.getDataUserName());
+    // logger.debug("cmnDataPd: "+dBean.getDataPd());
+    logger.debug("jenkinUrl: " + dBean.getJenkinUrl());
+    logger.debug("jenkinUserName: " + dBean.getJenkinUserName());
+    // logger.debug("jenkinPassword: "+dBean.getJenkinPassword());
+    logger.debug("jenkinJobSimple: " + dBean.getJenkinJobSimple());
+    logger.debug("jenkinJobComposite: " + dBean.getJenkinJobComposite());
+    logger.debug("jenkinJobComposite: " + dBean.getJenkinJobNifi());
+    logger.debug("logstashIP: " + dBean.getLogstashIP());
+    logger.debug("logstashHost: " + dBean.getLogstashHost());
+    logger.debug("logstashPort: " + dBean.getLogstashPort());
+    logger.debug("acumosRegistryName: " + dBean.getAcumosRegistryName());
+    logger.debug("acumosRegistryUser: " + dBean.getAcumosRegistryUser());
+    // logger.debug("acumosRegistryPd: "+dBean.getAcumosRegistryPd());
+    logger.debug("templateYmlDirectory: " + dBean.getTemplateYmlDirectory());
+    // logger.debug(dBean.getDataBrokerNodePort());
 
     logger.debug("setDeploymentBeanProperties End");
   }
@@ -1429,66 +1271,35 @@ public class DeploymentServiceImpl implements DeploymentService {
   public String createEnvFile(DeploymentBean dBean, String solType) throws Exception {
     logger.debug("createEnvFile Start");
     StringBuffer envBuffer = new StringBuffer();
-    String simpEnv = "";
-    String compEnv = "";
-    String setEnvDeploy =
-        ""
-            + "#!/bin/bash \n"
-            + "export DEPLOYMENT_CLIENT_API_BASE_URL="
-            + dBean.getDeploymentClientApiBaseUrl()
-            + " \n"
-            + "export ACUMOS_DOCKER_REGISTRY="
-            + dBean.getAcumosRegistryName()
-            + " \n"
-            + "export ACUMOS_DOCKER_REGISTRY_USER="
-            + dBean.getAcumosRegistryUser()
-            + " \n"
-            + "export ACUMOS_DOCKER_REGISTRY_PASSWORD="
-            + dBean.getAcumosRegistryPd()
-            + " \n"
-            + "export K8S_CLUSTER="+dBean.getEnvId()
-            //+ "export K8S_CLUSTER=default"
-            + "\n"
-            + "export TRACKING_ID="
-            + dBean.getTrackingId()
-            + "\n"
-            + "export TASK_ID="
-            + dBean.getTaskId()
-            + "\n"
-            + "export SOLUTION_TYPE="
-            + solType
-            + "\n"
-            + "export SOLUTION_NAME="
-            + dBean.getSolutionName()
-            + " \n"
-            // TODO: figure out how to determine the actual model runner version
-            + "export SOLUTION_MODEL_RUNNER_STANDARD=v2\n"
-            + "export LOGSTASH_HOST="
-            + dBean.getLogstashHost()
-            + "\n"
-            + "export LOGSTASH_IP="
-            + dBean.getLogstashIP()
-            + "\n"
-            + "export LOGSTASH_PORT="
-            + dBean.getLogstashPort()
-            + "\n";
-
-    if (solType != null && "simple".equalsIgnoreCase(solType)) {
-      simpEnv = "export SOLUTION_ID=" + dBean.getSolutionId() + " \n";
-    } else {
-      compEnv =
-          "export COMP_SOLUTION_ID="
-              + dBean.getLogstashPort()
-              + " \n"
-              + "export COMP_REVISION_ID="
-              + dBean.getLogstashPort()
-              + " \n";
-    }
+    String setEnvDeploy = "" + "#!/bin/bash \n" + "export DEPLOYMENT_CLIENT_API_BASE_URL="
+        + dBean.getDeploymentClientApiBaseUrl() + " \n" + "export ACUMOS_DOCKER_REGISTRY="
+        + dBean.getAcumosRegistryName() + " \n" + "export ACUMOS_DOCKER_REGISTRY_USER=" + dBean.getAcumosRegistryUser()
+        + " \n" + "export ACUMOS_DOCKER_REGISTRY_PASSWORD=" + dBean.getAcumosRegistryPd() + " \n"
+        + "export K8S_CLUSTER=" + dBean.getEnvId() + " \n"
+        + "export USER_ID=" + dBean.getUserId() + " \n"
+        // + "export K8S_CLUSTER=default"
+        + "\n" + "export TRACKING_ID=" + dBean.getTrackingId() + "\n" + "export TASK_ID=" + dBean.getTaskId() + "\n"
+        + "export SOLUTION_TYPE=" + solType + "\n" + "export SOLUTION_NAME=" + dBean.getSolutionName() + " \n"
+        // TODO: figure out how to determine the actual model runner version
+        + "export SOLUTION_MODEL_RUNNER_STANDARD=v2\n" + "export LOGSTASH_HOST=" + dBean.getLogstashHost() + "\n"
+        + "export LOGSTASH_IP=" + dBean.getLogstashIP() + "\n" + "export LOGSTASH_PORT=" + dBean.getLogstashPort()
+        + "\n";
     envBuffer.append(setEnvDeploy);
-    envBuffer.append(simpEnv);
-	logger.debug("dBean.getEnvId()" + dBean.getEnvId());
-    logger.debug("createEnvFile End" + setEnvDeploy);
-    return setEnvDeploy;
+
+    // if (solType != null && "simple".equalsIgnoreCase(solType)) {
+    //   String simpEnv = "export SOLUTION_ID=" + dBean.getSolutionId() + " \n";
+    //   envBuffer.append(simpEnv);
+    // } else {
+    //   compEnv = "export COMP_SOLUTION_ID=" + dBean.getLogstashPort() + " \n" + "export COMP_REVISION_ID="
+    //       + dBean.getLogstashPort() + " \n";
+    // }
+    ParseDockerImageTag util = new ParseDockerImageTag();
+		String dockerEnv = util.getEnvFileDetails(dBean);
+    envBuffer.append(setEnvDeploy);
+    envBuffer.append(dockerEnv);
+    logger.debug("dBean.getEnvId()" + dBean.getEnvId());
+    logger.debug("createEnvFile End" + envBuffer);
+    return envBuffer.toString();
   }
 
   public byte[] createSingleSolutionZip(DeploymentBean dBean) throws Exception {
@@ -1548,11 +1359,10 @@ public class DeploymentServiceImpl implements DeploymentService {
 
     for (String filePath : filesListInDir) {
       logger.debug("Zipping " + filePath);
-      // for ZipEntry we need to keep only relative file path, so we used substring on absolute path
-      ZipEntry ze =
-          new ZipEntry(
-              "templates/"
-                  + filePath.substring(dir.getAbsolutePath().length() + 1, filePath.length()));
+      // for ZipEntry we need to keep only relative file path, so we used substring on
+      // absolute path
+      ZipEntry ze = new ZipEntry(
+          "templates/" + filePath.substring(dir.getAbsolutePath().length() + 1, filePath.length()));
       zos.putNextEntry(ze);
       // read the file and write to ZipOutputStream
       FileInputStream fis = new FileInputStream(filePath);
@@ -1570,12 +1380,13 @@ public class DeploymentServiceImpl implements DeploymentService {
     return baos.toByteArray();
   }
 
-  public ArrayList<String> populateFilesList(File dir, ArrayList<String> filesListInDir)
-      throws Exception {
+  public ArrayList<String> populateFilesList(File dir, ArrayList<String> filesListInDir) throws Exception {
     File[] files = dir.listFiles();
     for (File file : files) {
-      if (file.isFile()) filesListInDir.add(file.getAbsolutePath());
-      else populateFilesList(file, filesListInDir);
+      if (file.isFile())
+        filesListInDir.add(file.getAbsolutePath());
+      else
+        populateFilesList(file, filesListInDir);
     }
     return filesListInDir;
   }
@@ -1637,17 +1448,13 @@ public class DeploymentServiceImpl implements DeploymentService {
           int j = 0;
           while (contList.size() > j) {
             ContainerBean contbean = contList.get(j);
-            if (contbean != null
-                && contbean.getProtoUriPath() != null
-                && !"".equals(contbean.getProtoUriPath())
-                && contbean.getProtoUriDetails() != null
-                && !"".equals(contbean.getProtoUriDetails())) {
+            if (contbean != null && contbean.getProtoUriPath() != null && !"".equals(contbean.getProtoUriPath())
+                && contbean.getProtoUriDetails() != null && !"".equals(contbean.getProtoUriDetails())) {
               int index = contbean.getProtoUriPath().lastIndexOf("/");
               String protoFileName = contbean.getProtoUriPath().substring(index + 1);
               bOutput = new ByteArrayOutputStream(12);
               bOutput.write(contbean.getProtoUriDetails().getBytes());
-              String protoFolderName =
-                  "microservice" + "/" + contbean.getContainerName() + "/" + "model.proto";
+              String protoFolderName = "microservice" + "/" + contbean.getContainerName() + "/" + "model.proto";
               logger.debug(protoFolderName + "  " + protoFolderName);
               hmap.put(protoFolderName, bOutput);
               logger.debug(contbean.getProtoUriPath() + " " + bOutput);
@@ -1681,11 +1488,10 @@ public class DeploymentServiceImpl implements DeploymentService {
 
     for (String filePath : filesListInDir) {
       logger.debug("Zipping " + filePath);
-      // for ZipEntry we need to keep only relative file path, so we used substring on absolute path
-      ZipEntry ze =
-          new ZipEntry(
-              "templates/"
-                  + filePath.substring(dir.getAbsolutePath().length() + 1, filePath.length()));
+      // for ZipEntry we need to keep only relative file path, so we used substring on
+      // absolute path
+      ZipEntry ze = new ZipEntry(
+          "templates/" + filePath.substring(dir.getAbsolutePath().length() + 1, filePath.length()));
       zos.putNextEntry(ze);
       // read the file and write to ZipOutputStream
       FileInputStream fis = new FileInputStream(filePath);
@@ -1753,4 +1559,32 @@ public class DeploymentServiceImpl implements DeploymentService {
     logger.debug(" End-getModelName " + modelName);
     return modelName;
   }
+
+  public void getSolutionRevisionMap(DeploymentBean dBean) throws Exception {
+    logger.debug("getSolutionRevisionMap - start");
+    // ACUMOS-2782 - create map of solutionId and revisionId to export
+    // (deploy_env.sh)
+    Map<String, String> solRevMap = new HashMap<String, String>();
+    solRevMap.put(dBean.getSolutionId(), dBean.getRevisionId());
+    List<ContainerBean> containerBeans = dBean.getContainerBeanList();
+
+    if (containerBeans != null) {
+      CommonDataServiceRestClientImpl cmnDataService = getClient(dBean.getDatasource(), dBean.getDataUserName(),
+          dBean.getDataPd());
+      for (ContainerBean containerBean : containerBeans) {
+        String image = containerBean.getImage();
+        Map<String, String> imageMetaMap = ParseDockerImageTag.parseImageToken(image);
+        String solutionId = imageMetaMap.get(DeployConstants.SOLUTION_ID);
+        String solVersion = imageMetaMap.get(DeployConstants.VERSION);
+        List<MLPSolutionRevision> revisions = cmnDataService.getSolutionRevisions(solutionId);
+        for (MLPSolutionRevision revision : revisions) {
+          if (revision.getVersion().equals(solVersion)) {
+            solRevMap.put(solutionId, revision.getRevisionId());
+            break;
+          }
+        }
+      }
+    }
+  }
+
 }

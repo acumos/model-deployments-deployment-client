@@ -3,7 +3,7 @@
 # Acumos Apache-2.0
 # ===================================================================================
 # Copyright (C) 2018-2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
-# Modifications Copyright (C) 2019 Nordix Foundation.
+# Modifications Copyright (C) 2019-2020 Nordix Foundation.
 # ===================================================================================
 # This Acumos software file is distributed by AT&T and Tech Mahindra
 # under the Apache License, Version 2.0 (the "License");
@@ -71,6 +71,37 @@ function replace_env() {
   done
   set -x
 }
+
+
+function get_model_env() {
+  trap 'fail' ERR
+  echo "App" $1;
+#  awk "/Service/{f=1}/name:/ && f{print \$2; exit}"
+  export DOCKER_IMAGE_TAG=$(awk "/name: $1/{f=1}/image:/ && f{print \$2; exit}" solution.yaml)
+  export DOCKER_IMAGE=${DOCKER_IMAGE_TAG##*/}
+  export DOCKER_IMAGE_VERSION=${DOCKER_IMAGE_TAG##*:}
+  export DOCKER_IMAGE_2=${DOCKER_IMAGE_TAG##*_}
+  export SOLUTION_ID=$(echo $DOCKER_IMAGE_2 | cut -d':' -f 1)
+
+  # determine the revisionId based on the solutionId
+  revId=$SOL_REVISION_ID
+  regex=".*${SOLUTION_ID}:([a-z0-9-]*),*"
+  # echo "regex $regex"
+  [[ $revId =~ $regex ]];
+  export REVISION_ID=${BASH_REMATCH[1]}
+  echo "solutionId:${SOLUTION_ID} , revisionId:${REVISION_ID}"
+
+  echo "image" $image;
+  # is using micro service standard
+  # dockerProxyHttp=${dockerProxy/30883/30882}
+  # export MODEL_RUNNER_STANDARD=$(curl -k $dockerProxyHttp/v2/$DOCKER_IMAGE/manifests/$DOCKER_IMAGE_VERSION | \
+  #   python3 -c "import sys, json; \
+  #   manifest = json.load(sys.stdin); \
+  #   compatibility = manifest['history'][0]['v1Compatibility']; \
+  #   labels = json.loads(compatibility)['config']['Labels']; \
+  #   print(int('micro-service-rest-api-version' in labels));"  | tr -d '\r')
+ }
+
 
 prepare_k8s() {
   trap 'fail' ERR
@@ -220,6 +251,7 @@ function deploy_logging() {
       app=$(jq -r ".nodes[$n].container_name" blueprint.json)
       port=$(jq -r ".docker_info_list[$n].port" dockerinfo.json)
       export MODEL_NAME=$app
+      get_model_env $app
       cp templates/nginx-configmap-$SOLUTION_MODEL_RUNNER_STANDARD.yaml deploy/$app-nginx-configmap.yaml
       sed -i -- "s/8556/$port/g" deploy/$app-nginx-configmap.yaml
       cp templates/nginx-service.yaml deploy/$app-nginx-service.yaml
@@ -247,6 +279,7 @@ function deploy_logging() {
     cp templates/nginx-service.yaml deploy/nginx-service.yaml
     cp templates/nginx-deployment.yaml deploy/nginx-deployment.yaml
     MODEL_NAME=$SOLUTION_NAME
+    get_model_env $MODEL_NAME
     replace_env deploy
     kubectl create -f deploy/nginx-configmap.yaml
     kubectl create -f deploy/nginx-service.yaml
