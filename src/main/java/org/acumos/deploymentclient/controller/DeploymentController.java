@@ -59,7 +59,8 @@ public class DeploymentController {
     log.debug("Start deploy API ");
     JSONObject jsonOutput = new JSONObject();
     DeploymentBean dBean = new DeploymentBean();
-
+    String taskId="";
+    String trackingId="";
     try {
       log.debug("solutionId " + deployBean.getSolutionId());
       log.debug("revisionId " + deployBean.getRevisionId());
@@ -79,6 +80,14 @@ public class DeploymentController {
       log.debug("Spring Env properties");
       MLPTask mlpTask = deploymentService.createTaskDetails(deployBean, dBean);
       log.debug("mlpTask created taskId" + mlpTask.getTaskId());
+      if(mlpTask.getTaskId()!=null) {
+    	  taskId=String.valueOf(mlpTask.getTaskId()); 
+      }
+      if(mlpTask.getTrackingId()!=null) {
+    	  trackingId=String.valueOf(mlpTask.getTrackingId()); 
+      }
+      log.debug("taskId: " + taskId);
+      log.debug("trackingId: " + trackingId);
       String solutionToolKitType =
           deploymentService.getSolutionCode(
               dBean.getSolutionId(),
@@ -97,10 +106,14 @@ public class DeploymentController {
       }
 
       jsonOutput.put("status", "SUCCESS");
+      jsonOutput.put("taskId", taskId);
+      jsonOutput.put("trackingId", trackingId);
       response.setStatus(202);
     } catch (Exception e) {
       log.error("deploy API failed", e);
       jsonOutput.put("status", "FAIL");
+      jsonOutput.put("taskId", "");
+      jsonOutput.put("trackingId", "");
       response.setStatus(400);
     }
     log.debug("End deploy API ");
