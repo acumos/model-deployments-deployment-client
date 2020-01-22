@@ -20,8 +20,13 @@
 
 package org.acumos.deploymentclient.bean;
 
-public class SolutionBean {
+import java.io.Serializable;
 
+public class SolutionBean implements Serializable{
+
+  
+
+  private static final long serialVersionUID = -2430520411589939889L;
   private String solutionId;
   private String revisionId;
   private String envId;

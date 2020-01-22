@@ -222,6 +222,7 @@ public class DeploymentController {
       mlpTask =
           deploymentService.getTaskDetails(
               dBean.getDatasource(), dBean.getDataUserName(), dBean.getDataPd(), taskIdNum, null);
+      log.debug("TrackingId " + mlpTask.getTrackingId());
       deploymentService.updateTaskDetails(
           dBean.getDatasource(),
           dBean.getDataUserName(),
@@ -230,7 +231,7 @@ public class DeploymentController {
           statusBean.getStatus(),
           statusBean.getReason(),
           statusBean.getIngress(),
-          mlpTask);
+          mlpTask,dBean);
 
       jsonOutput.put("status", "OK");
       response.setStatus(200);

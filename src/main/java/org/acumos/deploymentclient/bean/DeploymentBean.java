@@ -20,11 +20,14 @@
 
 package org.acumos.deploymentclient.bean;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DeploymentBean {
+public class DeploymentBean implements Serializable {
 
+  private static final long serialVersionUID = -436415966206773156L;
+  
   private String bluePrintjson;
   private String probePort;
   private String bluePrintImage;
@@ -84,9 +87,21 @@ public class DeploymentBean {
   private String acumosRegistryPd;
   private String deploymentClientApiBaseUrl;
   private String solutionName;
+  private String jenkinDetailUrl;
   private List<ArrayList> kubernetesClusterList;
+  
+  
+  
 
-  public List<ArrayList> getKubernetesClusterList() {
+  public String getJenkinDetailUrl() {
+	return jenkinDetailUrl;
+}
+
+public void setJenkinDetailUrl(String jenkinDetailUrl) {
+	this.jenkinDetailUrl = jenkinDetailUrl;
+}
+
+public List<ArrayList> getKubernetesClusterList() {
     return kubernetesClusterList;
   }
 

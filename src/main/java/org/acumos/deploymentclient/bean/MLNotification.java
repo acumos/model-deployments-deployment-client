@@ -20,10 +20,13 @@
 
 package org.acumos.deploymentclient.bean;
 
+import java.io.Serializable;
 import java.time.Instant;
 
-public class MLNotification {
+public class MLNotification implements Serializable {
 
+  
+  private static final long serialVersionUID = 7048393520000916264L;
   private String notificationId;
   private String title;
   private String message;

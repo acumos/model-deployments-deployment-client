@@ -55,7 +55,7 @@ public interface DeploymentService {
       String status,
       String reason,
       String ingress,
-      MLPTask mlpTask)
+      MLPTask mlpTask,DeploymentBean dBean)
       throws Exception;
 
   public MLPTask createTaskDetails(DeployBean deployBean, DeploymentBean dBean) throws Exception;

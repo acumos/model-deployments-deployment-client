@@ -19,7 +19,11 @@
  */
 package org.acumos.deploymentclient.bean;
 
-public class ContainerBean {
+import java.io.Serializable;
+
+public class ContainerBean implements Serializable {
+ 
+  private static final long serialVersionUID = 3047976826678173113L;
   private String containerName;
   private String nodeType;
   private String image;

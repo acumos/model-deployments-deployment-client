@@ -20,8 +20,13 @@
 
 package org.acumos.deploymentclient.bean;
 
-public class StatusBean {
+import java.io.Serializable;
 
+public class StatusBean implements Serializable {
+
+
+  private static final long serialVersionUID = 3513274641235816829L;
+  
   private String status;
   private String reason;
   private String ingress;

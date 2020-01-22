@@ -17,49 +17,32 @@
  * limitations under the License.
  * ===============LICENSE_END=========================================================
  */
+
 package org.acumos.deploymentclient.bean;
 
 import java.io.Serializable;
 
-public class DeploymentKubeBean implements Serializable {
-
- 
-  private static final long serialVersionUID = 5421183470790402902L;
+public class DeploymentDetailBean implements Serializable{
 	
-  private String containerName;
-  private String image;
-  private String nodeType;
-  private String imagePort;
+	
+	private static final long serialVersionUID = -4596110210757617811L;
+	
+	private String jenkinUrl;
+	 private String deploymentUrl;
+	 
+	 public String getJenkinUrl() {
+			return jenkinUrl;
+	 }
+	 public void setJenkinUrl(String jenkinUrl) {
+		this.jenkinUrl = jenkinUrl;
+	 }
+	 public String getDeploymentUrl() {
+		return deploymentUrl;
+	 }
+	 public void setDeploymentUrl(String deploymentUrl) {
+		this.deploymentUrl = deploymentUrl;
+	 }
+	 
+	 
 
-  public String getContainerName() {
-    return containerName;
-  }
-
-  public void setContainerName(String containerName) {
-    this.containerName = containerName;
-  }
-
-  public String getImage() {
-    return image;
-  }
-
-  public void setImage(String image) {
-    this.image = image;
-  }
-
-  public String getNodeType() {
-    return nodeType;
-  }
-
-  public void setNodeType(String nodeType) {
-    this.nodeType = nodeType;
-  }
-
-  public String getImagePort() {
-    return imagePort;
-  }
-
-  public void setImagePort(String imagePort) {
-    this.imagePort = imagePort;
-  }
 }

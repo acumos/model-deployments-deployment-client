@@ -20,11 +20,16 @@
 
 package org.acumos.deploymentclient.bean;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class DockerInfoBean {
+public class DockerInfoBean implements Serializable{
+	
 
-  @JsonProperty("container_name")
+  private static final long serialVersionUID = -5273832296746022010L;
+
+@JsonProperty("container_name")
   private String container = null;
 
   @JsonProperty("ip_address")

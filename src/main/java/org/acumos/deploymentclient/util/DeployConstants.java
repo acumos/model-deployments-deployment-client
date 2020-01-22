@@ -123,6 +123,8 @@ public class DeployConstants {
 
   public static final String DEPLOYMENT_PROCESS = "DP";
   public static final String DEPLOYMENT_FAILED = "FA";
+  public static final String DEPLOYMENT_COMPLETE = "SU";
+  
   public static final String DATA_BROKER_CSV_FILE = "csv";
   public static final String ARTIFACT_TYPE_BLUEPRINT = "BP";
   public static final String HTTP_PROPERTY = "https.protocols";
@@ -199,6 +201,7 @@ public class DeployConstants {
   public static final String CMNDATASVC_CMNDATASVCUSER_PROP = "cmndatasvc.cmndatasvcuser";
   public static final String CMNDATASVC_CMNDATASVCPD_PROP = "cmndatasvc.cmndatasvcpwd";
   public static final String JENKINS_URL_PROP = "jenkins.url";
+  public static final String JENKINS_DETAIL_URL_PROP = "jenkins.detailUrl";
   public static final String JENKINS_USER_PROP = "jenkins.user";
   public static final String JENKINS_PASSWORD_PROP = "jenkins.password";
 
