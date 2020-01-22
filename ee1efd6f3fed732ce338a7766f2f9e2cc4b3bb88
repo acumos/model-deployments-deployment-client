@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6a52a87f_bdbcd5fc",
+        "filename": "src/main/java/org/acumos/deploymentclient/serviceimpl/DeploymentServiceImpl.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 290
+      },
+      "writtenOn": "2020-01-22T16:00:41Z",
+      "side": 1,
+      "message": "Why is every line changed here? This caused large merge conflict for me.",
+      "revId": "ee1efd6f3fed732ce338a7766f2f9e2cc4b3bb88",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
