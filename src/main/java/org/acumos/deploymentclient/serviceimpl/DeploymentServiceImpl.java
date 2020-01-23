@@ -970,7 +970,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 
 	public void updateTaskDetails(String datasource, String dataUserName, String dataPd, long taskIdNum, String status,
 			String reason, String ingress, MLPTask mlpTask, DeploymentBean dBean) throws Exception {
-		logger.debug("updateTaskDetails Start");
+		logger.debug("updateTaskDetails task Start");
 		DeploymentDetailBean deploymentDetailBean = null;
 		String target = null;
 		CommonDataServiceRestClientImpl cmnDataService = getClient(datasource, dataUserName, dataPd);
