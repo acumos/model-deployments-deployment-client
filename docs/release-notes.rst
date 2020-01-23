@@ -20,6 +20,12 @@
 Deployment Client Release Notes
 ===============================
 
+
+-------------------------------
+Version 1.0.5, 23 January 2020
+-------------------------------
+* deployment client api changes (`ACUMOS-3934 <https://jira.acumos.org/browse/ACUMOS-3934>`_)
+
 ------------------------------
 Version 1.0.4, 22 January 2020
 ------------------------------
