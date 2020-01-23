@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e6d4e576_aff3a06f",
+        "filename": "src/main/java/org/acumos/deploymentclient/serviceimpl/DeploymentServiceImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 1021,
+      "author": {
+        "id": 290
+      },
+      "writtenOn": "2020-01-23T05:46:24Z",
+      "side": 1,
+      "message": "I am noticing errors with CDS for this value...\n\ncreateTask took exception java.lang.IllegalArgumentException: Unexpected code DP for CodeNameType TASK_TYPE on data org.acumos.cds.domain.MLPTask",
+      "revId": "ed67b684914fdb99efc8406dedbce6e372ef2b81",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
