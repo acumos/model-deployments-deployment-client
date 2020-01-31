@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "857948cc_b7f0607f",
+        "filename": "src/main/java/org/acumos/deploymentclient/serviceimpl/DeploymentServiceImpl.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 930,
+      "author": {
+        "id": 24
+      },
+      "writtenOn": "2020-01-31T14:36:49Z",
+      "side": 1,
+      "message": "logger.debug(\"mlpTask.getTaskId():{} \", mlpTask.getTaskId());\n\nPlease change it to this way",
+      "range": {
+        "startLine": 930,
+        "startChar": 2,
+        "endLine": 930,
+        "endChar": 56
+      },
+      "revId": "e27976eb95c031478c452a099138bdd0433bfd88",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
