@@ -927,7 +927,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 				dBean.getDataPd());
 		mlpTask = cmnDataService.createTask(mlpTask);
 		// mlpTask.setTaskId(Long.getLong("3155"));
-		logger.debug("mlpTask.getTaskId() " + mlpTask.getTaskId());
+		logger.debug("mlpTask TaskId:{} ", mlpTask.getTaskId());
 		logger.debug("createTaskDetails end");
 		return mlpTask;
 	}
