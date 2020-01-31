@@ -20,6 +20,9 @@
 Deployment Client Release Notes
 ===============================
 
+Version 1.0.6, 31 January 2020
+---------------------------------
+* update acumos-azure-client, openstack-client,kubernetis-client and deployment-client for cds 3.1.1(`ACUMOS-3957 <https://jira.acumos.org/browse/ACUMOS-3957>`_)
 
 -------------------------------
 Version 1.0.5, 23 January 2020
