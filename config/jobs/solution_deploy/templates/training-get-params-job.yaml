@@ -1,0 +1,75 @@
+apiVersion: batch/v1beta1
+# ===============LICENSE_START=======================================================
+# Acumos Apache-2.0
+# ===================================================================================
+# Copyright (C) 2020 Nordix Foundation
+# ===================================================================================
+# This Acumos software file is distributed by Nordix Foundation
+# under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# This file is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ===============LICENSE_END=========================================================
+#
+# What this is: Kubernetes cronjob template for running the job every scheduled minute
+# and logging only if param have values.
+#
+# Usage: intended to be customized and created for the specific deployment by
+# deploy.sh
+#
+
+kind: CronJob
+metadata:
+  name: param-logs-<TRACKING_ID>
+  namespace: <NAMESPACE>
+  labels:
+    app: params
+    type: cron
+spec:
+  schedule: <TRAINING_SCHEDULE>
+  jobTemplate:
+    metadata:
+      labels:
+        app: params
+        type: cron
+        trackingid: <TRACKING_ID>
+    spec:
+      template:
+        spec:
+          containers:
+            - name: params-update-log
+              image: dwdraju/alpine-curl-jq
+              volumeMounts:
+                - name: model-param-log
+                  mountPath: /var/log/
+              args:
+                - /bin/sh
+                - -ec
+                - |
+                  set -o nounset
+                  set -o errexit
+                  response=`curl -X POST "http://<MODEL_NAME>:<MODEL_RUNNER_PORT><PARAM_URI>" -H  \
+                    "accept: application/json" -H  "Content-Type: application/json" \
+                    -d "{  \"number\": 1000}" -s  | jq --arg foo bar \
+                      '. + {"model" : {"solutionId": "<SOLUTION_ID>", "revisionId":"<REVISION_ID>", "userId":"<USER_ID>" }}' \
+                      -c`
+                  res=$?
+                  if test "$res" != 0; then
+                    echo "The curl command failed with response code - "$res""
+                  elif [[ `echo $response | grep "{\"value\":{},"` ]]; then
+                    echo "empty value"
+                  else
+                    echo $response >> /var/log/model-param-update.log 2>&1
+                    echo "$response"
+                  fi
+          restartPolicy: OnFailure
+          volumes:
+            - name: model-param-log
+              persistentVolumeClaim:
+                claimName: param-logs-<TRACKING_ID>

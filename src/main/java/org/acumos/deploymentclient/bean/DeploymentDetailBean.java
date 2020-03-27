@@ -29,7 +29,9 @@ public class DeploymentDetailBean implements Serializable{
 	
 	private String jenkinUrl;
 	 private String deploymentUrl;
-	 
+	 private String nodePortUrl;
+	 private Boolean continuousTrainingEnabled;
+
 	 public String getJenkinUrl() {
 			return jenkinUrl;
 	 }
@@ -42,7 +44,20 @@ public class DeploymentDetailBean implements Serializable{
 	 public void setDeploymentUrl(String deploymentUrl) {
 		this.deploymentUrl = deploymentUrl;
 	 }
-	 
-	 
 
+	public String getNodePortUrl() {
+		return nodePortUrl;
+	}
+
+	public void setNodePortUrl(String nodePortUrl) {
+		this.nodePortUrl = nodePortUrl;
+	}
+
+	public Boolean getContinuousTrainingEnabled() {
+		return continuousTrainingEnabled;
+	}
+
+	public void setContinuousTrainingEnabled(Boolean continuousTrainingEnabled) {
+		this.continuousTrainingEnabled = continuousTrainingEnabled;
+	}
 }

@@ -3,9 +3,8 @@ apiVersion: v1
 # Acumos Apache-2.0
 # ===================================================================================
 # Copyright (C) 2020 Nordix Foundation
-# Modifications Copyright (C) 2019 AT&T Intellectual Property. All rights reserved.
 # ===================================================================================
-# This Acumos software file is distributed by Nordix Foundation and AT&T
+# This Acumos software file is distributed by Nordix Foundation
 # under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -18,37 +17,21 @@ apiVersion: v1
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# What this is: Kubernetes configmap template for nginx as deployed with
-# Acumos models in kubernetes environments, for logging of model events.
+# What this is: This is used for recording updates to parameters
+# in a continuous training model.
 #
 # Usage: intended to be customized and created for the specific deployment by
 # deploy.sh
 #
 
-kind: ConfigMap
+kind: PersistentVolumeClaim
 metadata:
-  name: filebeat-<TRACKING_ID>
+  name: param-logs-<TRACKING_ID>
   namespace: <NAMESPACE>
-  labels:
-    app: filebeat-<TRACKING_ID>
-data:
-  filebeat.yml: |-
-    filebeat.prospectors:
-      - type: log
-        paths:
-          - /var/log/nginx/model-usage-*.log
-        tags: [ "acumos-model-usage-logs" ]
-        close_inactive: 20m
-        json.keys_under_root: true
-      - type: log
-        paths:
-          - /var/log/params/model-param-*.log
-        tags: [ "acumos-model-param-logs" ]
-        close_inactive: 20m
-        json.keys_under_root: true
-
-    # output.console:
-    #   pretty: true
-
-    output.logstash:
-      hosts: ["<LOGSTASH_HOST>:<LOGSTASH_PORT>"]
+spec:
+  storageClassName:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: <PARAM_DATA_PVC_SIZE>

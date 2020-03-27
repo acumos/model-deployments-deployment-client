@@ -21,6 +21,8 @@
 
 package org.acumos.deploymentclient.serviceimpl;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -33,6 +35,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
 import java.time.Period;
@@ -61,7 +64,10 @@ import org.acumos.deploymentclient.bean.DeploymentDetailBean;
 import org.acumos.deploymentclient.bean.DeploymentKubeBean;
 import org.acumos.deploymentclient.bean.DockerInfo;
 import org.acumos.deploymentclient.bean.DockerInfoBean;
+import org.acumos.deploymentclient.bean.MLModel;
 import org.acumos.deploymentclient.bean.MLNotification;
+import org.acumos.deploymentclient.bean.SourceModelInfo;
+import org.acumos.deploymentclient.bean.StatusBean;
 import org.acumos.deploymentclient.parsebean.DataBrokerBean;
 import org.acumos.deploymentclient.service.DeploymentService;
 import org.acumos.deploymentclient.util.DeployConstants;
@@ -143,31 +149,68 @@ public class DeploymentServiceImpl implements DeploymentService {
 		return toolKitTypeCode;
 	}
 
-	public String getSingleImageData(String solutionId, String revisionId, String datasource, String userName,
-			String dataPd) throws Exception {
+	public SourceModelInfo getSourceModelInfo(String solutionId, String revisionId, String datasource, String userName,
+			String dataPd, DeploymentBean dBean) throws Exception {
 		logger.debug("Start getSingleImageData");
-		String imageTag = "";
+		SourceModelInfo info = new SourceModelInfo();
 		CommonDataServiceRestClientImpl cmnDataService = getClient(datasource, userName, dataPd);
 		List<MLPArtifact> mlpSolutionRevisions = null;
 		mlpSolutionRevisions = cmnDataService.getSolutionRevisionArtifacts(solutionId, revisionId);
 		if (mlpSolutionRevisions != null) {
 			for (MLPArtifact artifact : mlpSolutionRevisions) {
+
 				String[] st = artifact.getUri().split("/");
 				String name = st[st.length - 1];
 				artifact.setName(name);
 				logger.debug("ArtifactTypeCode" + artifact.getArtifactTypeCode());
 				logger.debug("URI" + artifact.getUri());
+				// GET metadata for model to find the methods
+				if (artifact.getArtifactTypeCode() != null && artifact.getArtifactTypeCode().equalsIgnoreCase("MD")) {
+					addMLModelInfo(dBean, info, artifact);
+					checkIfUsingContinuousTraining(info, info.getModelMetadata());
+				}
 				if (artifact.getArtifactTypeCode() != null && artifact.getArtifactTypeCode().equalsIgnoreCase("DI")) {
-					imageTag = artifact.getUri();
+					info.setImageTag(artifact.getUri());
 				}
 			}
 		}
 
-		logger.debug("End getSingleImageData imageTag" + imageTag);
-		return imageTag;
+		logger.debug("End getSingleImageData imageTag", info.getImageTag());
+		logger.debug("End getSingleImageData isContinuousTrainingEnabled", info.isContinuousTrainingEnabled());
+
+		return info;
+
 	}
 
-	public byte[] singleSolutionDetails(DeploymentBean dBean, String imageTag, String singleModelPort) throws Exception {
+	private void addMLModelInfo(DeploymentBean dBean, SourceModelInfo info, MLPArtifact artifact)
+			throws Exception, IOException, JsonParseException, JsonMappingException {
+		String modelMetadataUri = artifact.getUri();
+		// get methods from this area is there a common type for MD (metadata)
+		ByteArrayOutputStream byteArrayOutputStream = getNexusUrlFile(dBean.getNexusUrl(),
+				dBean.getNexusUserName(), dBean.getNexusPd(), modelMetadataUri);
+		ObjectMapper objectMapper = new ObjectMapper();
+		MLModel modelData =
+				objectMapper.readValue(byteArrayOutputStream.toString(), MLModel.class);
+		info.setModelMetadata(modelData);
+	}
+
+	private void checkIfUsingContinuousTraining(SourceModelInfo info, MLModel modelData) {
+		Map<String, Object> methods = modelData.getMethods().getAdditionalProperties();
+		String[] requiredModelMethods = new String[]{"params", "updateParams"};
+		boolean isTrainingEnabled = false;
+		for (String method : requiredModelMethods) {
+			if(methods.containsKey(method)){
+				isTrainingEnabled = true;
+				continue;
+			}
+			isTrainingEnabled = false;
+		}
+		info.setContinuousTrainingEnabled(isTrainingEnabled);
+		
+	}
+
+	public byte[] singleSolutionDetails(DeploymentBean dBean, String singleModelPort) throws Exception {
+		String imageTag = dBean.getSourceModelInfo().getImageTag();
 		logger.debug("singleSolutionDetails start");
 		logger.debug("imageTag " + imageTag + " singleModelPort " + singleModelPort);
 		byte[] solutionZip = null;
@@ -968,13 +1011,15 @@ public class DeploymentServiceImpl implements DeploymentService {
 		return mlpTask;
 	}
 
-	public void updateTaskDetails(String datasource, String dataUserName, String dataPd, long taskIdNum, String status,
-			String reason, String ingress, MLPTask mlpTask, DeploymentBean dBean) throws Exception {
+	public void updateTaskDetails(String datasource, String dataUserName, String dataPd, long taskIdNum, StatusBean statusBean, MLPTask mlpTask, DeploymentBean dBean) throws Exception {
 		logger.debug("updateTaskDetails task Start");
 		DeploymentDetailBean deploymentDetailBean = null;
 		String target = null;
 		CommonDataServiceRestClientImpl cmnDataService = getClient(datasource, dataUserName, dataPd);
 		String deploymentStatusCode = "";
+		String status = statusBean.getStatus();
+		String reason = statusBean.getReason();
+		String ingress = statusBean.getIngress();
 		mlpTask.setStatusCode(status);
 		mlpTask.setModified(Instant.now());
 		cmnDataService.updateTask(mlpTask);
@@ -983,6 +1028,8 @@ public class DeploymentServiceImpl implements DeploymentService {
 		logger.debug("reason before : " + reason);
 		logger.debug("status before : " + status);
 		logger.debug("ingress before : " + ingress);
+		logger.debug("nodePortUrl before : " + statusBean.getNodePortUrl());
+		logger.debug("continuousTrainingEnabled before : " + statusBean.getContinuousTrainingEnabled());
 
 		if (status != null && status.equalsIgnoreCase(DeployConstants.DEPLOYMENT_FAILED)) {
 			reason = "Unknown failure in Jenkins deployment task";
@@ -991,8 +1038,10 @@ public class DeploymentServiceImpl implements DeploymentService {
 			deploymentStatusCode = DeployConstants.DEPLOYMENT_PROCESS;
 			deploymentDetailBean = new DeploymentDetailBean();
 			deploymentDetailBean.setJenkinUrl(dBean.getJenkinDetailUrl());
+			deploymentDetailBean.setContinuousTrainingEnabled(statusBean.getContinuousTrainingEnabled());
 			if (ingress != null && !"".equals(ingress)) {
 				deploymentDetailBean.setDeploymentUrl(ingress);
+				deploymentDetailBean.setNodePortUrl(statusBean.getNodePortUrl());
 			}
 			logger.debug("deploymentDetailBean.getJenkinUrl() : " + deploymentDetailBean.getJenkinUrl());
 			logger.debug("deploymentDetailBean.getDeploymentUrl() : " + deploymentDetailBean.getDeploymentUrl());
@@ -1361,7 +1410,8 @@ public class DeploymentServiceImpl implements DeploymentService {
 				+ "export SOLUTION_TYPE=" + solType + "\n" + "export SOLUTION_NAME=" + dBean.getSolutionName() + " \n"
 				// TODO: figure out how to determine the actual model runner version
 				+ "export SOLUTION_MODEL_RUNNER_STANDARD=v2\n" + "export LOGSTASH_HOST=" + dBean.getLogstashHost() + "\n"
-				+ "export LOGSTASH_IP=" + dBean.getLogstashIP() + "\n" + "export LOGSTASH_PORT=" + dBean.getLogstashPort()
+				+ "export LOGSTASH_IP=" + dBean.getLogstashIP() + "\n" + "export LOGSTASH_PORT=" + dBean.getLogstashPort() + "\n"
+				+ "export CONTINUOUS_TRAINING_ENABLED=" + dBean.getSourceModelInfo().isContinuousTrainingEnabled()
 				+ "\n";
 		envBuffer.append(setEnvDeploy);
 		ParseDockerImageTag util = new ParseDockerImageTag();
@@ -1383,7 +1433,6 @@ public class DeploymentServiceImpl implements DeploymentService {
 		ByteArrayOutputStream bOutput = new ByteArrayOutputStream(12);
 		// CommonUtil util=new CommonUtil();
 		if (dBean != null) {
-
 			bOutput = new ByteArrayOutputStream(12);
 			String deployFile = dBean.getFolderPath() + DeployConstants.KUBE_DEPLOY_SH;
 			String deployScript = getFileDetails(deployFile);

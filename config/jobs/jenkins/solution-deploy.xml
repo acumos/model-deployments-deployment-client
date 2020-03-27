@@ -4,6 +4,7 @@
   Acumos Apache-2.0
   ===================================================================================
   Copyright (C) 2019 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+  Modifications Copyright (C) 2020 Nordix Foundation.
   ===================================================================================
   This Acumos software file is distributed by AT&T and Tech Mahindra
   under the Apache License, Version 2.0 (the "License");
@@ -72,8 +73,10 @@ case &quot;$K8S_CLUSTER&quot; in
     NAMESPACE=acumos
     FILEBEAT_DATA_PVC_STORAGE_CLASS_NAME=
     FILEBEAT_DATA_PVC_SIZE=1Gi
+    PARAM_DATA_PVC_SIZE=1Gi
     NGINX_PROXY_LOG_PVC_STORAGE_CLASS_NAME=
     NGINX_PROXY_LOG_PVC_SIZE=1Gi
+    TRAINING_SCHEDULE="\*/2 \* \* \* \*"
     ;;
   *)
     exit 1
@@ -85,8 +88,10 @@ export SOLUTION_DOMAIN=$SOLUTION_DOMAIN
 export NAMESPACE=$NAMESPACE
 export FILEBEAT_DATA_PVC_STORAGE_CLASS_NAME=$FILEBEAT_DATA_PVC_STORAGE_CLASS_NAME
 export FILEBEAT_DATA_PVC_SIZE=$FILEBEAT_DATA_PVC_SIZE
+export PARAM_DATA_PVC_SIZE=$PARAM_DATA_PVC_SIZE
 export NGINX_PROXY_LOG_PVC_STORAGE_CLASS_NAME=$NGINX_PROXY_LOG_PVC_STORAGE_CLASS_NAME
 export NGINX_PROXY_LOG_PVC_SIZE=$NGINX_PROXY_LOG_PVC_SIZE
+export TRAINING_SCHEDULE="\"$TRAINING_SCHEDULE\""
 EOF
 
 bash deploy.sh

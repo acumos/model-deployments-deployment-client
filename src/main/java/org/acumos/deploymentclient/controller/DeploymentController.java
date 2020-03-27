@@ -3,6 +3,7 @@
  * Acumos
  * ===================================================================================
  * Copyright (C) 2017 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+ * Modifications Copyright (C) 2020 Nordix Foundation.
  * ===================================================================================
  * This Acumos software file is distributed by AT&T and Tech Mahindra
  * under the Apache License, Version 2.0 (the "License");
@@ -26,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.acumos.cds.domain.MLPTask;
 import org.acumos.deploymentclient.bean.DeployBean;
 import org.acumos.deploymentclient.bean.DeploymentBean;
+import org.acumos.deploymentclient.bean.SourceModelInfo;
 import org.acumos.deploymentclient.bean.StatusBean;
 import org.acumos.deploymentclient.service.DeploymentService;
 import org.json.JSONObject;
@@ -161,15 +163,17 @@ public class DeploymentController {
         log.debug("Composite Solution Deployment End");
       } else {
         log.debug("Single Solution Details Start");
-        String imageTag =
-            deploymentService.getSingleImageData(
+        SourceModelInfo sourceModelInfo =
+            deploymentService.getSourceModelInfo(
                 dBean.getSolutionId(),
                 dBean.getRevisionId(),
                 dBean.getDatasource(),
                 dBean.getDataUserName(),
-                dBean.getDataPd());
+                dBean.getDataPd(), dBean);
+        dBean.setSourceModelInfo(sourceModelInfo);
+        String imageTag = sourceModelInfo.getImageTag();
         if(imageTag!=null && !"".equals(imageTag)) {
-        	solutionZip = deploymentService.singleSolutionDetails(dBean, imageTag, singleModelPort);
+        	solutionZip = deploymentService.singleSolutionDetails(dBean, singleModelPort);
             log.debug("Single Solution Details End");
         }else {
         	log.debug("imageTag : "+imageTag);
@@ -218,6 +222,8 @@ public class DeploymentController {
       log.debug("Status " + statusBean.getStatus());
       log.debug("Reason " + statusBean.getReason());
       log.debug("Ingress " + statusBean.getIngress());
+      log.debug("NodePortURL " + statusBean.getNodePortUrl());
+      log.debug("ContinuousTrainingEnabled " + statusBean.getContinuousTrainingEnabled());
       deploymentService.setDeploymentBeanProperties(dBean, env);
       mlpTask =
           deploymentService.getTaskDetails(
@@ -228,9 +234,7 @@ public class DeploymentController {
           dBean.getDataUserName(),
           dBean.getDataPd(),
           taskIdNum,
-          statusBean.getStatus(),
-          statusBean.getReason(),
-          statusBean.getIngress(),
+          statusBean,
           mlpTask,dBean);
 
       jsonOutput.put("status", "OK");
