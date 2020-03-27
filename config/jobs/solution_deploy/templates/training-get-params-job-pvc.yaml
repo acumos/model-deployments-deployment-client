@@ -1,11 +1,11 @@
+---
 apiVersion: v1
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
-# Copyright (C) 2019 Nordix Foundation
-# Modifications Copyright (C) 2019 AT&T Intellectual Property. All rights reserved.
+# Copyright (C) 2020 Nordix Foundation
 # ===================================================================================
-# This Acumos software file is distributed by Nordix Foundation and AT&T
+# This Acumos software file is distributed by Nordix Foundation
 # under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -18,25 +18,21 @@ apiVersion: v1
 # limitations under the License.
 # ===============LICENSE_END=========================================================
 #
-# What this is: Kubernetes service template for nginx as deployed with
-# Acumos models in kubernetes environments, for logging of model events.
+# What this is: This is used for recording updates to parameters
+# in a continuous training model.
 #
 # Usage: intended to be customized and created for the specific deployment by
 # deploy.sh
 #
 
-kind: Service
+kind: PersistentVolumeClaim
 metadata:
+  name: param-logs-<TRACKING_ID>
   namespace: <NAMESPACE>
-  name: nginx-<MODEL_NAME>-<TRACKING_ID>
-  labels:
-    trackingid: <TRACKING_ID>
-    app: nginx-sidecar-svc
 spec:
-  selector:
-    app: nginx-<MODEL_NAME>-<TRACKING_ID>
-  type: NodePort
-  ports:
-  - name: nginx-proxy-api
-    port: 8550
-    targetPort: 80
+  storageClassName:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: <PARAM_DATA_PVC_SIZE>

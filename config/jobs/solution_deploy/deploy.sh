@@ -232,6 +232,26 @@ function deploy_solution() {
   fi
 }
 
+function deploy_training_solution() {
+  trap 'fail' ERR
+  log "invoke kubectl to deploy the services and deployments in solution.yaml"
+
+  if [[ ${CONTINUOUS_TRAINING_ENABLED} == 'true' ]]; then
+    cp templates/training-get-params-job-pvc.yaml deploy/.
+    cp templates/training-get-params-job.yaml deploy/.
+
+    export MODEL_NAME=`kubectl get svc -l trackingid=$TRACKING_ID -n $NAMESPACE -o json | jq -r '.items[0].spec.selector.app'`
+    export PORT=`kubectl get svc -l trackingid=$TRACKING_ID -n $NAMESPACE -o json | jq -r '.items[0].spec.ports[0].port'`
+    export PARAM_URI="/model/methods/params"
+
+    replace_env deploy
+
+    kubectl create -f deploy/training-get-params-job-pvc.yaml
+    kubectl create -f deploy/training-get-params-job.yaml
+  fi
+
+}
+
 function deploy_logging() {
   trap 'fail' ERR
   cp templates/filebeat-*.yaml deploy/.
@@ -307,7 +327,10 @@ update_blueprint
 update_dockerinfo
 deploy_solution
 deploy_logging
+deploy_training_solution
+NODEPORT=`kubectl get svc -l trackingid=$TRACKING_ID,app=nginx-sidecar-svc -n $NAMESPACE -o json | jq -r '.items[0].spec.ports[0].nodePort'`
+nodeporturl="http://$SOLUTION_DOMAIN:$NODEPORT/"
 ingress="https://$SOLUTION_DOMAIN/$SOLUTION_NAME/$TRACKING_ID/"
 cat <<EOF >status.json
-{"status": "SU", "reason": "$SOLUTION_NAME deployment is complete. The solution can be accessed at the ingress URL $ingress", "ingress": "$ingress"}
+{"status": "SU", "reason": "$SOLUTION_NAME deployment is complete. The solution can be accessed at the ingress URL $ingress", "ingress": "$ingress","nodePortUrl":"$nodeporturl","continuousTrainingEnabled":"$CONTINUOUS_TRAINING_ENABLED"}
 EOF

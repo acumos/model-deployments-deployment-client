@@ -3,6 +3,7 @@
  * Acumos
  * ===================================================================================
  * Copyright (C) 2017 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+ * Modifications Copyright (C) 2020 Nordix Foundation.
  * ===================================================================================
  * This Acumos software file is distributed by AT&T and Tech Mahindra
  * under the Apache License, Version 2.0 (the "License");
@@ -23,6 +24,8 @@ package org.acumos.deploymentclient.service;
 import org.acumos.cds.domain.MLPTask;
 import org.acumos.deploymentclient.bean.DeployBean;
 import org.acumos.deploymentclient.bean.DeploymentBean;
+import org.acumos.deploymentclient.bean.SourceModelInfo;
+import org.acumos.deploymentclient.bean.StatusBean;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -34,11 +37,11 @@ public interface DeploymentService {
   public String getSolutionCode(
       String solutionId, String datasource, String userName, String dataPd);
 
-  public String getSingleImageData(
-      String solutionId, String revisionId, String datasource, String userName, String dataPd)
+  public SourceModelInfo getSourceModelInfo(
+      String solutionId, String revisionId, String datasource, String userName, String dataPd, DeploymentBean dBean)
       throws Exception;
 
-  public byte[] singleSolutionDetails(DeploymentBean dBean, String imageTag, String singleModelPort)
+  public byte[] singleSolutionDetails(DeploymentBean dBean, String singleModelPort)
       throws Exception;
 
   public byte[] compositeSolutionDetails(DeploymentBean dBean) throws Exception;
@@ -52,9 +55,7 @@ public interface DeploymentService {
       String userName,
       String dataPd,
       long taskIdNum,
-      String status,
-      String reason,
-      String ingress,
+      StatusBean statusBean,
       MLPTask mlpTask,DeploymentBean dBean)
       throws Exception;
 

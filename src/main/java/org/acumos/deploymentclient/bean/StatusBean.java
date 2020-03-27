@@ -3,6 +3,7 @@
  * Acumos
  * ===================================================================================
  * Copyright (C) 2017 AT&T Intellectual Property & Tech Mahindra. All rights reserved.
+ * Modifications Copyright (C) 2020 Nordix Foundation.
  * ===================================================================================
  * This Acumos software file is distributed by AT&T and Tech Mahindra
  * under the Apache License, Version 2.0 (the "License");
@@ -30,6 +31,8 @@ public class StatusBean implements Serializable {
   private String status;
   private String reason;
   private String ingress;
+  private String nodePortUrl;
+  private Boolean continuousTrainingEnabled;
 
   public String getStatus() {
     return status;
@@ -53,5 +56,21 @@ public class StatusBean implements Serializable {
 
   public void setIngress(String ingress) {
   	this.ingress = ingress;
+  }
+
+  public String getNodePortUrl() {
+    return nodePortUrl;
+  }
+
+  public void setNodePortUrl(String nodePortUrl) {
+    this.nodePortUrl = nodePortUrl;
+  }
+
+  public Boolean getContinuousTrainingEnabled() {
+    return continuousTrainingEnabled;
+  }
+
+  public void setContinuousTrainingEnabled(Boolean continuousTrainingEnabled) {
+    this.continuousTrainingEnabled = continuousTrainingEnabled;
   }
 }

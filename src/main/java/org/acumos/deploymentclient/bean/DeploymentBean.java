@@ -79,6 +79,8 @@ public class DeploymentBean implements Serializable {
 	private String dockerInfoJson;
 	private String solutionYml;
 
+	private SourceModelInfo sourceModelInfo;
+
 	/*
 	 * private String dockerProxyHost; private String dockerProxyPort;
 	 */
@@ -96,6 +98,14 @@ public class DeploymentBean implements Serializable {
 
 	public String getJenkinDetailUrl() {
 		return jenkinDetailUrl;
+	}
+
+	public SourceModelInfo getSourceModelInfo() {
+		return sourceModelInfo;
+	}
+
+	public void setSourceModelInfo(SourceModelInfo sourceModelInfo) {
+		this.sourceModelInfo = sourceModelInfo;
 	}
 
 	public void setJenkinDetailUrl(String jenkinDetailUrl) {

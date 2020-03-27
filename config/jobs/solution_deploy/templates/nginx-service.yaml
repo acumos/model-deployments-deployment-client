@@ -29,6 +29,9 @@ kind: Service
 metadata:
   namespace: <NAMESPACE>
   name: nginx-<MODEL_NAME>-<TRACKING_ID>
+  labels:
+    trackingid: <TRACKING_ID>
+    app: nginx-sidecar-svc
 spec:
   selector:
     app: nginx-<MODEL_NAME>-<TRACKING_ID>
