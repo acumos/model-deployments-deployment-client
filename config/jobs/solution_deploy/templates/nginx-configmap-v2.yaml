@@ -2,7 +2,7 @@ apiVersion: v1
 # ===============LICENSE_START=======================================================
 # Acumos Apache-2.0
 # ===================================================================================
-# Copyright (C) 2019 Nordix Foundation
+# Copyright (C) 2020 Nordix Foundation
 # Modifications Copyright (C) 2019 AT&T Intellectual Property. All rights reserved.
 # ===================================================================================
 # This Acumos software file is distributed by Nordix Foundation and AT&T
@@ -62,6 +62,13 @@ data:
       add_header 'Content-Length' 0;
       return 204;
     }
+    if ($request_uri ~* "([^/]*$)" ) {
+      set $last_path_component $1;
+    }
+    if ($server_protocol ~* "([^/]*$)" ) {
+      set  $http_version  $1;
+    }
+
   nginx.conf: |
     user www-data;
     pid /run/nginx.pid;
@@ -93,6 +100,22 @@ data:
                         ' "request": { "scheme": "$scheme", "length": $request_length }, '
                         ' "response": { "status": "$status", "bytesSent": $body_bytes_sent, "time": $request_time } '
                         '}';
+
+    # logging custom format for model methods
+    log_format  ecs-acumos escape=json '{ "version": "$http_version", "action": "modelrunner:$last_path_component", '
+                      ' "agent" : { '
+                        ' "type": "filebeat", '
+                        ' "version": "7.0.0-beta1" '
+                      '}, '
+                      ' "ecs": { "version": "1.0.0" }, '
+                      ' "event": { "category": "web", "code": "$request_id", "created": "$time_local" }, '
+                      ' "model": { "solutionId": "<SOLUTION_ID>", "revisionId": "<REVISION_ID>", "name": "<MODEL_NAME>", "operationName": "$request_uri", "deployUserName": "<USER_ID>" }, '
+                      ' "http": { '
+                      ' "request": { "bytes": "$request_length", "method": "$request_method", "referrer": "$http_referer" }, '
+                      ' "response": { "bytes": "$body_bytes_sent", "status_code": "$status" } }, '
+                      ' "user_agent": { "original": "$http_user_agent" } '
+                      '}';
+
       # standard logging
       log_format  common_log  '$remote_addr - $remote_user [$time_local] '
                   '"$request" $status $body_bytes_sent '
@@ -112,7 +135,7 @@ data:
 
           # Access log is used by filebeat for model usage tracking
           if ($request_method != 'OPTIONS') {
-            access_log /var/log/nginx/model-usage-<SOLUTION_ID>.log acumos;
+            access_log /var/log/nginx/model-usage-<SOLUTION_ID>.log ecs-acumos;
           }
           error_log /var/log/nginx/error-<SOLUTION_ID>.log warn;
           proxy_pass http://<MODEL_NAME>-<TRACKING_ID>:8556/$request_uri;
