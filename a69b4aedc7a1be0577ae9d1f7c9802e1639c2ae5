@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0606d57a_f9afae16",
+        "filename": "config/jobs/solution_deploy/templates/nginx-configmap-v2.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 278
+      },
+      "writtenOn": "2020-04-07T14:11:27Z",
+      "side": 1,
+      "message": "update the copyright to 2020 + company",
+      "range": {
+        "startLine": 5,
+        "startChar": 2,
+        "endLine": 6,
+        "endChar": 83
+      },
+      "revId": "a69b4aedc7a1be0577ae9d1f7c9802e1639c2ae5",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
