@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "caf72bfa_eebe2076",
+        "filename": "INFO.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 383
+      },
+      "writtenOn": "2020-04-13T18:00:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2a50ad54_42f8442b",
+      "range": {
+        "startLine": 7,
+        "startChar": 19,
+        "endLine": 7,
+        "endChar": 21
+      },
+      "revId": "1b10e08fb6eb0ace367cc7b5bbf0d79427f1e35f",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "780c6ebe_46ff864d",
         "filename": "INFO.yaml",
         "patchSetId": 1
@@ -45,6 +69,30 @@
       "revId": "1b10e08fb6eb0ace367cc7b5bbf0d79427f1e35f",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e9109631_af3cea43",
+        "filename": "INFO.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 383
+      },
+      "writtenOn": "2020-04-13T18:00:45Z",
+      "side": 1,
+      "message": "Mulali told to keep both of them in Lead roles and they also agree with this.",
+      "parentUuid": "780c6ebe_46ff864d",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 10
+      },
+      "revId": "1b10e08fb6eb0ace367cc7b5bbf0d79427f1e35f",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     },
     {
       "key": {
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "66fa6b27_12c9d627",
+        "filename": "INFO.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 383
+      },
+      "writtenOn": "2020-04-13T18:00:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2338be04_14a2d36a",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 4
+      },
+      "revId": "1b10e08fb6eb0ace367cc7b5bbf0d79427f1e35f",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6f21b1ac_9d3fe0c5",
         "filename": "INFO.yaml",
         "patchSetId": 1
@@ -91,6 +163,30 @@
       "revId": "1b10e08fb6eb0ace367cc7b5bbf0d79427f1e35f",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a7e48f3a_ce2fb9b6",
+        "filename": "INFO.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 383
+      },
+      "writtenOn": "2020-04-13T18:00:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6f21b1ac_9d3fe0c5",
+      "range": {
+        "startLine": 50,
+        "startChar": 5,
+        "endLine": 50,
+        "endChar": 27
+      },
+      "revId": "1b10e08fb6eb0ace367cc7b5bbf0d79427f1e35f",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
