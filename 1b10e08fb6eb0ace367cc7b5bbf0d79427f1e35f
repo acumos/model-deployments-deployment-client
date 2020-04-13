@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2a50ad54_42f8442b",
+        "filename": "INFO.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2020-04-13T12:00:04Z",
+      "side": 1,
+      "message": "two spaces?",
+      "range": {
+        "startLine": 7,
+        "startChar": 19,
+        "endLine": 7,
+        "endChar": 21
+      },
+      "revId": "1b10e08fb6eb0ace367cc7b5bbf0d79427f1e35f",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "780c6ebe_46ff864d",
+        "filename": "INFO.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2020-04-13T12:00:04Z",
+      "side": 1,
+      "message": "Guy and manoop are leads but not committers, that\u0027s weird.",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 10
+      },
+      "revId": "1b10e08fb6eb0ace367cc7b5bbf0d79427f1e35f",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2338be04_14a2d36a",
+        "filename": "INFO.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2020-04-13T12:00:04Z",
+      "side": 1,
+      "message": "Remove, Parichay left the project long ago.",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 4
+      },
+      "revId": "1b10e08fb6eb0ace367cc7b5bbf0d79427f1e35f",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6f21b1ac_9d3fe0c5",
+        "filename": "INFO.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2020-04-13T12:00:04Z",
+      "side": 1,
+      "message": "This doesn\u0027t look right.  If you want a location-based zone, and I don\u0027t know where you are located, you should pick something like \"Asia/Kolkata\".  If you just want \"IST\" then show that.\n\nhttps://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
+      "range": {
+        "startLine": 50,
+        "startChar": 5,
+        "endLine": 50,
+        "endChar": 27
+      },
+      "revId": "1b10e08fb6eb0ace367cc7b5bbf0d79427f1e35f",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
