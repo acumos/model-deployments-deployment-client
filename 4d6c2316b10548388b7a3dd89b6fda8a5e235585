@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bb60d4d7_0e406f61",
+        "filename": "INFO.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2020-05-04T10:54:37Z",
+      "side": 1,
+      "message": "Do not repeat the data.  Use a Yaml anchor/reference to pull in the lines:\n\n    \u003c\u003c: *acumos_deployment_ptl",
+      "range": {
+        "startLine": 46,
+        "startChar": 3,
+        "endLine": 54,
+        "endChar": 20
+      },
+      "revId": "4d6c2316b10548388b7a3dd89b6fda8a5e235585",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "15ac4c5a_ac171acb",
+        "filename": "config/jobs/solution_deploy/templates/nginx-configmap-v2.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2020-05-04T10:54:37Z",
+      "side": 1,
+      "message": "Please remove this unrelated non-functional copyright date change. Limit this changeset to the people in INFO.yaml",
+      "revId": "4d6c2316b10548388b7a3dd89b6fda8a5e235585",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
