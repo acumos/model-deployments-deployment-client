@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8ee6a82c_7504edeb",
+        "filename": "INFO.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2020-05-06T13:19:37Z",
+      "side": 1,
+      "message": "I\u0027ve never before seen a joint PTL listing.  I think this is supposed to be a single entry. Or maybe you all are pioneering a new approach in Acumos??",
+      "range": {
+        "startLine": 12,
+        "startChar": 1,
+        "endLine": 16,
+        "endChar": 32
+      },
+      "revId": "b99ed68de38009be60f6109f94b2d5c31acf15a9",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f285f498_7b3bcaba",
+        "filename": "INFO.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2020-05-06T13:19:37Z",
+      "side": 1,
+      "message": "see above",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 2
+      },
+      "revId": "b99ed68de38009be60f6109f94b2d5c31acf15a9",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
