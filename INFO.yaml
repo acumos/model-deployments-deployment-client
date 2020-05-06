@@ -4,11 +4,16 @@ project_creation_date: '2019-09-20'
 project_category: ''
 lifecycle_state: 'Incubation'
 project_lead: &acumos_deployment_ptl
-    name: 'Bryan Sullivan'
-    email: 'bryan.sullivan@att.com'
-    id: 'blsaws'
+  - name: 'MANOOP TALASILA'
+    email: 'talasila@research.att.com'
+    id: 'talasila'
     company: 'ATT'
-    timezone: 'America/Los_Angeles'
+    timezone: 'America/New_York'
+  - name: 'Guy Jacobson'
+    email: 'gj2418@att.com'
+    id: 'guyjacobson'
+    company: 'ATT'
+    timezone: 'America/New_York'
 primary_contact: *acumos_deployment_ptl
 issue_tracking:
     type: 'jira'
@@ -33,15 +38,11 @@ meetings:
 repositories:
     - 'kubernetes-client'
 committers:
-    - name: 'Bryan Sullivan'
-      email: 'bryan.sullivan@att.com'
-      company: 'ATT'
-      id: 'blsaws'
-      timezone: 'America/Los_Angeles'
-    - name: 'Parichay Gupta'
-      email: 'pg0057291@techmahindra.com'
-      company: 'TechMahindra'
-      id: 'parichay12'
-      timezone: 'America/New_York'
+  - name: 'Shiv Shakti'
+    email: 'shiv.shakti@est.tech'
+    company: 'Ericsson Software Technology'
+    id: 'shiv070'
+    timezone: 'Asia/Kolkata'
+  <<: *acumos_deployment_ptl
 tsc:
     approval: 'https://lists.acumos.org/g/tscgeneral'
