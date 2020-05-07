@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1bcf5a99_bb4f0d8b",
+        "filename": "INFO.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2020-05-07T10:31:55Z",
+      "side": 1,
+      "message": "Remove this YAML list marker, you only have a single entry now",
+      "range": {
+        "startLine": 7,
+        "startChar": 2,
+        "endLine": 7,
+        "endChar": 3
+      },
+      "revId": "acc10a0db25bd388b57724b1f8b1d87a6971b00c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7c434a84_1b42ae93",
+        "filename": "INFO.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2020-05-07T10:31:55Z",
+      "side": 1,
+      "message": "add the YAML list marker here",
+      "range": {
+        "startLine": 46,
+        "startChar": 2,
+        "endLine": 46,
+        "endChar": 4
+      },
+      "revId": "acc10a0db25bd388b57724b1f8b1d87a6971b00c",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
