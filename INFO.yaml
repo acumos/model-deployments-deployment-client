@@ -31,7 +31,7 @@ meetings:
     repeats: 'weekly'
     time: '11:00 ET'
 repositories:
-  - 'kubernetes-client'
+  - 'model-deployments/deployment-client'
 committers:
   - name: 'Shiv Shakti'
     email: 'shiv.shakti@est.tech'
