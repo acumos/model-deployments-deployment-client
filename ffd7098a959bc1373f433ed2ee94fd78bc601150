@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "14ffd497_9065c70f",
+        "filename": "INFO.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2020-05-08T22:00:13Z",
+      "side": 1,
+      "message": "Please remove all the blank lines, just make sure you hit RETURN at the end of the \"approval\" line.",
+      "range": {
+        "startLine": 51,
+        "startChar": 0,
+        "endLine": 51,
+        "endChar": 1
+      },
+      "revId": "ffd7098a959bc1373f433ed2ee94fd78bc601150",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
