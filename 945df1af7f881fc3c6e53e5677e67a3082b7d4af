@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "59e17fc2_726ba2ab",
+        "filename": "INFO.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2020-05-11T17:49:09Z",
+      "side": 1,
+      "message": "I missed this, the verify job caught it, wrong repo name, please correct to be\n\n    model-deployments/deployment-client",
+      "range": {
+        "startLine": 34,
+        "startChar": 5,
+        "endLine": 34,
+        "endChar": 22
+      },
+      "revId": "945df1af7f881fc3c6e53e5677e67a3082b7d4af",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
