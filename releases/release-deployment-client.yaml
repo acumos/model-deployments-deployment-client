@@ -1,10 +1,10 @@
 ---
 distribution_type: container
-container_release_tag: 1.0.5
+container_release_tag: 1.0.8
 container_pull_registry: nexus3.acumos.org:10004
 container_push_registry: nexus3.acumos.org:10002
 project: model-deployments/deployment-client
-ref: ec3e2da4e11eb7eda0e964e1f3821517c589abcc
+ref: 262acead7d5c8dd3ba3af4e150ef98cfc7de2c9a
 containers:
     - name: deployment-client
-      version: 1.0.5
+      version: 1.0.8
