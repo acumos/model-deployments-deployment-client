@@ -47,7 +47,7 @@ spec:
               image: dwdraju/alpine-curl-jq
               volumeMounts:
                 - name: model-param-log
-                  mountPath: /var/log/
+                  mountPath: /var/log/params
               args:
                 - /bin/sh
                 - -ec
@@ -56,18 +56,18 @@ spec:
                   set -o errexit
                   # This peice of code will only handle single model runner case not composite model case.
                   # If there are multiple model runners in composite case then we will need to loop over those.
-                  response=`curl -X POST "http://<MODEL_NAME>:<MODEL_RUNNER_PORT><PARAM_URI>" -H  \
-                    "accept: application/json" -H  "Content-Type: application/json" \
-                    -d "{  \"number\": 1000}" -s  | jq --arg foo bar \
-                      '. + {"model" : {"solutionId": "<SOLUTION_ID>", "revisionId":"<REVISION_ID>", "userId":"<USER_ID>" }}' \
-                      -c`
+                  response=`curl -X POST "http://<MODEL_NAME>:<PORT><PARAM_URI>" -H  \
+                            "accept: application/json" -H "Content-Type: application/json" \
+                            -d "{ \"number\": 0}" -s | jq --arg SOLUTION_ID "<SOLUTION_ID>" --arg REVISION_ID \
+                            "<REVISION_ID>" --arg USER_ID "<USER_ID>" '.+{"model" : {"solutionId": $SOLUTION_ID, \
+                            "revisionId": $REVISION_ID, "userId": $USER_ID }}' -c`
                   res=$?
                   if test "$res" != 0; then
                     echo "The curl command failed with response code - "$res""
                   elif [[ `echo $response | grep "{\"value\":{},"` ]]; then
                     echo "empty value"
                   else
-                    echo $response >> /var/log/model-param-update.log 2>&1
+                    echo $response >> /var/log/params/model-param-update.log 2>&1
                     echo "$response"
                   fi
           restartPolicy: OnFailure
