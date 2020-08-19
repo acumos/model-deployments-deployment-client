@@ -20,20 +20,20 @@
 Deployment Client Release Notes
 ===============================
 
---------------------------------
+---------------------------------
 Version 1.0.9, 04 August 2020
 ---------------------------------
-* update deployment-client for cds 3.1.1 (`ACUMOS-3922 <https://jira.acumos.org/browse/ACUMOS-3922>`)
+* update sidecar component of deployment-client for cds 3.1.1 (`ACUMOS-3922 <https://jira.acumos.org/browse/ACUMOS-3922>`_) and (`ACUMOS-3083 <https://jira.acumos.org/browse/ACUMOS-3083>`_)
 
---------------------------------
+---------------------------------
 Version 1.0.8, 04 May 2020
 ---------------------------------
 * update sidecar component of deployment-client for cds 3.1.1 (`ACUMOS-3923 <https://jira.acumos.org/browse/ACUMOS-3923>`_) and (`ACUMOS-3083 <https://jira.acumos.org/browse/ACUMOS-3083>`_)
 
---------------------------------
+---------------------------------
 Version 1.0.7, 04 May 2020
 ---------------------------------
-* update deployment-client for cds 3.1.1 (`ACUMOS-3922 <https://jira.acumos.org/browse/ACUMOS-3922>`)
+* update deployment-client for cds 3.1.1 (`ACUMOS-3922 <https://jira.acumos.org/browse/ACUMOS-3922>`_)
 
 ---------------------------------
 Version 1.0.6, 31 January 2020
