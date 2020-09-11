@@ -1,0 +1,8 @@
+Verified+1: Acumos Jobbuilder <acumos-jobbuilder@jenkins.acumos.org>
+Code-Review+2: Eric Ball <eball@linuxfoundation.org>
+Code-Review+1: Guy Jacobson <gj2418@att.com>
+Submitted-by: Eric Ball <eball@linuxfoundation.org>
+Submitted-at: Fri, 11 Sep 2020 17:38:58 +0000
+Reviewed-on: https://gerrit.acumos.org/r/c/model-deployments/deployment-client/+/8265
+Project: model-deployments/deployment-client
+Branch: refs/heads/master
